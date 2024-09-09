@@ -1,10 +1,12 @@
 package com.example.Backend.configuration;
 
+import com.example.Backend.entity.Cart.Cart;
 import com.example.Backend.entity.User.CustomerType;
 import com.example.Backend.entity.User.Role;
 import com.example.Backend.enums.CustomerTypeEnum;
 import com.example.Backend.enums.RoleEnum;
 import com.example.Backend.entity.User.User;
+import com.example.Backend.repository.Cart.CartRepository;
 import com.example.Backend.repository.User.CustomerTypeRepository;
 import com.example.Backend.repository.User.RoleRepository;
 import com.example.Backend.repository.User.UserRepository;
@@ -30,24 +32,24 @@ public class ApplicationInitConfig {
 
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository,
-                                        CustomerTypeRepository customerTypeRepository) {
+                                        CustomerTypeRepository customerTypeRepository, CartRepository cartRepository) {
         return args -> {
             if (roleRepository.findAll().isEmpty()) {
                 log.info("Add Role");
                 for (RoleEnum roleEnum : RoleEnum.values()) {
-                        roleRepository.save(Role.builder()
-                                .name(roleEnum.getName())
-                                .description(roleEnum.getDescription())
-                                .build());
+                    roleRepository.save(Role.builder()
+                            .name(roleEnum.getName())
+                            .description(roleEnum.getDescription())
+                            .build());
                 }
             }
 
-            if (customerTypeRepository.findAll().isEmpty()){
+            if (customerTypeRepository.findAll().isEmpty()) {
                 log.info("Add CustomerType");
                 for (CustomerTypeEnum customerTypeEnum : CustomerTypeEnum.values()) {
-                        customerTypeRepository.save(CustomerType.builder()
-                                .name(customerTypeEnum.getName())
-                                .build());
+                    customerTypeRepository.save(CustomerType.builder()
+                            .name(customerTypeEnum.getName())
+                            .build());
                 }
             }
 
@@ -62,6 +64,10 @@ public class ApplicationInitConfig {
                         .build();
 
                 userRepository.save(user);
+
+                cartRepository.save(Cart.builder()
+                        .user(user)
+                        .build());
                 log.warn("Manager user has been created with default password: manager, please change it.");
             }
         };

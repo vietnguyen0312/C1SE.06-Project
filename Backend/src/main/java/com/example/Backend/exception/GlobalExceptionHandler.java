@@ -77,9 +77,9 @@ public class GlobalExceptionHandler {
         ApiResponse apiResponse = new ApiResponse();
 
         apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(Objects.nonNull(attributes) ?
+        apiResponse.setMessage(exception.getFieldError().getField()+": "+(Objects.nonNull(attributes) ?
                 mapAttribute(errorCode.getMessage(), attributes)
-                : errorCode.getMessage());
+                : errorCode.getMessage()));
 
         return ResponseEntity.badRequest().body(apiResponse);
     }

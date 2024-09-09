@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,12 +28,15 @@ public class ServiceService {
     ServiceTypeRepository serviceTypeRepository;
     ServiceMapper serviceMapper;
 
-    public ServiceEntity createService(ServiceRequest request) {
-        if (serviceRepository.existsByName(request.getName())) {
+    @PreAuthorize("hasRole('MANAGER')")
+    public ServiceResponse createService(ServiceRequest request) {
+        try {
+            ServiceEntity serviceEntity = serviceMapper.toRequest(request);
+            serviceEntity.setServiceType(serviceTypeRepository.findById(request.getServiceTypeId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+            return serviceMapper.toResponse(serviceRepository.save(serviceEntity));
+        } catch (Exception e) {
             throw new AppException(ErrorCode.EXISTED);
         }
-        ServiceEntity serviceEntity = serviceMapper.toEntity(request);
-        return serviceRepository.save(serviceEntity);
     }
 
     public List<ServiceResponse> getAllServices() {
@@ -42,32 +46,28 @@ public class ServiceService {
     }
 
     public ServiceResponse getServiceById(String id) {
-        ServiceEntity serviceEntity = serviceRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-        return serviceMapper.toResponse(serviceEntity);
+        return serviceMapper.toResponse(serviceRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public ServiceResponse updateService(String id, ServiceRequest request) {
-        ServiceEntity serviceEntity = serviceRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        ServiceEntity service = serviceRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-        ServiceType serviceType = serviceTypeRepository.findById(request.getServiceTypeId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        serviceMapper.updateService(service, request);
+        service.setServiceType(serviceTypeRepository.findById(request.getServiceTypeId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
 
-        serviceEntity.setName(request.getName());
-        serviceEntity.setDescription(request.getDescription());
-        serviceEntity.setImage(request.getImage());
-        serviceEntity.setServiceType(serviceType);
-
-        ServiceEntity updatedServiceEntity = serviceRepository.save(serviceEntity);
-        return serviceMapper.toResponse(updatedServiceEntity);
+        return serviceMapper.toResponse(serviceRepository.save(service));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public void deleteService(String id) {
         serviceRepository.deleteById(id);
     }
 
-    public List<ServiceResponse> getServiceByServiceType(ServiceType serviceType) {
-        return serviceRepository.findAllByServiceType(serviceType).stream().map(serviceMapper::toResponse).toList();
+    public List<ServiceResponse> getServiceByServiceType(String idServiceType) {
+        return serviceRepository.findAllByServiceType(serviceTypeRepository.findById(idServiceType)
+                .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED)))
+                .stream().map(serviceMapper::toResponse).toList();
     }
 }

@@ -29,8 +29,10 @@ import javax.crypto.spec.SecretKeySpec;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] PUBLIC_ENDPOINTS = {"/auth/introspect", "/auth/token"
+    private final String[] AUTHENTICATED_ENDPOINTS = {"/auth/introspect", "/auth/token"
             , "/auth/logout", "/auth/refresh", "/users"};
+
+    private final String[] PUBLIC_ENDPOINTS = {"/serviceType", "/serviceType/*", "/service", "/service/*"};
 
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;
@@ -41,7 +43,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                request.requestMatchers(HttpMethod.POST, AUTHENTICATED_ENDPOINTS).permitAll()
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 ->
@@ -57,7 +60,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsFilter corsFilter(){
+    public CorsFilter corsFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
         corsConfiguration.addAllowedOrigin("http://localhost:3000");

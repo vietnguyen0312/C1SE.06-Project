@@ -40,5 +40,4 @@ public class UserCreationRequest {
     String gender;
 
     String nation;
-
 }

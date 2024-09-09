@@ -15,7 +15,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ServiceTypeRequest {
-
     @NotBlank(message = "NOT_BLANK")
     @Size(max = 255, message = "NAME_SIZE")
     String name;

@@ -1,10 +1,14 @@
 package com.example.Backend.controller;
 
+import com.example.Backend.dto.request.Cart.CartRequest;
 import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
+import com.example.Backend.dto.response.Cart.CartResponse;
 import com.example.Backend.dto.response.User.UserResponse;
+import com.example.Backend.entity.User.User;
 import com.example.Backend.service.Bill.BillTicketService;
+import com.example.Backend.service.Cart.CartService;
 import com.example.Backend.service.User.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -23,13 +27,16 @@ import java.util.List;
 @Slf4j
 public class UserController {
     UserService userService;
-    BillTicketService billTicketService;
+    CartService cartService;
 
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
-        return ApiResponse
-                .<UserResponse>builder()
-                .result(userService.createUser(request))
+        UserResponse response = userService.createUser(request);
+        cartService.createCart(CartRequest.builder()
+                .userCreationRequest(request)
+                .build());
+        return ApiResponse.<UserResponse>builder()
+                .result(response)
                 .build();
     }
 

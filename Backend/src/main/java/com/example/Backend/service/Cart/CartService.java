@@ -1,10 +1,13 @@
 package com.example.Backend.service.Cart;
 
 import com.example.Backend.dto.request.Cart.CartRequest;
-import com.example.Backend.dto.response.Cart.CartResponse;
 import com.example.Backend.entity.Cart.Cart;
-import com.example.Backend.mapper.Cart.CartMapper;
+import com.example.Backend.entity.User.User;
+import com.example.Backend.enums.ErrorCode;
+import com.example.Backend.exception.AppException;
+import com.example.Backend.mapper.User.UserMapper;
 import com.example.Backend.repository.Cart.CartRepository;
+import com.example.Backend.repository.User.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,11 +20,13 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class CartService {
     CartRepository cartRepository;
-    CartMapper cartMapper;
+    UserRepository userRepository;
 
-    public CartResponse createCart(CartRequest request) {
-        Cart cart = cartMapper.toCart(request);
+    public void createCart(CartRequest request) {
 
-        return cartMapper.toCartResponse(cartRepository.save(cart));
+        cartRepository.save(Cart.builder()
+                .user(userRepository.findByUsername(request.getUserCreationRequest().getUsername())
+                        .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED)))
+                .build());
     }
 }

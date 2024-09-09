@@ -16,6 +16,6 @@ public class ServiceType {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 255, nullable = false, unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String name;
 }

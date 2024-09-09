@@ -26,6 +26,6 @@ public class ServiceEntity {
     @Column(length = 255)
     String image;
 
-    @Column(length = 255, nullable = false)
+    @Column(length = 255, nullable = false, unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String name;
 }

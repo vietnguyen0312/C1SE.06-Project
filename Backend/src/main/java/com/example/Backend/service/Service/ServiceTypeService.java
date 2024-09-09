@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,17 +25,20 @@ public class ServiceTypeService {
     ServiceTypeRepository serviceTypeRepository;
     ServiceTypeMapper serviceTypeMapper;
 
-    public ServiceType createServiceType(ServiceTypeRequest request) {
-        if (serviceTypeRepository.existsByName(request.getName())) {
+    @PreAuthorize("hasRole('MANAGER')")
+    public ServiceTypeResponse createServiceType(ServiceTypeRequest request) {
+        try {
+            ServiceType serviceType = serviceTypeMapper.toEntity(request);
+            return serviceTypeMapper.toResponse(serviceTypeRepository.save(serviceType));
+        } catch (Exception exception) {
             throw new AppException(ErrorCode.EXISTED);
         }
-        ServiceType serviceType = serviceTypeMapper.toEntity(request);
-        return serviceTypeRepository.save(serviceType);
     }
+
     public List<ServiceTypeResponse> getAllServiceTypes() {
         return serviceTypeRepository.findAll().stream()
                 .map(serviceTypeMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public ServiceTypeResponse getServiceTypeById(String id) {
@@ -42,14 +46,8 @@ public class ServiceTypeService {
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         return serviceTypeMapper.toResponse(serviceType);
     }
-    public ServiceTypeResponse updateServiceType(String id, ServiceTypeRequest request) {
-        ServiceType serviceType = serviceTypeRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-        serviceType.setName(request.getName());
-        ServiceType updatedServiceType = serviceTypeRepository.save(serviceType);
-        return serviceTypeMapper.toResponse(updatedServiceType);
-    }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public void deleteServiceType(String id) {
         serviceTypeRepository.deleteById(id);
     }

@@ -4,10 +4,13 @@ import com.example.Backend.dto.request.Service.ServiceRequest;
 import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.entity.Service.ServiceEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ServiceMapper {
-    ServiceEntity toEntity(ServiceRequest request);
+    ServiceEntity toRequest(ServiceRequest request);
+
+    void updateService(@MappingTarget ServiceEntity service, ServiceRequest request);
 
     ServiceResponse toResponse(ServiceEntity serviceEntity);
 }

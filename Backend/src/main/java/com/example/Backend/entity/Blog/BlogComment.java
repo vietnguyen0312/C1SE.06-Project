@@ -6,7 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "blog_content")
+@Table(name = "blog_comment")
 @Data
 @Builder
 @NoArgsConstructor

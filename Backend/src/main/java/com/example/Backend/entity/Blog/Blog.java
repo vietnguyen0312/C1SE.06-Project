@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.Date;
 
 @Entity
-@Table(name = "blog_content")
+@Table(name = "blog")
 @Data
 @Builder
 @NoArgsConstructor
