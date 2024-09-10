@@ -32,10 +32,7 @@ public class SecurityConfig {
     private final String[] AUTHENTICATED_ENDPOINTS = {"/auth/introspect", "/auth/token"
             , "/auth/logout", "/auth/refresh", "/users"};
 
-    private final String[] PUBLIC_ENDPOINTS = {"/serviceType", "/serviceType/*", "/service", "/service/*"};
-
-    @Value("${jwt.signerKey}")
-    private String SIGNER_KEY;
+    private final String[] PUBLIC_ENDPOINTS = {"/serviceType", "/serviceType/**", "/service", "/service/**"};
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;

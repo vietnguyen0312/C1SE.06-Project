@@ -20,7 +20,7 @@ public class ServiceEntity {
     @JoinColumn(name = "serviceType_id")
     ServiceType serviceType;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     String description;
 
     @Column(length = 255)

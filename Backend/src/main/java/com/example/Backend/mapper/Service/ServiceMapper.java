@@ -8,7 +8,7 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ServiceMapper {
-    ServiceEntity toRequest(ServiceRequest request);
+    ServiceEntity toService(ServiceRequest request);
 
     void updateService(@MappingTarget ServiceEntity service, ServiceRequest request);
 

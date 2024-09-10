@@ -31,8 +31,9 @@ public class ServiceService {
     @PreAuthorize("hasRole('MANAGER')")
     public ServiceResponse createService(ServiceRequest request) {
         try {
-            ServiceEntity serviceEntity = serviceMapper.toRequest(request);
-            serviceEntity.setServiceType(serviceTypeRepository.findById(request.getServiceTypeId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+            ServiceEntity serviceEntity = serviceMapper.toService(request);
+            serviceEntity.setServiceType(serviceTypeRepository.findById(request.getServiceTypeId())
+                    .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
             return serviceMapper.toResponse(serviceRepository.save(serviceEntity));
         } catch (Exception e) {
             throw new AppException(ErrorCode.EXISTED);

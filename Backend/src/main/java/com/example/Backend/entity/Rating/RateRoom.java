@@ -29,6 +29,6 @@ public class RateRoom {
     @Column(nullable = false)
     int score;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     String comment;
 }

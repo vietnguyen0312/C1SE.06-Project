@@ -44,7 +44,7 @@ public class ServiceController {
                 .build();
     }
 
-    @GetMapping("/{idServiceType}")
+    @GetMapping("/findByServiceType/{idServiceType}")
     ApiResponse<List<ServiceResponse>> getByServiceType(@PathVariable("idServiceType") String idServiceType) {
         return ApiResponse.<List<ServiceResponse>>builder()
                 .result(serviceService.getServiceByServiceType(idServiceType))

@@ -1,30 +1,26 @@
-package com.example.Backend.entity.Blog;
+package com.example.Backend.entity.Ticket;
 
-import com.example.Backend.entity.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "blog_comment")
+@Table(name = "ticket_classify")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BlogComment {
+public class TicketClassify {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
+    @JoinColumn(name = "ticketType_id")
+    TicketType ticketType;
 
     @ManyToOne
-    @JoinColumn(name = "blog_id")
-    Blog blog;
-
-    @Column(columnDefinition = "TEXT")
-    String comment;
+    @JoinColumn(name = "ticket_id")
+    Ticket ticket;
 }

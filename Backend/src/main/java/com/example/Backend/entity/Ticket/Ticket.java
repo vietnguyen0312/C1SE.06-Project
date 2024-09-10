@@ -18,10 +18,6 @@ public class Ticket {
     String id;
 
     @ManyToOne
-    @JoinColumn(name = "ticketType_id")
-    TicketType ticketType;
-
-    @ManyToOne
     @JoinColumn(name = "service_id")
     ServiceEntity serviceEntity;
 

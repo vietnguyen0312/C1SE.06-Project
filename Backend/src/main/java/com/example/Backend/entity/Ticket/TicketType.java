@@ -18,4 +18,7 @@ public class TicketType {
 
     @Column(length = 255, nullable = false)
     String name;
+
+    @Column(nullable = false)
+    float discount;
 }
