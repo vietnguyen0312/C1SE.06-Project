@@ -20,6 +20,6 @@ public class BlogImages {
     String image;
 
     @ManyToOne
-    @JoinColumn(name = "blog_content_id")
+    @JoinColumn(name = "blog_id")
     Blog blog;
 }

@@ -34,9 +34,6 @@ public class SecurityConfig {
 
     private final String[] PUBLIC_ENDPOINTS = {"/serviceType", "/serviceType/*", "/service", "/service/*"};
 
-    @Value("${jwt.signerKey}")
-    private String SIGNER_KEY;
-
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
 

@@ -17,5 +17,6 @@ public class Role {
     @Id
     String name;
 
+    @Column(columnDefinition = "TEXT")
     String description;
 }

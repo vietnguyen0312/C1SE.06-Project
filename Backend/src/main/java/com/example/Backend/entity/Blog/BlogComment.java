@@ -22,9 +22,9 @@ public class BlogComment {
     User user;
 
     @ManyToOne
-    @JoinColumn(name = "blog_content_id")
+    @JoinColumn(name = "blog_id")
     Blog blog;
 
-    @Column(length = 255)
+    @Column(columnDefinition = "TEXT")
     String comment;
 }

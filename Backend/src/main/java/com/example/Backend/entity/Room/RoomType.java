@@ -30,4 +30,7 @@ public class RoomType {
 
     @Column(nullable = false)
     int maxOfPeople;
+
+    @Column(nullable = false)
+    int quantity;
 }
