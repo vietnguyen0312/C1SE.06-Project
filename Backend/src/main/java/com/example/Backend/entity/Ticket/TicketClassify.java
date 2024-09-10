@@ -5,20 +5,22 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "ticket_type")
+@Table(name = "ticket_classify")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketType {
+public class TicketClassify {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @Column(length = 255, nullable = false)
-    String name;
+    @ManyToOne
+    @JoinColumn(name = "ticketType_id")
+    TicketType ticketType;
 
-    @Column(nullable = false)
-    float discount;
+    @ManyToOne
+    @JoinColumn(name = "ticket_id")
+    Ticket ticket;
 }

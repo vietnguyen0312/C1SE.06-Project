@@ -15,9 +15,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TicketCreationRequest {
     @NotNull(message = "NOT_NULL")
-    String ticketTypeId;
-
-    @NotNull(message = "NOT_NULL")
     String serviceId;
 
     @NotNull(message = "NOT_NULL")

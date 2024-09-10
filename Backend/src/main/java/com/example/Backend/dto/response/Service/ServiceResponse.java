@@ -1,5 +1,6 @@
 package com.example.Backend.dto.response.Service;
 
+import com.example.Backend.entity.Service.ServiceType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,5 +14,5 @@ public class ServiceResponse {
     String name;
     String description;
     String image;
-    String serviceTypeId;
+    ServiceType serviceType;
 }

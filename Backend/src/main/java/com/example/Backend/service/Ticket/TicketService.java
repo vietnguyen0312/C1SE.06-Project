@@ -50,10 +50,6 @@ public class TicketService {
         ticketRepository.delete(ticket);
     }
 
-    public List<TicketResponse> getTicketByTicketType(TicketType ticketType) {
-        return ticketRepository.findAllByTicketType(ticketType).stream().map(ticketMapper::toResponse).toList();
-    }
-
     public TicketResponse updateTicket(TicketUpdateRequest request, String id) {
         Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         ticketMapper.updateTicket(ticket, request);

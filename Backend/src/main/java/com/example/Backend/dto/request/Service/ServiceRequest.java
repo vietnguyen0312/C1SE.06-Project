@@ -20,7 +20,7 @@ public class ServiceRequest {
     @Size(max = 255, message = "MAX_SIZE")
     String name;
 
-    @Size(max = 255, message = "MAX_SIZE")
+    @NotBlank(message = "NOT_BLANK")
     String description;
 
     @Size(max = 255, message = "MAX_SIZE")

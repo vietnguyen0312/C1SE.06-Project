@@ -1,12 +1,8 @@
 package com.example.Backend.dto.request.Ticket;
 
+import com.example.Backend.entity.Ticket.TicketType;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -14,12 +10,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TicketTypeRequest {
+public class TicketClassifyRequest {
+    @NotBlank(message = "NOT_BLANK")
+    String ticketTypeId;
 
     @NotBlank(message = "NOT_BLANK")
-    @Size(max = 255, message = "NAME_SIZE")
-    String name;
-
-    @NotBlank(message = "NOT_BLANK")
-    float discount;
+    String ticketId;
 }
