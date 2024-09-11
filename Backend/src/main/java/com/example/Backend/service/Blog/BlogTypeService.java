@@ -24,23 +24,25 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class BlogTypeService {
     BlogTypeRepository blogTypeRepository;
-    BlogTypeMapper  blogTypeMapper;
+    BlogTypeMapper blogTypeMapper;
 
-    public BlogTypeResponse createBlogType (BlogTypeCreateRequest  request) {
+    public BlogTypeResponse createBlogType(BlogTypeCreateRequest request) {
         BlogType blogType = blogTypeMapper.toBlogType(request);
         return blogTypeMapper.toBlogTypeResponse(blogTypeRepository.save(blogType));
     }
 
-    public BlogTypeResponse updateBlogType (BlogTypeUpdateRequest request, String id){
-        BlogType blogType = blogTypeRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED));
-        blogTypeMapper.updateBlogType(blogType,request);
+    public BlogTypeResponse updateBlogType(BlogTypeUpdateRequest request, String id) {
+        BlogType blogType = blogTypeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        blogTypeMapper.updateBlogType(blogType, request);
         return blogTypeMapper.toBlogTypeResponse(blogTypeRepository.save(blogType));
     }
-    public void deleteBlogType (String id){
+
+    public void deleteBlogType(String id) {
         blogTypeRepository.deleteById(id);
     }
-    public BlogTypeResponse getBlogType (String id){
-        return blogTypeMapper.toBlogTypeResponse(blogTypeRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
+
+    public BlogTypeResponse getBlogTypeById(String id) {
+        return blogTypeMapper.toBlogTypeResponse(blogTypeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
 }

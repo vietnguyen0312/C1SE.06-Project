@@ -8,6 +8,8 @@ import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Blog.BlogMapper;
 import com.example.Backend.repository.Blog.BlogRepository;
+import com.example.Backend.repository.Blog.BlogTypeRepository;
+import com.example.Backend.repository.User.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,31 +24,33 @@ import java.util.List;
 @Slf4j
 public class BlogService {
     BlogRepository blogRepository;
+    BlogTypeRepository blogTypeRepository;
+    UserRepository userRepository;
     BlogMapper blogMapper;
-//    UserRepository userRepository;
 
-
-    public BlogResponse createBlogContent (BlogCreateRequest request){
+    public BlogResponse createBlog(BlogCreateRequest request) {
         Blog blog = blogMapper.toBlog(request);
+        blog.setBlogType(blogTypeRepository.findById(request.getBlogTypeId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+        blog.setUser(userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
         return blogMapper.toBlogResponse(blogRepository.save(blog));
     }
 
-    public BlogResponse updateBlogContent (BlogUpdateRequest request, String id){
-            Blog   blog = blogRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED));
-            blogMapper.updateBlog(blog,request);
-            return blogMapper.toBlogResponse(blogRepository.save(blog));
+    public BlogResponse updateBlog(BlogUpdateRequest request, String id) {
+        Blog blog = blogRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        blogMapper.updateBlog(blog, request);
+        return blogMapper.toBlogResponse(blogRepository.save(blog));
     }
 
-    public void deleteBlogContent (String id){
+    public void deleteBlog(String id) {
         blogRepository.deleteById(id);
     }
 
-    public List<BlogResponse> getAllBlogContent(){
+    public List<BlogResponse> getAllBlog() {
         return blogRepository.findAll().stream().map(blogMapper::toBlogResponse).toList();
     }
 
-    public BlogResponse getBlogContent (String id){
-        return blogMapper.toBlogResponse(blogRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
+    public BlogResponse getBlogById(String id) {
+        return blogMapper.toBlogResponse(blogRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
 }

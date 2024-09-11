@@ -4,6 +4,7 @@ import com.example.Backend.dto.request.Blog.BlogImagesCreateRequest;
 import com.example.Backend.dto.response.Blog.BlogImagesResponse;
 import com.example.Backend.entity.Blog.Blog;
 import com.example.Backend.entity.Blog.BlogImages;
+import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.exception.GlobalExceptionHandler;
 import com.example.Backend.mapper.Blog.BlogImagesMapper;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
@@ -22,18 +24,22 @@ import java.util.List;
 @Slf4j
 public class BlogImagesService {
     BlogImagesRepository blogImagesRepository;
+    BlogRepository blogRepository;
     BlogImagesMapper blogImagesMapper;
-    BlogRepository blogContentRepository;
-    public BlogImagesResponse createBlogImages(BlogImagesCreateRequest request)  {
+
+    public BlogImagesResponse createBlogImages(BlogImagesCreateRequest request) {
         BlogImages blogImages = blogImagesMapper.toBlogImages(request);
+        blogImages.setBlog(blogRepository.findById(request.getBlogId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
         return blogImagesMapper.toBlogImagesResponse(blogImagesRepository.save(blogImages));
     }
 
-    public List<BlogImagesResponse> blogImages(Blog blog){
-      return blogImagesRepository.findByBlog(blog).stream().map(blogImagesMapper::toBlogImagesResponse).toList();
+    public List<BlogImagesResponse> getBlogImagesByBlog(String blogId) {
+        return blogImagesRepository.findAllByBlog(blogRepository.findById(blogId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED))).stream().map(blogImagesMapper::toBlogImagesResponse).toList();
     }
 
-    public void deleteBlogImages(String blogID){
+    public void deleteBlogImages(String blogID) {
         blogImagesRepository.deleteById(blogID);
     }
 

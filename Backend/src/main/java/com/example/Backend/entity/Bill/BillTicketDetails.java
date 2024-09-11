@@ -1,6 +1,5 @@
 package com.example.Backend.entity.Bill;
 
-import com.example.Backend.entity.Ticket.Ticket;
 import com.example.Backend.entity.Ticket.TicketClassify;
 import jakarta.persistence.*;
 import lombok.*;

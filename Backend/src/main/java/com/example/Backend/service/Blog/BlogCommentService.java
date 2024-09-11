@@ -32,29 +32,29 @@ public class BlogCommentService {
     BlogCommentRepository blogCommentRepository;
     BlogCommentMapper blogCommentMapper;
     BlogRepository blogRepository;
-//    UserRepository userRepository;
 
-
-    public BlogCommentResponse createBlogComment (BlogCommentCreateRequest request){
+    public BlogCommentResponse createBlogComment(BlogCommentCreateRequest request) {
         BlogComment blogComment = blogCommentMapper.toBlogComment(request);
         return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.save(blogComment));
     }
 
-    public BlogCommentResponse updateBlogComment (BlogCommentUpdateRequest request, String id){
-        BlogComment blogComment = blogCommentRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED));
-        blogCommentMapper.updateBlogComment(blogComment,request);
+    public BlogCommentResponse updateBlogComment(BlogCommentUpdateRequest request, String id) {
+        BlogComment blogComment = blogCommentRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        blogCommentMapper.updateBlogComment(blogComment, request);
         return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.save(blogComment));
     }
 
-    public void deleteBlogComment (String id){
+    public void deleteBlogComment(String id) {
         blogCommentRepository.deleteById(id);
     }
 
-    public BlogCommentResponse getBlogComment (String id){
-        return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
+    public BlogCommentResponse getBlogComment(String id) {
+        return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    public List<BlogCommentResponse> getAllBlogComment(String idBlog){
-        return blogCommentRepository.findBlogCommentBy(idBlog).stream().map(blogCommentMapper::toBlogCommentResponse).toList();
+    public List<BlogCommentResponse> getBlogCommentByIdBlog(String idBlog) {
+        return blogCommentRepository.findAllByBlog(blogRepository.findById(idBlog)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)))
+                .stream().map(blogCommentMapper::toBlogCommentResponse).toList();
     }
 }

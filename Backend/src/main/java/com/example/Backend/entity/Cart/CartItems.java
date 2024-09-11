@@ -1,6 +1,5 @@
 package com.example.Backend.entity.Cart;
 
-import com.example.Backend.entity.Ticket.Ticket;
 import com.example.Backend.entity.Ticket.TicketClassify;
 import jakarta.persistence.*;
 import lombok.*;

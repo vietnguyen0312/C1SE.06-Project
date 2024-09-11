@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface BlogImagesRepository extends JpaRepository<BlogImages, String> {
-    List<BlogImages> findByBlog(Blog blog);
+    List<BlogImages> findAllByBlog(Blog blog);
 }

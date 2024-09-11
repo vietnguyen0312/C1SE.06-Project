@@ -71,4 +71,5 @@ public class ServiceService {
                 .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED)))
                 .stream().map(serviceMapper::toResponse).toList();
     }
+
 }

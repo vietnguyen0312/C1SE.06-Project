@@ -10,7 +10,6 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface BlogCommentMapper {
-
     BlogComment toBlogComment (BlogCommentCreateRequest request);
     void updateBlogComment (@MappingTarget BlogComment blogComment, BlogCommentUpdateRequest request);
     BlogCommentResponse toBlogCommentResponse(BlogComment blogComment);
