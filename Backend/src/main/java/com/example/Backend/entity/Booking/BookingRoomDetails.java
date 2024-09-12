@@ -25,4 +25,7 @@ public class BookingRoomDetails {
     @JoinColumn(name = "booking_room_id")
     BookingRoom bookingRoom;
 
+    @Column(nullable = false)
+    double price;
+
 }

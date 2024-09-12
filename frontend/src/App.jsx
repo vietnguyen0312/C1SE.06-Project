@@ -1,25 +1,13 @@
 import React from 'react';
 import './App.css';
-import Header from './components/Header'
-import Home from './components/Home'
-import Footer from './components/Footer'
+import Home from './Layout/Home';
 import Services from './components/Services'
-
+import MainLayout from './Layout/MainLayout';
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Home />,
-  },
-  {
-    path: "/services",
-    element: <Services />,
-  },
-]);
+import Authenticate from './Service/Authenticate';
 
 const scripts = [
   "js/vendor/jquery-2.2.4.min.js",
@@ -44,13 +32,30 @@ scripts.forEach(src => {
   document.body.appendChild(script);
 });
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <MainLayout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: "services",
+        element: <Services />,
+      },
+    ],
+  },
+  {
+    path: "/authenticate",
+    element: <Authenticate />,
+  },
+]);
+
 function App() {
   return (
-    <>
-      <Header />
-      <RouterProvider router={router} />
-      <Footer />
-    </>
+    <RouterProvider router={router} />
   );
 }
 

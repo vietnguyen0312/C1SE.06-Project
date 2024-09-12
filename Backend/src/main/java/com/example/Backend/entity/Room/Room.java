@@ -23,7 +23,6 @@ public class Room {
     @JoinColumn(name = "roomType_id")
     RoomType roomType;
 
-
     @Column(length = 50)
     String status;
 

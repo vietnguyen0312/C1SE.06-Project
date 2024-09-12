@@ -10,7 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TicketUpdateRequest {
-
     @NotNull(message = "NOT_NULL")
     double price;
 

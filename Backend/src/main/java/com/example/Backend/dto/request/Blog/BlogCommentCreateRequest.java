@@ -14,7 +14,7 @@ public class BlogCommentCreateRequest {
     String userId;
 
     @NotBlank(message = "NOT_BLANK")
-    String blogContentId;
+    String blogId;
 
     @NotBlank(message = "NOT_BLANK")
     @Size(max = 255,message = "COMMENT_SIZE")

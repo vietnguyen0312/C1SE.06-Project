@@ -1,15 +1,18 @@
 import React from 'react'
-import ServiceList from './Api/ServiceList'
-import '../Css/Service.css'
+import ServiceList from '../Service/ServiceList'
+import { useLocation } from 'react-router-dom'
+import '../assets/Css/Service.css'
 
-function Services() {
+const Services = () => {
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const serviceTypeId = searchParams.get('serviceTypeId');
+
   return (
     <>
       <section className="ftco-section">
         <div className="container">
-          <div className="row">
-            <ServiceList />
-          </div>
+          <ServiceList serviceTypeId={serviceTypeId} />
         </div>
       </section>
     </>

@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "ticket")
 @Data
@@ -29,6 +31,9 @@ public class Ticket {
 
     @Column(length = 50)
     String status;
+
+    @ManyToMany
+    Set<TicketType> ticketTypes;
 
     @PrePersist
     public void prePersist() {

@@ -1,8 +1,11 @@
 package com.example.Backend.dto.request.Blog;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import  lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -13,4 +16,7 @@ public class BlogCommentUpdateRequest {
     @NotBlank(message = "NOT_BLANK")
     @Size(max = 255,message = "COMMENT_SIZE")
     String comment;
+
+    @Future(message = "DATE_FUTURE")
+    Date dateUpdate;
 }

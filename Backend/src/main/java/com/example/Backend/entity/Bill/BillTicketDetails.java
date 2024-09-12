@@ -1,6 +1,6 @@
 package com.example.Backend.entity.Bill;
 
-import com.example.Backend.entity.Ticket.TicketClassify;
+import com.example.Backend.entity.Ticket.Ticket;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -22,8 +22,8 @@ public class BillTicketDetails {
     BillTicket billTicket;
 
     @ManyToOne
-    @JoinColumn(name = "ticket_classify_id")
-    TicketClassify ticketClassify;
+    @JoinColumn(name = "ticket_id")
+    Ticket ticket;
 
     @Column(nullable = false)
     int quantity;

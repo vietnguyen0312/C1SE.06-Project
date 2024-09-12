@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "cart")
 @Data
@@ -20,4 +22,7 @@ public class Cart {
     @ManyToOne
     @JoinColumn(name = "user_id", unique = true)
     User user;
+
+    @Column(nullable = false)
+    double total;
 }

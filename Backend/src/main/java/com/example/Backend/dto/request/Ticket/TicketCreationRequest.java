@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,5 +25,6 @@ public class TicketCreationRequest {
     @NotNull(message = "NOT_NULL")
     int quantity;
 
-    String status;
+    @NotNull(message = "NOT_NULL")
+    Set<String> ticketTypeId;
 }
