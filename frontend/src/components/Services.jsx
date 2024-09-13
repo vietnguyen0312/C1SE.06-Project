@@ -1,7 +1,7 @@
 import React from 'react'
 import ServiceList from '../Service/ServiceList'
 import { useLocation } from 'react-router-dom'
-import '../assets/Css/Service.css'
+import '../Style/Service.css'
 
 const Services = () => {
   const location = useLocation();

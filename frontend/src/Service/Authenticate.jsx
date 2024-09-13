@@ -1,13 +1,16 @@
 import React, { useState, useRef } from 'react';
-import axios from './axios-customize'
-import '../assets/Css/Login.css'
+import { useNavigate } from 'react-router-dom';
+import axios from './axios-customize';
+import styles from '../Style/Authenticate.module.css';
 
-const Authenticate = ({ onLoginSuccess }) => {
-    const [email, setEmail] = useState('');
+const Authenticate = () => {
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const contRef = useRef(null);
+    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -15,8 +18,10 @@ const Authenticate = ({ onLoginSuccess }) => {
         setError('');
 
         try {
-            const response = await axios.post('/user/login', { email, password });
-            onLoginSuccess(response.data);
+            const response = await axios.post('/auth/token', { username, password });
+            const token = response.result.token;
+            localStorage.setItem('token', token);
+            navigate('/');
         } catch (err) {
             setError('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.');
         } finally {
@@ -24,118 +29,119 @@ const Authenticate = ({ onLoginSuccess }) => {
         }
     };
 
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await axios.post('/users', { username, password });
+            const token = response.result.token;
+            localStorage.setItem('token', token);
+            console.log('Registration successful, navigating to home page');
+            navigate('/'); // Redirect to main page
+        } catch (err) {
+            setError('Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleToggle = () => {
         if (contRef.current) {
-            contRef.current.classList.toggle('s--signup');
+            contRef.current.classList.toggle(styles['s--signup']);
         }
     };
 
     return (
-        <div className="cont" ref={contRef}>
-            <div className="form sign-in">
+        <div className={styles.cont} ref={contRef}>
+            <div className={`${styles.form} ${styles['sign-in']}`}>
                 <h2>Chào mừng bạn đến Healing Ecotourism</h2>
-                <form onSubmit={handleLogin}>
-                    <label className="pom-agile">
+                <form>
+                    <label className={styles['pom-agile']}>
                         <span className="fa fa-user-o" aria-hidden="true" />
-                        <span>Email</span>
+                        <span>Tên đăng nhập</span>
                         <input
                             id="username"
                             name="username"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="user"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className={styles.user}
                             type="text"
                             required
                         />
                     </label>
-                    <label className="pom-agile">
+                    <label className={styles['pom-agile']}>
                         <span className="fa fa-key" aria-hidden="true" />
-                        <span>Mật Khẩu</span>
+                        <span>Mật khẩu</span>
                         <input
                             id="password"
                             name="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="pass"
+                            className={styles.pass}
                             type="password"
                             required
                         />
                     </label>
-                    <button type="submit" className="submit">Đăng Nhập</button>
+                    <button type="button" className={styles.submit} onClick={handleLogin}>Đăng Nhập</button>
                 </form>
             </div>
-            <div className="sub-cont">
-                <div className="img">
-                    <div className="img__text m--up">
+            <div className={styles['sub-cont']}>
+                <div className={styles.img}>
+                    <div className={`${styles['img__text']} ${styles['m--up']}`}>
                         <h2>Bạn chưa có tài khoản?</h2>
                         <p>Đăng ký và đặt vé để trải nghiệm những nơi thú vị!</p>
                     </div>
-                    <div className="img__text m--in">
+                    <div className={`${styles['img__text']} ${styles['m--in']}`}>
                         <h2>Bạn đã đăng ký?</h2>
                         <p>Nếu bạn đã có tài khoản, chỉ cần đăng nhập. Chúng tôi nhớ bạn!</p>
                     </div>
-                    <div className="img__btn" onClick={handleToggle}>
-                        <span className="m--up">Đăng Ký</span>
-                        <span className="m--in">Đăng Nhập</span>
+                    <div className={styles['img__btn']} onClick={handleToggle}>
+                        <span className={styles['m--up']}>Đăng Ký</span>
+                        <span className={styles['m--in']}>Đăng Nhập</span>
                     </div>
                 </div>
-                <div className="form-container">
-                    <div className="form sign-up">
+                <div className={styles['form-container']}>
+                    <div className={`${styles.form} ${styles['sign-up']}`}>
                         <h2>Đăng Ký</h2>
-                        <form onsubmit="return validateForm()" th:action="@{/user/register}" th:method="post" th:object="${user}">
+                        <form>
                             <label>
-                                <span>Tên</span>
-                                <input name="username" th:field="*{username}" type="text" autoComplete="off" required />
+                                <span>Tên đăng nhập</span>
+                                <input
+                                    name="username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    type="text"
+                                    autoComplete="off"
+                                    required
+                                />
                             </label>
                             <label>
                                 <span>Email</span>
-                                <input id="em" name="email" th:field="*{email}" type="email" autoComplete="off" required />
+                                <input
+                                    id="email"
+                                    name="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    type="email"
+                                    autoComplete="off"
+                                    required
+                                />
                             </label>
                             <label>
-                                <span>Ngày Sinh</span>
-                                <input id="birth" type="date" name="birth" style={{ width: '100%', padding: '20px 0px', background: 'transparent', border: 0, borderBottom: '1px solid #435160', outline: 'none', color: '#6D7781', fontSize: 16, height: 30 }} required />
+                                <span>Mật khẩu</span>
+                                <input
+                                    id="pw"
+                                    name="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    type="password"
+                                    autoComplete="new-password"
+                                    required
+                                />
                             </label>
-                            <label>
-                                <span>CCCD</span>
-                                <input name="cardID" th:field="*{cardID}" type="text" required />
-                            </label>
-                            <label>
-                                <span>Địa Chỉ</span>
-                                <input name="address" th:field="*{address}" type="text" required />
-                            </label>
-                            <label>
-                                <span>Giới Tính</span>
-                                <select name="gender" th:field="*{gender}" required>
-                                    <option value={1}>Nam</option>
-                                    <option value={2}>Nữ</option>
-                                    <option value={3}>Khác</option>
-                                </select>
-                            </label>
-                            <label>
-                                <span>Số Điện Thoại</span>
-                                <input id="ph" name="phone" th:field="*{phoneNumber}" type="text" autoComplete="off" required />
-                            </label>
-                            <label>
-                                <span>Ảnh Đại Diện</span>
-                                <input type="file" th:field="*{avatar}" style={{ width: '100%', padding: '20px 0px', background: 'transparent', border: 0, borderBottom: '1px solid #435160', outline: 'none', color: '#6D7781', fontSize: 16, height: 30 }} />
-                            </label>
-                            <label>
-                                <span>Quốc Gia</span>
-                                <input name="nation" th:field="*{nation}" type="text" required />
-                            </label>
-                            <label>
-                                <span>Mật Khẩu</span>
-                                <input id="pw" name="password" th:field="*{password}" type="password" autoComplete="new-password" required />
-                            </label>
-                            <label>
-                                <span>Xác Nhận Mật Khẩu</span>
-                                <input id="pwa" name="passAgain" type="password" autoComplete="new-password" required />
-                            </label>
-                            <label className="agree">
-                                <input id="agree" name="agree" type="checkbox" required />
-                                <span>Chập nhận điều khoản của chúng tôi</span>
-                            </label>
-                            <button type="submit" className="submit">Đăng Ký</button>
+                            <button type="button" className={styles.submit} onClick={handleRegister}>Đăng Ký</button>
                         </form>
                     </div>
                 </div>

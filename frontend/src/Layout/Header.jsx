@@ -1,7 +1,54 @@
-import React from 'react'
-import ServiceTypeList from '../Service/ServiceTypeList'
+import React, { useState, useEffect } from 'react';
+import ServiceTypeList from '../Service/ServiceTypeList';
+import axios from '../Service/axios-customize';
+import { useNavigate } from 'react-router-dom';
 
 function Header() {
+    const [user, setUser] = useState(null);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const token = localStorage.getItem('token');
+            if (token !== null) {
+                localStorage.removeItem('token');
+                const response = await axios.post('/auth/introspect', { token });
+                if (response.result.valid === true) {
+                    localStorage.setItem('token', token);
+                    getMyInfo();
+                } else {
+                    try {
+                        const refreshToken = await axios.post('/auth/refresh', { token });
+                        localStorage.setItem('token', refreshToken.result.token);
+                        getMyInfo();
+                    } catch (error) {
+                        handleLogout();
+                    }
+                }
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    const getMyInfo = async () => {
+        const userInfo = await axios.get('/users/myInfo');
+        setUser(userInfo.result);
+    }
+
+    const handleLogout = async () => {
+        const token = localStorage.getItem('token');
+        try {
+            localStorage.removeItem('token');
+            await axios.post('/auth/logout', { token });
+            setUser(null);
+            console.log('Logout successful, navigating to home page');
+            navigate('/');
+        } catch (error) {
+            console.error('Failed to logout:', error);
+        }
+    }
+
     return (
         <>
             <header id="header">
@@ -33,7 +80,7 @@ function Header() {
                         <nav id="nav-menu-container">
                             <ul className="nav-menu">
                                 <li><a href="/">Trang chủ</a></li>
-                                <li class="menu-has-children"><a href="/services">Dịch vụ</a>
+                                <li className="menu-has-children"><a href="/services">Dịch vụ</a>
                                     <ul>
                                         <ServiceTypeList />
                                     </ul>
@@ -41,12 +88,20 @@ function Header() {
                                 <li><a href="/hotels">Khách sạn</a></li>
                                 <li><a href="/contact">Liên hệ</a></li>
                                 <li><a href="/news">Tin tức</a></li>
-                                <li><a href="/authenticate">Đăng nhập</a></li>
+                                {user ? (
+                                    <>
+                                        <img src={`img/${user.avatar}`} alt="" />
+                                        <li>{user.username}</li>
+                                        <li><a onClick={handleLogout}>Đăng xuất</a></li>
+                                    </>
+                                ) : (
+                                    <li><a href="/authenticate">Đăng nhập</a></li>
+                                )}
                             </ul>
                         </nav>
                     </div>
                 </div>
-            </header>{/* #header */}
+            </header>
             {/* start banner Area */}
             <section className="banner-area relative">
                 <div className="overlay overlay-bg" />
@@ -112,7 +167,7 @@ function Header() {
                 </div>
             </section>
         </>
-    )
+    );
 }
 
-export default Header
+export default Header;
