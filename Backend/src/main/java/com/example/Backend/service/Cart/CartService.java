@@ -2,10 +2,8 @@ package com.example.Backend.service.Cart;
 
 import com.example.Backend.dto.request.Cart.CartRequest;
 import com.example.Backend.entity.Cart.Cart;
-import com.example.Backend.entity.User.User;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.exception.AppException;
-import com.example.Backend.mapper.User.UserMapper;
 import com.example.Backend.repository.Cart.CartRepository;
 import com.example.Backend.repository.User.UserRepository;
 import lombok.AccessLevel;
@@ -25,7 +23,7 @@ public class CartService {
     public void createCart(CartRequest request) {
 
         cartRepository.save(Cart.builder()
-                .user(userRepository.findByUsername(request.getUserCreationRequest().getUsername())
+                .user(userRepository.findById(request.getUserId())
                         .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED)))
                 .build());
     }

@@ -14,5 +14,5 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartRequest {
     @NotNull(message = "NOT_NULL")
-    UserCreationRequest userCreationRequest;
+    String userId;
 }

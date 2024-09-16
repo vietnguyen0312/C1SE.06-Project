@@ -1,6 +1,6 @@
 import React from 'react';
-import ServiceTypeList from '../Service/ServiceTypeList';
-import Authorization from '../Service/Authorization';
+import ServiceTypeList from '../../Service/ServiceTypeList';
+import Authorization from '../../Service/Authorization';
 
 function Header() {
     return (

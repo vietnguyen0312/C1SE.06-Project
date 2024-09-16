@@ -1,5 +1,5 @@
 import React from 'react'
-import ServiceList from '../Service/ServiceList'
+import ServiceList from '../../Service/ServiceList'
 
 function Home() {
 

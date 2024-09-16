@@ -2,11 +2,13 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from './axios-customize';
 import styles from '../Style/Authenticate.module.css';
+import { OAuthConfig } from "./ConfigurationGG";
+import GoogleIcon from "@mui/icons-material/Google";
 
 const Authenticate = () => {
     const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const contRef = useRef(null);
@@ -18,7 +20,8 @@ const Authenticate = () => {
         setError('');
 
         try {
-            const response = await axios.post('/auth/token', { username, password });
+            localStorage.removeItem('token');
+            const response = await axios.post('/auth/token', { email, password });
             const token = response.result.token;
             localStorage.setItem('token', token);
             navigate('/');
@@ -35,7 +38,7 @@ const Authenticate = () => {
         setError('');
 
         try {
-            const response = await axios.post('/users', { username, password });
+            const response = await axios.post('/users', { username, email, password });
             const token = response.result.token;
             localStorage.setItem('token', token);
             console.log('Registration successful, navigating to home page');
@@ -53,6 +56,20 @@ const Authenticate = () => {
         }
     };
 
+    const handleClick = () => {
+        const callbackUrl = OAuthConfig.redirectUri;
+        const authUrl = OAuthConfig.authUri;
+        const googleClientId = OAuthConfig.clientId;
+
+        const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
+            callbackUrl
+        )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
+
+        console.log(targetUrl); 
+
+        window.location.href = targetUrl;
+    };
+
     return (
         <div className={styles.cont} ref={contRef}>
             <div className={`${styles.form} ${styles['sign-in']}`}>
@@ -62,10 +79,10 @@ const Authenticate = () => {
                         <span className="fa fa-user-o" aria-hidden="true" />
                         <span>Tên đăng nhập</span>
                         <input
-                            id="username"
-                            name="username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            id="email"
+                            name="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className={styles.user}
                             type="text"
                             required
@@ -85,16 +102,23 @@ const Authenticate = () => {
                         />
                     </label>
                     <button type="button" className={styles.submit} onClick={handleLogin}>Đăng Nhập</button>
+                    <button type="button" className={styles.submit} onClick={handleClick} >
+                        <GoogleIcon style={{ textAlign: 'center', marginRight: '10px' }} /> 
+                        Đăng nhập với Google
+                    </button>
+                    <p className={styles['forgot-pass']}>
+                        <a href="">Quên Mật Khẩu?</a>
+                    </p>
                 </form>
             </div>
             <div className={styles['sub-cont']}>
                 <div className={styles.img}>
                     <div className={`${styles['img__text']} ${styles['m--up']}`}>
-                        <h2>Bạn chưa có tài khoản?</h2>
+                        <h2 style={{ color: 'white' }}>Bạn chưa có tài khoản?</h2>
                         <p>Đăng ký và đặt vé để trải nghiệm những nơi thú vị!</p>
                     </div>
                     <div className={`${styles['img__text']} ${styles['m--in']}`}>
-                        <h2>Bạn đã đăng ký?</h2>
+                        <h2 style={{ color: 'white' }}>Bạn đã đăng ký?</h2>
                         <p>Nếu bạn đã có tài khoản, chỉ cần đăng nhập. Chúng tôi nhớ bạn!</p>
                     </div>
                     <div className={styles['img__btn']} onClick={handleToggle}>
@@ -107,7 +131,7 @@ const Authenticate = () => {
                         <h2>Đăng Ký</h2>
                         <form>
                             <label>
-                                <span>Tên đăng nhập</span>
+                                <span>Tên người dùng</span>
                                 <input
                                     name="username"
                                     value={username}

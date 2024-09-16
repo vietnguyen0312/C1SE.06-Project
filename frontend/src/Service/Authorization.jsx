@@ -8,21 +8,32 @@ const useAuthorization = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
+
+        const authCode = /code=([^&]+)/;
+        const isMatch = window.location.href.match(authCode);
+
         const fetchUser = async () => {
-            const token = localStorage.getItem('token');
-            if (token !== null) {
-                localStorage.removeItem('token');
-                const response = await axios.post('/auth/introspect', { token });
-                if (response.result.valid === true) {
-                    localStorage.setItem('token', token);
-                    getMyInfo();
-                } else {
-                    try {
-                        const refreshToken = await axios.post('/auth/refresh', { token });
-                        localStorage.setItem('token', refreshToken.result.token);
+            if (isMatch) {
+                const code = isMatch[1];
+                const response = await axios.post(`/auth/outbound/authentication?code=${code}`);
+                localStorage.setItem('token', response.result.token);
+                getMyInfo();
+            } else {
+                const token = localStorage.getItem('token');
+                if (token !== null) {
+                    localStorage.removeItem('token');
+                    const response = await axios.post('/auth/introspect', { token });
+                    if (response.result.valid === true) {
+                        localStorage.setItem('token', token);
                         getMyInfo();
-                    } catch (error) {
-                        handleLogout();
+                    } else {
+                        try {
+                            const refreshToken = await axios.post('/auth/refresh', { token });
+                            localStorage.setItem('token', refreshToken.result.token);
+                            getMyInfo();
+                        } catch (error) {
+                            handleLogout();
+                        }
                     }
                 }
             }
@@ -58,7 +69,7 @@ const Authorization = () => {
         <>
             {user ? (
                 <li className="menu-has-children">
-                    <li>{user.username}</li>
+                    <li><a href="/profile">{user.username}</a></li>
                     <ul>
                         <li><a href='/profile'>Thông tin cá nhân</a></li>
                         <li><a href='' onClick={handleLogout}>Đăng xuất</a></li>

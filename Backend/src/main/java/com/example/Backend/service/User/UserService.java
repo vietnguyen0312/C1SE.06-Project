@@ -65,9 +65,9 @@ public class UserService {
 
     public UserResponse getMyInfo() {
         var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
+        String email = context.getAuthentication().getName();
 
-        User user = userRepository.findByUsername(name).orElseThrow(
+        User user = userRepository.findByEmail(email).orElseThrow(
                 () -> new AppException(ErrorCode.NOT_EXISTED));
 
         return userMapper.toUserResponse(user);

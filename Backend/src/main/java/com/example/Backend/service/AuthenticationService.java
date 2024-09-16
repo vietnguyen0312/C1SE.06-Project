@@ -1,16 +1,19 @@
 package com.example.Backend.service;
 
-import com.example.Backend.dto.request.AuthenticationRequest;
-import com.example.Backend.dto.request.IntrospectRequest;
-import com.example.Backend.dto.request.LogoutRequest;
-import com.example.Backend.dto.request.RefreshRequest;
+import com.example.Backend.dto.request.*;
 import com.example.Backend.dto.response.AuthenticationResponse;
 import com.example.Backend.dto.response.IntrospectResponse;
+import com.example.Backend.entity.Cart.Cart;
 import com.example.Backend.entity.InvalidatedToken;
+import com.example.Backend.entity.User.Role;
 import com.example.Backend.entity.User.User;
+import com.example.Backend.enums.RoleEnum;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
+import com.example.Backend.repository.Cart.CartRepository;
+import com.example.Backend.repository.HttpClient.OutboundUserClient;
 import com.example.Backend.repository.InvalidatedTokenRepository;
+import com.example.Backend.repository.HttpClient.OutboundIdentityClient;
 import com.example.Backend.repository.User.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -31,9 +34,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
-import java.util.StringJoiner;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +42,10 @@ import java.util.UUID;
 @Slf4j
 public class AuthenticationService {
     UserRepository userRepository;
+    CartRepository cartRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
+    OutboundIdentityClient outboundIdentityClient;
+    OutboundUserClient outboundUserClient;
 
     @NonFinal
     @Value("${jwt.signerKey}")
@@ -55,6 +59,21 @@ public class AuthenticationService {
     @Value("${jwt.refreshable-duration}")
     protected long REFRESHABLE_DURATION;
 
+    @NonFinal
+    @Value("${outbound.identity.client-id}")
+    protected String CLIENT_ID;
+
+    @NonFinal
+    @Value("${outbound.identity.client-secret}")
+    protected String CLIENT_SECRET;
+
+    @NonFinal
+    @Value("${outbound.identity.redirect-uri}")
+    protected String REDIRECT_URI;
+
+    @NonFinal
+    protected final String GRANT_TYPE = "authorization_code";
+
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
         boolean isValid = true;
@@ -67,6 +86,45 @@ public class AuthenticationService {
 
         return IntrospectResponse.builder()
                 .valid(isValid)
+                .build();
+    }
+
+    public AuthenticationResponse outboundAuthenticate(String code){
+        var response = outboundIdentityClient.exchangeToken(ExchangeTokenRequest.builder()
+                .code(code)
+                .clientId(CLIENT_ID)
+                .clientSecret(CLIENT_SECRET)
+                .redirectUri(REDIRECT_URI)
+                .grantType(GRANT_TYPE)
+                .build());
+
+        log.info("TOKEN RESPONSE {}", response);
+
+        var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
+
+        log.info("User info: {}", userInfo);
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(Role.builder()
+                .name(RoleEnum.ROLE_CUSTOMER.getName())
+                .description(RoleEnum.ROLE_CUSTOMER.getDescription())
+                .build());
+
+        var user = userRepository.findByEmail(userInfo.getEmail())
+                .orElseGet(()->{
+                    User newUser = userRepository.save(User.builder()
+                            .email(userInfo.getEmail())
+                            .username(userInfo.getName())
+                            .roles(roles)
+                            .build());
+                    cartRepository.save(Cart.builder()
+                            .user(newUser)
+                            .build());
+                    return newUser;
+                });
+
+        return AuthenticationResponse.builder()
+                .token(generateToken(user))
                 .build();
     }
 
@@ -100,9 +158,9 @@ public class AuthenticationService {
 
         invalidatedTokenRepository.save(invalidatedToken);
 
-        var username = signedJWT.getJWTClaimsSet().getSubject();
+        var email = signedJWT.getJWTClaimsSet().getSubject();
 
-        var user = userRepository.findByUsername(username).orElseThrow(
+        var user = userRepository.findByEmail(email).orElseThrow(
                 () -> new AppException(ErrorCode.UNAUTHENTICATED)
         );
 
@@ -135,7 +193,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticated(AuthenticationRequest request) {
-        var user = userRepository.findByUsername(request.getUsername())
+        var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
@@ -154,7 +212,7 @@ public class AuthenticationService {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getUsername())
+                .subject(user.getEmail())
                 .issuer("HE.com")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))

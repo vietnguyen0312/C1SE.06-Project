@@ -19,13 +19,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @Column(nullable = false, length = 255, unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
+    @Column(nullable = false, length = 255)
     String username;
 
     @Column(length = 255, unique = true, columnDefinition = "VARCHAR(255) COLLATE utf8mb4_unicode_ci")
     String email;
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     String password;
 
     @Column(length = 50)

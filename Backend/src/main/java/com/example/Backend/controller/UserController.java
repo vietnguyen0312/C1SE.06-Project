@@ -33,7 +33,7 @@ public class UserController {
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         UserResponse response = userService.createUser(request);
         cartService.createCart(CartRequest.builder()
-                .userCreationRequest(request)
+                .userId(response.getId())
                 .build());
         return ApiResponse.<UserResponse>builder()
                 .result(response)
