@@ -154,7 +154,7 @@ export class ServiceList extends Component {
                 </div>
 
                 {totalPages > 1 && (
-                    <Pagination
+                    <Pagination 
                         itemsPerPage={servicesPerPage}
                         totalItems={services.length}
                         paginate={this.paginate}
