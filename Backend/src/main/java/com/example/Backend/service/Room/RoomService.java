@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class RoomService {
     RoomRepository roomRepository;
     RoomMapper roomMapper;
 
+    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse createRoom(RoomCreationRequest request) {
 
         Room room = roomMapper.toRoom(request);
@@ -35,6 +37,7 @@ public class RoomService {
         return roomMapper.toRoomResponse(roomRepository.save(room));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse updateRoom(String id, RoomUpdateRequest request) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -44,6 +47,7 @@ public class RoomService {
         return roomMapper.toRoomResponse(roomRepository.save(room));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse getRoomById(String id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));

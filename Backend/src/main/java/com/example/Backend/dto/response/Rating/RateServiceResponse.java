@@ -1,5 +1,7 @@
 package com.example.Backend.dto.response.Rating;
 
+import com.example.Backend.entity.Service.ServiceEntity;
+import com.example.Backend.entity.User.User;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,8 +17,8 @@ import lombok.experimental.FieldDefaults;
 public class RateServiceResponse {
 
     String id;
-    String serviceName;
-    String userName;
+    ServiceEntity serviceEntity;
+    User user;
     int score;
     String comment;
 }

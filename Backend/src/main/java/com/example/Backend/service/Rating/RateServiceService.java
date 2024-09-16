@@ -32,15 +32,14 @@ public class RateServiceService {
     RateServiceMapper rateServiceMapper;
 
     public RateServiceResponse createRateService(RateServiceCreationRequest request) {
-        ServiceEntity serviceEntity = serviceRepository.findById(request.getServiceId())
-                .orElseThrow(() -> new AppException(ErrorCode.EXISTED));
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.EXISTED));
-
-
         RateService rateService = rateServiceMapper.toEntity(request);
-        rateService.setServiceEntity(serviceEntity);
-        rateService.setUser(user);
+
+        rateService.setServiceEntity(serviceRepository.findById(request.getServiceId())
+                .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
+
+        rateService.setUser(userRepository.findById(request.getUserId())
+                .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
+
         RateService savedRateService = rateServiceRepository.save(rateService);
         return rateServiceMapper.toResponse(savedRateService);
     }
@@ -55,24 +54,6 @@ public class RateServiceService {
         RateService rateService = rateServiceRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         return rateServiceMapper.toResponse(rateService);
-    }
-
-    public RateServiceResponse updateRateService(String id, RateServiceCreationRequest request) {
-        RateService rateService = rateServiceRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
-        ServiceEntity serviceEntity = serviceRepository.findById(request.getServiceId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
-        rateService.setServiceEntity(serviceEntity);
-        rateService.setUser(user);
-        rateService.setScore(request.getScore());
-        rateService.setComment(request.getComment());
-
-        RateService updatedRateService = rateServiceRepository.save(rateService);
-        return rateServiceMapper.toResponse(updatedRateService);
     }
 
     public void deleteRateService(String id) {

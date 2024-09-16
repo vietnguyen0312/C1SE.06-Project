@@ -56,7 +56,7 @@ public class ServiceController {
         serviceService.deleteService(id);
         return ApiResponse
                 .<String>builder()
-                .result("Service has been deleted")
+                .message("Service has been deleted")
                 .build();
     }
 
