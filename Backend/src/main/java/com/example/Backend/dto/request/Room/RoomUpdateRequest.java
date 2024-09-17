@@ -12,4 +12,5 @@ import lombok.experimental.FieldDefaults;
 public class RoomUpdateRequest {
     @NotBlank(message = "NOT_NULL")
     String status;
+    String roomTypeId;
 }

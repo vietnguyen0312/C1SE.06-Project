@@ -5,12 +5,14 @@ import com.example.Backend.dto.request.Room.RoomCreationRequest;
 import com.example.Backend.dto.request.Room.RoomUpdateRequest;
 import com.example.Backend.dto.response.Room.RoomResponse;
 
+import com.example.Backend.dto.response.Room.RoomTypeResponse;
 import com.example.Backend.entity.Room.Room;
 import com.example.Backend.entity.Room.RoomType;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Room.RoomMapper;
 import com.example.Backend.repository.Room.RoomRepository;
+import com.example.Backend.repository.Room.RoomTypeRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,26 +30,51 @@ import java.util.stream.Collectors;
 public class RoomService {
     RoomRepository roomRepository;
     RoomMapper roomMapper;
+    RoomTypeRepository roomTypeRepository;
 
-    @PreAuthorize("hasRole('MANAGER')")
-    public RoomResponse createRoom(RoomCreationRequest request) {
+//    @PreAuthorize("hasRole('MANAGER')")
+public RoomResponse createRoom(RoomCreationRequest request) {
+    try {
 
         Room room = roomMapper.toRoom(request);
 
-        return roomMapper.toRoomResponse(roomRepository.save(room));
-    }
 
-    @PreAuthorize("hasRole('MANAGER')")
+        RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        room.setRoomType(roomType);
+
+
+        Room savedRoom = roomRepository.save(room);
+        return roomMapper.toRoomResponse(savedRoom);
+    } catch (Exception e) {
+
+        throw new AppException(ErrorCode.EXISTED);
+    }
+}
+
+
+//    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse updateRoom(String id, RoomUpdateRequest request) {
+    // Tìm phòng theo ID
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-        roomMapper.updateRoom(room, request);
+        // Cập nhật trạng thái của phòng từ yêu cầu
+        room.setStatus(request.getStatus());
 
-        return roomMapper.toRoomResponse(roomRepository.save(room));
+        // Cập nhật RoomType nếu có
+        if (request.getRoomTypeId() != null && !request.getRoomTypeId().isEmpty()) {
+            RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
+                    .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+            room.setRoomType(roomType);
+        }
+
+        // Lưu đối tượng phòng đã cập nhật và trả về phản hồi
+        Room updatedRoom = roomRepository.save(room);
+        return roomMapper.toRoomResponse(updatedRoom);
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+//    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse getRoomById(String id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
