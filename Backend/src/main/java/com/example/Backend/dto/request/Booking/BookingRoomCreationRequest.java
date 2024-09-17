@@ -16,7 +16,7 @@ import java.util.Date;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingRoomCreationRequest {
     @NotNull(message = "NOT_NULL")
-    User user;
+    String userId;
 
     @Future(message = "DATE_FUTURE")
     Date checkInDate;

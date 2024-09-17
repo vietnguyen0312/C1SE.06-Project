@@ -4,10 +4,12 @@ import com.example.Backend.dto.request.Booking.BookingRoomCreationRequest;
 import com.example.Backend.dto.request.Booking.BookingRoomUpdateRequest;
 import com.example.Backend.dto.response.Booking.BookingRoomResponse;
 import com.example.Backend.entity.Booking.BookingRoom;
+import com.example.Backend.entity.User.User;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Booking.BookingRoomMapper;
 import com.example.Backend.repository.Booking.BookingRoomRepository;
+import com.example.Backend.repository.User.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,13 +25,23 @@ import java.util.List;
 public class BookingRoomService {
     BookingRoomRepository bookingRoomRepository;
     BookingRoomMapper bookingRoomMapper;
+    UserRepository userRepository;
 
     public BookingRoomResponse createBookingRoom(BookingRoomCreationRequest request) {
-
+        // Tạo đối tượng BookingRoom từ yêu cầu
         BookingRoom bookingRoom = bookingRoomMapper.toBookingRoom(request);
 
+        // Tìm đối tượng User từ ID trong yêu cầu
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
+        // Thiết lập mối quan hệ cho BookingRoom
+        bookingRoom.setUser(user);
+
+        // Lưu BookingRoom vào cơ sở dữ liệu và trả về phản hồi
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
+
 
     public List<BookingRoomResponse> getBookingRooms() {
         return bookingRoomRepository.findAll().stream().map(bookingRoomMapper::toBookingRoomResponse).toList();

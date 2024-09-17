@@ -33,7 +33,8 @@ public class SecurityConfig {
             , "/auth/logout", "/auth/refresh", "/auth/outbound/authentication", "/users"};
 
     private final String[] PUBLIC_ENDPOINTS = {"/serviceTypes", "/serviceTypes/**", "/services"
-            , "/services/**","/ratingServices","/ratingServices/**","/room_type","/room_type/**","/room","/room/**"};
+            , "/services/**","/ratingServices","/ratingServices/**","/room_type","/room_type/**","/room","/room/**"
+            ,"/blog_comments","/blog_comments/**"};
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
