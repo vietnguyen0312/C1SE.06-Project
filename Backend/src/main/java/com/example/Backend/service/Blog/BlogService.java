@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +31,14 @@ public class BlogService {
     BlogMapper blogMapper;
 
     public BlogResponse createBlog(BlogCreateRequest request) {
-        Blog blog = blogMapper.toBlog(request);
-        blog.setBlogType(blogTypeRepository.findById(request.getBlogTypeId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
-        blog.setUser(userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
-        return blogMapper.toBlogResponse(blogRepository.save(blog));
+        try {
+            Blog blog = blogMapper.toBlog(request);
+            blog.setBlogType(blogTypeRepository.findById(request.getBlogTypeId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+            blog.setUser(userRepository.findById(request.getUserId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+            return blogMapper.toBlogResponse(blogRepository.save(blog));
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.EXISTED);
+        }
     }
 
     public BlogResponse updateBlog(BlogUpdateRequest request, String id) {
@@ -51,6 +57,12 @@ public class BlogService {
 
     public BlogResponse getBlogById(String id) {
         return blogMapper.toBlogResponse(blogRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+    }
+
+    public List<BlogResponse> getBlogByBlogType(String idBlogType) {
+        return blogRepository.findAllByBlogType(blogTypeRepository.findById(idBlogType)
+                .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED)))
+                .stream().map(blogMapper::toBlogResponse).toList();
     }
 
 }

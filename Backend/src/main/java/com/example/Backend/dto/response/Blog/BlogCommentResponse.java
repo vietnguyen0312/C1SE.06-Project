@@ -4,6 +4,8 @@ import com.example.Backend.entity.User.User;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,4 +16,5 @@ public class BlogCommentResponse {
     User user;
     Blog blog;
     String comment;
+    Date dateUpdate;
 }

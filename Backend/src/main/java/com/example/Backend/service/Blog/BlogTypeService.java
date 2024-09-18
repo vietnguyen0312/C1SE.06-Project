@@ -18,6 +18,9 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -43,6 +46,12 @@ public class BlogTypeService {
 
     public BlogTypeResponse getBlogTypeById(String id) {
         return blogTypeMapper.toBlogTypeResponse(blogTypeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+    }
+
+    public List<BlogTypeResponse> getAllBlogTypes() {
+        return blogTypeRepository.findAll().stream()
+                .map(blogTypeMapper::toBlogTypeResponse)  // Chuyển đổi mỗi BlogType thành BlogTypeResponse
+                .collect(Collectors.toList());  // Thu thập tất cả vào một List
     }
 
 }

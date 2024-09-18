@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import './App.css';
 import Home from './Layout/CustomerLayout/Home';
+import Blogs from './components/Blogs';
 import Services from './components/Services'
 import MainLayout from './Layout/CustomerLayout/MainLayout';
 import {
@@ -22,6 +23,11 @@ const router = createBrowserRouter([
         path: "services",
         element: <Services />,
       },
+      {
+        path: "Blogs",
+        element: <Blogs />,
+      }
+   
     ],
   },
   {
