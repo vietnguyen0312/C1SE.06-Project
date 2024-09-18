@@ -6,8 +6,15 @@ import MainLayout from './Layout/CustomerLayout/MainLayout';
 import {
   createBrowserRouter,
   RouterProvider,
+  Navigate,
+  Outlet,
 } from "react-router-dom";
 import Authentication from './Service/Authentication';
+
+const UnthorizedRoute = () => {
+  const isAuthenticated = localStorage.getItem('token');
+  return isAuthenticated ? <Navigate to="/" /> : <Outlet />;
+}
 
 const router = createBrowserRouter([
   {
@@ -25,8 +32,13 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: "/authentication",
-    element: <Authentication />,
+    element: <UnthorizedRoute />,
+    children: [
+      {
+        path: "/authentication",
+        element: <Authentication />,
+      },
+    ],
   },
 ]);
 
