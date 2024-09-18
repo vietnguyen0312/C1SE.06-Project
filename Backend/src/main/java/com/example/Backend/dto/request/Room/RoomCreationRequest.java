@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomCreationRequest {
     @NotBlank(message = "NOT_BLANK")
-    RoomType roomType;
+    String roomTypeId;
 
     @Positive(message = "POSITIVE")
     int roomNumber ;
