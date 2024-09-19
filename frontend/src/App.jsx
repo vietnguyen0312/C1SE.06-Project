@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import './App.css';
 import Home from './Layout/CustomerLayout/Home';
 import Services from './components/Services'
-import MainLayout from './Layout/CustomerLayout/MainLayout';
+import MainLayoutForCus from './Layout/CustomerLayout/MainLayoutForCus';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -10,6 +10,9 @@ import {
   Outlet,
 } from "react-router-dom";
 import Authentication from './Service/Authentication';
+import Error403 from './Layout/Error403';
+
+
 
 const UnthorizedRoute = () => {
   const isAuthenticated = localStorage.getItem('token');
@@ -19,7 +22,7 @@ const UnthorizedRoute = () => {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <MainLayout />,
+    element: <MainLayoutForCus />,
     children: [
       {
         index: true,
@@ -31,6 +34,16 @@ const router = createBrowserRouter([
       },
     ],
   },
+  // {
+  //   path: "/manager",
+  //   element: <MainLayoutForManager />,
+  //   children: [
+  //     {
+  //       index: true,
+  //       element: <Home />,
+  //     },
+  //   ],
+  // },
   {
     element: <UnthorizedRoute />,
     children: [
@@ -40,6 +53,10 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path: "/403",
+    element: <Error403 />
+  }
 ]);
 
 function App() {

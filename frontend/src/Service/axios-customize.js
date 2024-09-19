@@ -38,7 +38,7 @@ instance.interceptors.response.use((response) => {
         instance.defaults.headers.Authorization = `Bearer ${response.result.token}`;
       }).catch((error) => {
         localStorage.removeItem('token');
-        localStorage.removeItem('userInfo');
+        window.location.reload();
 
         return Promise.reject(error);
       }).finally(() => {
@@ -49,7 +49,11 @@ instance.interceptors.response.use((response) => {
       return instance(originalRequest);
     });
   }
-  
+
+  if (error.response?.status === 403) {
+    window.location.href = '/403';
+  }
+
   if (error.response?.status !== 401) {
     toast.error(error.response?.data?.message || error?.message);
   }

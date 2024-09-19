@@ -17,13 +17,8 @@ class ServiceTypeList extends Component {
     }
 
     fetchServiceTypes = async () => {
-        try {
-            const response = await axios.get('/serviceTypes');
-            this.setState({ serviceTypes: response.result, loading: false });
-        } catch (error) {
-            console.error('Error fetching service types:', error);
-            this.setState({ loading: false, error: 'Failed to load service types' });
-        }
+        const response = await axios.get('/serviceTypes');
+        this.setState({ serviceTypes: response.result, loading: false });
     };
 
     render() {

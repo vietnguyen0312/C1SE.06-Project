@@ -23,21 +23,16 @@ export class ServiceList extends Component {
     }
 
     getServices = async () => {
-        try {
-            let response;
-            if (this.state.filterByServiceTypeId === null) {
-                response = await axios.get('/services');
-                if (this.state.limit) {
-                    response.result = response.result.slice(0, this.state.limit);
-                }
-            } else {
-                response = await axios.get(`/services/findByServiceType/${this.state.filterByServiceTypeId}`);
+        let response;
+        if (this.state.filterByServiceTypeId === null) {
+            response = await axios.get('/services');
+            if (this.state.limit) {
+                response.result = response.result.slice(0, this.state.limit);
             }
-            this.setState({ services: response.result, loading: false });
-        } catch (error) {
-            console.error('Error fetching services:', error.response || error);
-            this.setState({ loading: false, services: [] });
+        } else {
+            response = await axios.get(`/services/findByServiceType/${this.state.filterByServiceTypeId}`);
         }
+        this.setState({ services: response.result, loading: false });
     }
 
     componentDidMount = () => {
@@ -154,7 +149,7 @@ export class ServiceList extends Component {
                 </div>
 
                 {totalPages > 1 && (
-                    <Pagination 
+                    <Pagination
                         itemsPerPage={servicesPerPage}
                         totalItems={services.length}
                         paginate={this.paginate}
