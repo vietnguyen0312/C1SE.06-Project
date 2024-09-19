@@ -7,11 +7,16 @@ import MainLayoutForCus from './Layout/CustomerLayout/MainLayoutForCus';
 import {
   createBrowserRouter,
   RouterProvider,
+  Navigate,
+  Outlet,
 } from "react-router-dom";
 import Authentication from './Service/Authentication';
 import Error403 from './Layout/Error403';
 
-
+const UnthorizedRoute = () => {
+  const isAuthenticated = localStorage.getItem('token');
+  return isAuthenticated ? <Navigate to="/" /> : <Outlet />;
+}
 
 const router = createBrowserRouter([
   {
@@ -30,7 +35,7 @@ const router = createBrowserRouter([
         path: "Blogs",
         element: <Blogs />,
       }
-   
+
     ],
   },
   // {
@@ -44,8 +49,13 @@ const router = createBrowserRouter([
   //   ],
   // },
   {
-    path: "/authentication",
-    element: <Authentication />,
+    element: <UnthorizedRoute />,
+    children: [
+      {
+        path: "/authentication",
+        element: <Authentication />,
+      },
+    ],
   },
   {
     path: "/403",

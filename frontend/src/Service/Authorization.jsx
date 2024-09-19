@@ -17,46 +17,22 @@ const useAuthorization = () => {
                 const code = isMatch[1];
                 const response = await axios.post(`/auth/outbound/authentication?code=${code}`);
                 localStorage.setItem('token', response.result.token);
-                getMyInfo();
-            } else {
-                const token = localStorage.getItem('token');
-                if (token !== null) {
-                    localStorage.removeItem('token');
-                    const response = await axios.post('/auth/introspect', { token });
-                    if (response.result.valid === true) {
-                        localStorage.setItem('token', token);
-                        getMyInfo();
-                    } else {
-                        try {
-                            const refreshToken = await axios.post('/auth/refresh', { token });
-                            localStorage.setItem('token', refreshToken.result.token);
-                            getMyInfo();
-                        } catch (error) {
-                            handleLogout();
-                        }
-                    }
-                }
+            }
+            const token = localStorage.getItem('token');
+            if (token) {
+                const response = await axios.get('/users/myInfo');
+                setUser(response.result);
             }
         };
         fetchUser();
     }, []);
 
-    const getMyInfo = async () => {
-        const userInfo = await axios.get('/users/myInfo');
-        setUser(userInfo.result);
-    };
-
     const handleLogout = async () => {
         const token = localStorage.getItem('token');
-        try {
-            localStorage.removeItem('token');
-            await axios.post('/auth/logout', { token });
-            setUser(null);
-            console.log('Logout successful, navigating to home page');
-            navigate('/');
-        } catch (error) {
-            console.error('Failed to logout:', error);
-        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('userInfo');
+        await axios.post('/auth/logout', { token });
+        setUser(null);
     };
 
     return { user, handleLogout };
