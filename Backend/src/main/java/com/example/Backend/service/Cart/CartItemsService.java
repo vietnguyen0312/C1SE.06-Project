@@ -11,12 +11,10 @@ import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Cart.CartItemsMapper;
 import com.example.Backend.repository.Cart.CartItemsRepository;
 import com.example.Backend.repository.Cart.CartRepository;
-import com.example.Backend.repository.User.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +25,6 @@ import java.util.List;
 @Slf4j
 public class CartItemsService {
     CartItemsRepository CartItemsRepository;
-    UserRepository userRepository;
     CartRepository cartRepository;
     CartItemsMapper CartItemsMapper;
 
@@ -54,13 +51,8 @@ public class CartItemsService {
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    public List<CartItemsResponse> getMyCartItems() {
-        var context = SecurityContextHolder.getContext();
-        String email = context.getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED));
-
-        return CartItemsRepository.findAllByCart(cartRepository.findByUser(user)
-                .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED)))
-                .stream().map(CartItemsMapper::toCartItemsResponse).toList();
+    public List<CartItemsResponse> getCartItemsByUser(User user) {
+        Cart cart = cartRepository.findByUser(user);
+        return CartItemsRepository.findAllByCart(cart).stream().map(CartItemsMapper::toCartItemsResponse).toList();
     }
 }

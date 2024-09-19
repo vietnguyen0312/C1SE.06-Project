@@ -38,26 +38,19 @@ public class BlogCommentService {
     UserRepository userRepository;
 
     public BlogCommentResponse createBlogComment(BlogCommentCreateRequest request) {
-        // Tạo đối tượng BlogComment từ yêu cầu
         BlogComment blogComment = blogCommentMapper.toBlogComment(request);
 
-        // Tìm đối tượng User và Blog từ ID trong yêu cầu
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         Blog blog = blogRepository.findById(request.getBlogId())
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-        // Thiết lập các mối quan hệ cho BlogComment
+
         blogComment.setUser(user);
         blogComment.setBlog(blog);
-
-        // Thiết lập ngày cập nhật cho BlogComment
         blogComment.setDateUpdate(new Date());
-
-        // Lưu BlogComment vào cơ sở dữ liệu và trả về phản hồi
         return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.save(blogComment));
     }
-
 
     public BlogCommentResponse updateBlogComment(BlogCommentUpdateRequest request, String id) {
         BlogComment blogComment = blogCommentRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -84,7 +77,7 @@ public class BlogCommentService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-        // Tìm tất cả các BlogComment thuộc về User
+        // Tìm tất cả các BlogComment của  User
         return blogCommentRepository.findAllByUser(user)
                 .stream().map(blogCommentMapper::toBlogCommentResponse)
                 .toList();

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/blog_comments")
+@RequestMapping("/blogComments")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
@@ -59,9 +59,10 @@ public class BlogCommentController {
 
 
     @DeleteMapping("/{id}")
-    ApiResponse<Void> deleteBlogComment(@PathVariable String id) {
+    ApiResponse<String> deleteBlogComment(@PathVariable String id) {
         blogCommentService.deleteBlogComment(id);
-        return ApiResponse.<Void>builder()
-                .build(); // Không có kết quả trả về
+        return ApiResponse.<String>builder()
+                .result("Blog has been deleted")
+                .build();
     }
 }

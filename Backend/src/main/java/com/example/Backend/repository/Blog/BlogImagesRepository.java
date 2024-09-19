@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface BlogImagesRepository extends JpaRepository<BlogImages, String> {
     List<BlogImages> findAllByBlog(Blog blog);
+    boolean existsByImage(String name);
 }

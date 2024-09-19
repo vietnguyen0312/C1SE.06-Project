@@ -22,10 +22,7 @@ import java.util.List;
 public class RoomTypeService {
     RoomTypeRepository roomTypeRepository;
     RoomTypeMapper roomTypeMapper;
-
     public RoomTypeResponse createRoomType(RoomTypeRequest request) {
-
-
         RoomType roomType = roomTypeMapper.toRoomType(request);
         RoomType savedRoomType = roomTypeRepository.save(roomType);
         return roomTypeMapper.toRoomTypeResponse(savedRoomType);
@@ -38,7 +35,6 @@ public class RoomTypeService {
                 .map(roomTypeMapper::toRoomTypeResponse)
                 .toList();
     }
-
     public void deleteRoomType(String id) {
         // Xóa RoomType theo ID
         roomTypeRepository.deleteById(id);

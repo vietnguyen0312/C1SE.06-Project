@@ -42,7 +42,6 @@ public class BookingRoomService {
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
 
-
     public List<BookingRoomResponse> getBookingRooms() {
         return bookingRoomRepository.findAll().stream().map(bookingRoomMapper::toBookingRoomResponse).toList();
     }
@@ -63,5 +62,19 @@ public class BookingRoomService {
 
     public void deleteBookingRoom(String id) {
         bookingRoomRepository.deleteById(id);
+    }
+
+    public List<BookingRoomResponse> getBookingRoomsByUser(String userId) {
+        // Kiểm tra xem User có tồn tại hay không
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
+        // Tìm tất cả các BookingRoom có liên kết với User đó
+        List<BookingRoom> bookingRooms = bookingRoomRepository.findByUser(user);
+
+        // Chuyển đổi từ danh sách BookingRoom sang BookingRoomResponse
+        return bookingRooms.stream()
+                .map(bookingRoomMapper::toBookingRoomResponse)
+                .toList();
     }
 }

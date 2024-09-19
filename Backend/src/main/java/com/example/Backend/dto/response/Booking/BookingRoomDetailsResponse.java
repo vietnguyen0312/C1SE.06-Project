@@ -14,4 +14,5 @@ public class BookingRoomDetailsResponse {
     String id;
     BookingRoom bookingRoom;
     Room room;
+    double price;
 }

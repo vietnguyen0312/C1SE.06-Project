@@ -5,7 +5,6 @@ import com.example.Backend.dto.request.Room.RoomCreationRequest;
 import com.example.Backend.dto.request.Room.RoomUpdateRequest;
 import com.example.Backend.dto.response.Room.RoomResponse;
 
-import com.example.Backend.dto.response.Room.RoomTypeResponse;
 import com.example.Backend.entity.Room.Room;
 import com.example.Backend.entity.Room.RoomType;
 import com.example.Backend.exception.AppException;
@@ -32,30 +31,30 @@ public class RoomService {
     RoomMapper roomMapper;
     RoomTypeRepository roomTypeRepository;
 
-//    @PreAuthorize("hasRole('MANAGER')")
-public RoomResponse createRoom(RoomCreationRequest request) {
-    try {
+    //    @PreAuthorize("hasRole('MANAGER')")
+    public RoomResponse createRoom(RoomCreationRequest request) {
+        try {
 
-        Room room = roomMapper.toRoom(request);
-
-
-        RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-        room.setRoomType(roomType);
+            Room room = roomMapper.toRoom(request);
 
 
-        Room savedRoom = roomRepository.save(room);
-        return roomMapper.toRoomResponse(savedRoom);
-    } catch (Exception e) {
+            RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
+                    .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+            room.setRoomType(roomType);
 
-        throw new AppException(ErrorCode.EXISTED);
+
+            Room savedRoom = roomRepository.save(room);
+            return roomMapper.toRoomResponse(savedRoom);
+        } catch (Exception e) {
+
+            throw new AppException(ErrorCode.EXISTED);
+        }
     }
-}
 
 
-//    @PreAuthorize("hasRole('MANAGER')")
+    //    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse updateRoom(String id, RoomUpdateRequest request) {
-    // Tìm phòng theo ID
+        // Tìm phòng theo ID
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
@@ -74,25 +73,21 @@ public RoomResponse createRoom(RoomCreationRequest request) {
         return roomMapper.toRoomResponse(updatedRoom);
     }
 
-//    @PreAuthorize("hasRole('MANAGER')")
+    //    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse getRoomById(String id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         return roomMapper.toRoomResponse(room);
     }
-
     public List<RoomResponse> getAllRooms() {
         return roomRepository.findAll().stream()
                 .map(roomMapper::toRoomResponse)
                 .collect(Collectors.toList());
     }
-
     public void deleteRoom(String id) {
         roomRepository.deleteById(id);
     }
-
     public List<RoomResponse> getRoomByRoomType(RoomType RoomType) {
         return roomRepository.findAllByRoomType(RoomType).stream().map(roomMapper::toRoomResponse).toList();
     }
-
 }

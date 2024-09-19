@@ -9,22 +9,45 @@ const Authenticate = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const contRef = useRef(null);
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
-        const response = await axios.post('/auth/token', { email, password });
-        const token = response.result.token;
-        localStorage.setItem('token', token);
-        navigate('/');
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            localStorage.removeItem('token');
+            const response = await axios.post('/auth/token', { email, password });
+            const token = response.result.token;
+            localStorage.setItem('token', token);
+            navigate('/');
+        } catch (err) {
+            setError('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleRegister = async (e) => {
-        const response = await axios.post('/users', { username, email, password });
-        const token = response.result.token;
-        localStorage.setItem('token', token);
-        console.log('Registration successful, navigating to home page');
-        navigate('/');
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await axios.post('/users', { username, email, password });
+            const token = response.result.token;
+            localStorage.setItem('token', token);
+            console.log('Registration successful, navigating to home page');
+            navigate('/'); // Redirect to main page
+        } catch (err) {
+            setError('Đăng ký không thành công. Vui lòng kiểm tra lại thông tin.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleToggle = () => {
@@ -41,6 +64,8 @@ const Authenticate = () => {
         const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
             callbackUrl
         )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
+
+        console.log(targetUrl); 
 
         window.location.href = targetUrl;
     };
@@ -78,7 +103,7 @@ const Authenticate = () => {
                     </label>
                     <button type="button" className={styles.submit} onClick={handleLogin}>Đăng Nhập</button>
                     <button type="button" className={styles.submit} onClick={handleClick} >
-                        <GoogleIcon style={{ textAlign: 'center', marginRight: '10px' }} />
+                        <GoogleIcon style={{ textAlign: 'center', marginRight: '10px' }} /> 
                         Đăng nhập với Google
                     </button>
                     <p className={styles['forgot-pass']}>

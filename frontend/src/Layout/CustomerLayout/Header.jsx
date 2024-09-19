@@ -1,4 +1,5 @@
 import React from 'react';
+import BlogTypeList from '../../Service/BlogTypeList';
 import ServiceTypeList from '../../Service/ServiceTypeList';
 import Authorization from '../../Service/Authorization';
 
@@ -41,7 +42,11 @@ function Header() {
                                 </li>
                                 <li><a href="/hotels">Khách sạn</a></li>
                                 <li><a href="/contact">Liên hệ</a></li>
-                                <li><a href="/news">Tin tức</a></li>
+                                <li className="menu-has-children"><a href="/blogs">Tin tức</a>
+                                    <ul>
+                                        <BlogTypeList />
+                                    </ul>
+                                </li>
                                 <Authorization />
                             </ul>
                         </nav>

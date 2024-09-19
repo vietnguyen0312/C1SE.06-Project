@@ -3,7 +3,6 @@ package com.example.Backend.service.User;
 import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.User.UserResponse;
-import com.example.Backend.entity.Cart.Cart;
 import com.example.Backend.entity.User.Role;
 import com.example.Backend.entity.User.User;
 import com.example.Backend.enums.CustomerTypeEnum;
@@ -11,7 +10,6 @@ import com.example.Backend.enums.RoleEnum;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.User.UserMapper;
-import com.example.Backend.repository.Cart.CartRepository;
 import com.example.Backend.repository.User.CustomerTypeRepository;
 import com.example.Backend.repository.User.RoleRepository;
 import com.example.Backend.repository.User.UserRepository;
@@ -34,9 +32,8 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class UserService {
-    RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
     UserRepository userRepository;
-    CartRepository cartRepository;
     CustomerTypeRepository customerTypeRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
@@ -56,17 +53,14 @@ public class UserService {
                 .build());
 
         user.setRoles(roles);
+
         try {
             user = userRepository.save(user);
-            cartRepository.save(Cart.builder()
-                    .user(user)
-                    .build());
-
         } catch (DataIntegrityViolationException exception) {
             throw new AppException(ErrorCode.EXISTED);
         }
 
-        return userMapper.toUserResponse(user);
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
     public UserResponse getMyInfo() {

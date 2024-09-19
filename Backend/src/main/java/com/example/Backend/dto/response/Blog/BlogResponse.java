@@ -1,7 +1,10 @@
 package com.example.Backend.dto.response.Blog;
 
+import com.example.Backend.entity.Blog.BlogImages;
 import com.example.Backend.entity.Blog.BlogType;
 import com.example.Backend.entity.User.User;
+import com.example.Backend.repository.Blog.BlogTypeRepository;
+import com.example.Backend.repository.User.UserRepository;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.Date;
@@ -17,10 +20,7 @@ public class BlogResponse {
     String contentOpen;
     Date dateTimeEdit;
     String status;
-    String userId;
-    String blogTypeId;
-    String username;
-    String blogTypeName;
-    BlogType blogType;
+    BlogType blogType ;
     User user;
+
 }

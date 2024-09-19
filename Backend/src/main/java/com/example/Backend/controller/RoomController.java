@@ -73,5 +73,6 @@ public class RoomController {
         return ApiResponse.<List<RoomResponse>>builder()
                 .result(rooms)
                 .build();
+
     }
 }

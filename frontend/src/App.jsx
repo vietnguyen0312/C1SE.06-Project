@@ -1,23 +1,17 @@
 import React, { useEffect } from 'react';
 import './App.css';
 import Home from './Layout/CustomerLayout/Home';
+import Blogs from './components/Blogs';
 import Services from './components/Services'
 import MainLayoutForCus from './Layout/CustomerLayout/MainLayoutForCus';
 import {
   createBrowserRouter,
   RouterProvider,
-  Navigate,
-  Outlet,
 } from "react-router-dom";
 import Authentication from './Service/Authentication';
 import Error403 from './Layout/Error403';
 
 
-
-const UnthorizedRoute = () => {
-  const isAuthenticated = localStorage.getItem('token');
-  return isAuthenticated ? <Navigate to="/" /> : <Outlet />;
-}
 
 const router = createBrowserRouter([
   {
@@ -32,6 +26,11 @@ const router = createBrowserRouter([
         path: "services",
         element: <Services />,
       },
+      {
+        path: "Blogs",
+        element: <Blogs />,
+      }
+   
     ],
   },
   // {
@@ -45,13 +44,8 @@ const router = createBrowserRouter([
   //   ],
   // },
   {
-    element: <UnthorizedRoute />,
-    children: [
-      {
-        path: "/authentication",
-        element: <Authentication />,
-      },
-    ],
+    path: "/authentication",
+    element: <Authentication />,
   },
   {
     path: "/403",

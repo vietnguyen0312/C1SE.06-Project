@@ -2,6 +2,7 @@ package com.example.Backend.configuration;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,12 +12,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
@@ -27,8 +33,11 @@ public class SecurityConfig {
             , "/auth/logout", "/auth/refresh", "/auth/outbound/authentication", "/users"};
 
     private final String[] PUBLIC_ENDPOINTS = {"/serviceTypes", "/serviceTypes/**", "/services"
-            , "/services/**","/ratingServices","/ratingServices/**","/room_type","/room_type/**","/room","/room/**"
-            ,"/blog_comments","/blog_comments/**","/swagger-ui/**","/v3/api-docs/**"};
+            , "/services/**","/ratingServices","/ratingServices/**", "/services/**",
+            "/blogTypes", "/blogTypes/**", "/blogs", "/blogs/**", "/images", "/images/**",
+            "/blogComments", "/blogComments/**", "/room_type","/room_type/**","/room","/room/**",
+            "/booking_room","/booking_room/**", "/booking_room_details","/booking_room_details/**",
+            "/swagger-ui/**","/v3/api-docs/**"};
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;

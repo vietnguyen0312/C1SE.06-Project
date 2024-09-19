@@ -2,6 +2,7 @@ package com.example.Backend.service.Blog;
 
 import com.example.Backend.dto.request.Blog.BlogImagesCreateRequest;
 import com.example.Backend.dto.response.Blog.BlogImagesResponse;
+import com.example.Backend.dto.response.Blog.BlogResponse;
 import com.example.Backend.entity.Blog.Blog;
 import com.example.Backend.entity.Blog.BlogImages;
 import com.example.Backend.enums.ErrorCode;
@@ -28,15 +29,26 @@ public class BlogImagesService {
     BlogImagesMapper blogImagesMapper;
 
     public BlogImagesResponse createBlogImages(BlogImagesCreateRequest request) {
-        BlogImages blogImages = blogImagesMapper.toBlogImages(request);
-        blogImages.setBlog(blogRepository.findById(request.getBlogId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
-        return blogImagesMapper.toBlogImagesResponse(blogImagesRepository.save(blogImages));
+       try {
+           BlogImages blogImages = blogImagesMapper.toBlogImages(request);
+           if(blogImagesRepository.existsByImage(blogImages.getImage())) {
+               throw new AppException(ErrorCode.EXISTED);
+           }
+           return blogImagesMapper.toBlogImagesResponse(blogImagesRepository.save(blogImages));
+       } catch (Exception e) {
+           throw new AppException(ErrorCode.EXISTED);
+       }
     }
 
     public List<BlogImagesResponse> getBlogImagesByBlog(String blogId) {
         return blogImagesRepository.findAllByBlog(blogRepository.findById(blogId)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED))).stream().map(blogImagesMapper::toBlogImagesResponse).toList();
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)))
+                .stream().map(blogImagesMapper::toBlogImagesResponse).toList();
+    }
+
+    public BlogImagesResponse getBlogImagesById(String id) {
+         return blogImagesMapper.toBlogImagesResponse(blogImagesRepository.findById(id)
+                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
     public void deleteBlogImages(String blogID) {
