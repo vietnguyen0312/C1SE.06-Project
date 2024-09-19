@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import '../Style/Service.css'
 import '../Style/Loading.css'
-import axios from './axios-customize'
+import axios from '../Configuration/AxiosConfig'
 import Pagination from '../components/Pagination'
 
 export class ServiceList extends Component {

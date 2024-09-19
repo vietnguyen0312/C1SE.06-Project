@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import LoadingIcons from 'react-loading-icons'
-import axios from './axios-customize'; // Đảm bảo đường dẫn đúng với cấu trúc dự án của bạn
+import axios from '../Configuration/AxiosConfig'; // Đảm bảo đường dẫn đúng với cấu trúc dự án của bạn
 
 class ServiceTypeList extends Component {
     constructor(props) {

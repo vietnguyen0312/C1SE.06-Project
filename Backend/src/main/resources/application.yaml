@@ -15,7 +15,7 @@ outbound:
   identity:
     client-id: "1000977843172-1rjrltqi0h45tk75e9r32sje0of6vpif.apps.googleusercontent.com"
     client-secret: "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"
-    redirect-uri: "http://localhost:3000/"
+    redirect-uri: "http://localhost:3000/authentication"
 
 jwt:
   signerKey: "fJn3xzOOIjzVhaRYqAbtI0g9AC0hUXRwATg9k1RNaVWYtSdXT5mdjHEsVJYowipI"

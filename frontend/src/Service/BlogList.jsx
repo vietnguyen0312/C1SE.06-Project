@@ -2,9 +2,8 @@ import React, { Component } from 'react'
 import LoadingIcons from 'react-loading-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
-// import '../Style/Blog.css'
 import '../Style/Loading.css'
-import axios from './axios-customize'
+import axios from '../Configuration/AxiosConfig'
 import Pagination from '../components/Pagination'
 
 export class BlogList extends Component {

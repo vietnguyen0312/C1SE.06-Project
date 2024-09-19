@@ -3,7 +3,7 @@ import Header from './Header';
 import Footer from './Footer';
 import { Outlet } from 'react-router-dom'; // Outlet để hiển thị các route con
 
-const MainLayoutForManager = () => {
+const MainLayout = () => {
     return (
         <>
             <Header />
@@ -13,4 +13,4 @@ const MainLayoutForManager = () => {
     );
 };
 
-export default MainLayoutForManager;
+export default MainLayout;

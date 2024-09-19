@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from './axios-customize';
+import axios from '../Configuration/AxiosConfig';
 import styles from '../Style/Authenticate.module.css';
-import { OAuthConfig } from "./ConfigurationGG";
+import { OAuthConfig } from "../Configuration/ClientConfig";
 import GoogleIcon from "@mui/icons-material/Google";
 
 const Authenticate = () => {
@@ -12,11 +12,49 @@ const Authenticate = () => {
     const contRef = useRef(null);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        const fetchGGLogin = async () => {
+            const authCode = /code=([^&]+)/;
+            const isMatch = window.location.href.match(authCode);
+            if (isMatch) {
+                const code = isMatch[1];
+                const response = await axios.post(`/auth/outbound/authentication?code=${code}`);
+                localStorage.setItem('token', response.result.token);
+                const roles = getRoles(response.result.token);
+                const redirectPath = getRedirectPath(roles);
+                navigate(redirectPath);
+            }
+        };
+        fetchGGLogin();
+    }, []);
+
     const handleLogin = async (e) => {
         const response = await axios.post('/auth/token', { email, password });
         const token = response.result.token;
         localStorage.setItem('token', token);
-        navigate('/');
+        const roles = getRoles(token);
+        console.log(roles);
+        const redirectPath = getRedirectPath(roles);
+        console.log(redirectPath);
+        navigate(redirectPath);
+    };
+
+    const getRoles = (token) => {
+        let jwtData = token.split('.')[1];
+        let decodedJwtJsonData = window.atob(jwtData);
+        let decodedJwtData = JSON.parse(decodedJwtJsonData);
+        let roles = decodedJwtData.scope.split(' ');
+        return roles;
+    };
+
+    const getRedirectPath = (roles) => {
+        if (roles.includes('MANAGER'))
+            return '/manager';
+        else if (roles.includes('EMPLOYER'))
+            return '/employer';
+        else if (roles.includes('EMPLOYEE'))
+            return '/employee';
+        return '/';
     };
 
     const handleRegister = async (e) => {

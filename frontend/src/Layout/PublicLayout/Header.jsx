@@ -1,7 +1,7 @@
 import React from 'react';
 import BlogTypeList from '../../Service/BlogTypeList';
 import ServiceTypeList from '../../Service/ServiceTypeList';
-import Authorization from '../../Service/Authorization';
+import UserInfo from '../../Service/UserInfo';
 
 function Header() {
     return (
@@ -47,7 +47,7 @@ function Header() {
                                         <BlogTypeList />
                                     </ul>
                                 </li>
-                                <Authorization />
+                                <UserInfo />
                             </ul>
                         </nav>
                     </div>

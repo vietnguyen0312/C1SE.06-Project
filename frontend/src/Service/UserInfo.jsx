@@ -1,26 +1,15 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import axios from './axios-customize';
-import { useNavigate } from 'react-router-dom';
+import axios from '../Configuration/AxiosConfig';
 
-const useAuthorization = () => {
+const GetUserInfo = () => {
     const [user, setUser] = useState(null);
-    const navigate = useNavigate();
 
     useEffect(() => {
-
-        const authCode = /code=([^&]+)/;
-        const isMatch = window.location.href.match(authCode);
-
         const fetchUser = async () => {
-            if (isMatch) {
-                const code = isMatch[1];
-                const response = await axios.post(`/auth/outbound/authentication?code=${code}`);
-                localStorage.setItem('token', response.result.token);
-            }
-            const token = localStorage.getItem('token');
-            if (token) {
-                const response = await axios.get('/users/myInfo');
+        const token = localStorage.getItem('token');
+        if (token) {
+            const response = await axios.get('/users/myInfo');
                 setUser(response.result);
             }
         };
@@ -38,8 +27,8 @@ const useAuthorization = () => {
     return { user, handleLogout };
 };
 
-const Authorization = () => {
-    const { user, handleLogout } = useAuthorization();
+const UserInfo = () => {
+    const { user, handleLogout } = GetUserInfo();
 
     return (
         <>
@@ -58,4 +47,4 @@ const Authorization = () => {
     );
 };
 
-export default Authorization;
+export default UserInfo;

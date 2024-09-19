@@ -1,10 +1,10 @@
 import axios from 'axios'
-import { SERVER_API } from '../config'
 import { toast } from 'react-toastify';
-import { refreshToken } from './RefreshToken';
+import { refreshToken } from '../Api/RefreshToken';
+import { API_URL } from './ClientConfig';
 
 let instance = axios.create({
-  baseURL: SERVER_API,
+  baseURL: API_URL,
 });
 
 instance.defaults.timeout = 1000 * 60 * 10;
@@ -27,9 +27,12 @@ instance.interceptors.response.use((response) => {
 }, async (error) => {
   const originalRequest = error.config;
   if (error.response?.status === 401 && originalRequest) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/';
+    }
 
     if (!refreshTokenPromise) {
-
       const token = localStorage.getItem('token');
       localStorage.removeItem('token');
 
@@ -39,7 +42,6 @@ instance.interceptors.response.use((response) => {
       }).catch((error) => {
         localStorage.removeItem('token');
         window.location.reload();
-
         return Promise.reject(error);
       }).finally(() => {
         refreshTokenPromise = null;
@@ -54,9 +56,7 @@ instance.interceptors.response.use((response) => {
     window.location.href = '/403';
   }
 
-  if (error.response?.status !== 401) {
-    toast.error(error.response?.data?.message || error?.message);
-  }
+  toast.error(error.response?.data?.message || error?.message);
 
   return Promise.reject(error);
 });
