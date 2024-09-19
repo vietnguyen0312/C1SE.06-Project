@@ -37,7 +37,8 @@ public class SecurityConfig {
             "/blogTypes", "/blogTypes/**", "/blogs", "/blogs/**", "/images", "/images/**",
             "/blogComments", "/blogComments/**",
             "/room_type","/room_type/**","/room","/room/**",
-            "/booking_room","/booking_room/**"};
+            "/booking_room","/booking_room/**",
+            "/booking_room_details","/booking_room_details/**"};
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
