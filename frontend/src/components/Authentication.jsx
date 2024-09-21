@@ -1,16 +1,93 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../Configuration/AxiosConfig';
-import styles from '../Style/Authenticate.module.css';
 import { OAuthConfig } from "../Configuration/ClientConfig";
-import GoogleIcon from "@mui/icons-material/Google";
+import { FcGoogle } from "react-icons/fc";
+import {
+    Box,
+    Button,
+    Checkbox,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Container,
+    FormControlLabel,
+    Grid,
+    IconButton,
+    InputAdornment,
+    TextField,
+    Typography,
+    styled,
+    Link
+} from "@mui/material";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { MdEmail, MdLock, MdPerson, MdPhone, MdCake, MdFlag } from "react-icons/md";
 
-const Authenticate = () => {
+const StyledContainer = styled(Container)(({ theme }) => ({
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundImage: "url('https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    padding: theme.spacing(3),
+}));
+
+const StyledForm = styled(Box)(({ theme }) => ({
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderRadius: theme.shape.borderRadius,
+    padding: theme.spacing(4),
+    boxShadow: theme.shadows[5],
+    transition: "all 0.3s ease-in-out",
+    "&:hover": {
+        transform: "translateY(-5px)",
+        boxShadow: theme.shadows[8],
+    },
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+    marginTop: theme.spacing(2),
+    padding: theme.spacing(1, 4),
+    fontSize: "1.1rem",
+    transition: "all 0.3s ease-in-out",
+    "&:hover": {
+        transform: "scale(1.05)",
+    },
+}));
+
+const commonEmailDomains = [
+    "gmail.com",
+    "yahoo.com",
+    "hotmail.com",
+    "outlook.com",
+];
+
+const StyledLink = styled(Link)(({ theme }) => ({
+    display: "block",
+    textAlign: "right",
+    marginTop: theme.spacing(1),
+    color: theme.palette.primary.main,
+    textDecoration: "none",
+    "&:hover": {
+        textDecoration: "underline",
+    },
+}));
+
+const Authentication = () => {
+    const [isLogin, setIsLogin] = useState(true);
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const contRef = useRef(null);
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [gender, setGender] = useState('');
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         const fetchGGLogin = async () => {
@@ -28,15 +105,85 @@ const Authenticate = () => {
         fetchGGLogin();
     }, []);
 
-    const handleLogin = async (e) => {
-        const response = await axios.post('/auth/token', { email, password });
-        const token = response.result.token;
-        localStorage.setItem('token', token);
-        const roles = getRoles(token);
-        console.log(roles);
-        const redirectPath = getRedirectPath(roles);
-        console.log(redirectPath);
-        navigate(redirectPath);
+    const validateEmail = (email) => {
+        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return re.test(String(email).toLowerCase());
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const newErrors = {};
+
+        if (!validateEmail(email)) {
+            newErrors.email = "Please enter a valid email address";
+        }
+
+        if (!isLogin) {
+            if (!username) {
+                newErrors.username = "User name is required";
+            }
+            if (!phoneNumber) {
+                newErrors.phoneNumber = "Phone number is required";
+            }
+            if (!gender) {
+                newErrors.gender = "Gender is required";
+            }
+            if (password !== confirmPassword) {
+                newErrors.confirmPassword = "Passwords do not match";
+            }
+            if (!password || !confirmPassword) {
+                newErrors.password = "Both password fields are required";
+            }
+        } else {
+            if (!password) {
+                newErrors.password = "Password is required";
+            }
+        }
+
+        if (!email) {
+            newErrors.email = "Email is required";
+        }
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length === 0) {
+            if (isLogin) {
+                const response = await axios.post('/auth/token', { email, password });
+                const token = response.result.token;
+                localStorage.setItem('token', token);
+                const roles = getRoles(token);
+                const redirectPath = getRedirectPath(roles);
+                navigate(redirectPath);
+            } else {
+                await axios.post('/users', {
+                    username, email, password,
+                    phoneNumber, gender
+                });
+                navigate('/otp-submit');
+            }
+        }
+
+    };
+
+    const toggleForm = () => {
+        setIsLogin(!isLogin);
+        setErrors({});
+    };
+
+    const handleGoogleLogin = () => {
+        const callbackUrl = OAuthConfig.redirectUri;
+        const authUrl = OAuthConfig.authUri;
+        const googleClientId = OAuthConfig.clientId;
+
+        const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
+            callbackUrl
+        )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
+
+        window.location.href = targetUrl;
+    };
+
+    const handleForgotPassword = () => {
+        alert("Forgot password clicked");
     };
 
     const getRoles = (token) => {
@@ -57,134 +204,189 @@ const Authenticate = () => {
         return '/';
     };
 
-    const handleRegister = async (e) => {
-        const response = await axios.post('/users', { username, email, password });
-        const token = response.result.token;
-        localStorage.setItem('token', token);
-        console.log('Registration successful, navigating to home page');
-        navigate('/');
-    };
-
-    const handleToggle = () => {
-        if (contRef.current) {
-            contRef.current.classList.toggle(styles['s--signup']);
-        }
-    };
-
-    const handleClick = () => {
-        const callbackUrl = OAuthConfig.redirectUri;
-        const authUrl = OAuthConfig.authUri;
-        const googleClientId = OAuthConfig.clientId;
-
-        const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
-            callbackUrl
-        )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
-
-        window.location.href = targetUrl;
-    };
-
     return (
-        <div className={styles.cont} ref={contRef}>
-            <div className={`${styles.form} ${styles['sign-in']}`}>
-                <h2>Chào mừng bạn đến Healing Ecotourism</h2>
-                <form>
-                    <label className={styles['pom-agile']}>
-                        <span className="fa fa-user-o" aria-hidden="true" />
-                        <span>Tên đăng nhập</span>
-                        <input
-                            id="email"
-                            name="email"
+        <StyledContainer maxWidth="lg">
+            <StyledForm component="form" onSubmit={handleSubmit}>
+                <Typography variant="h4" align="center" gutterBottom>
+                    {isLogin ? "Login" : "Register"}
+                </Typography>
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            label="Email"
+                            type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className={styles.user}
-                            type="text"
+                            error={!!errors.email}
+                            helperText={errors.email}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <MdEmail />
+                                    </InputAdornment>
+                                ),
+                            }}
+                            autoComplete="email"
                             required
                         />
-                    </label>
-                    <label className={styles['pom-agile']}>
-                        <span className="fa fa-key" aria-hidden="true" />
-                        <span>Mật khẩu</span>
-                        <input
-                            id="password"
-                            name="password"
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            fullWidth
+                            label="Password"
+                            type={showPassword ? "text" : "password"}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className={styles.pass}
-                            type="password"
+                            error={!!errors.password}
+                            helperText={errors.password}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <MdLock />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            edge="end"
+                                        >
+                                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
                             required
                         />
-                    </label>
-                    <button type="button" className={styles.submit} onClick={handleLogin}>Đăng Nhập</button>
-                    <button type="button" className={styles.submit} onClick={handleClick} >
-                        <GoogleIcon style={{ textAlign: 'center', marginRight: '10px' }} />
-                        Đăng nhập với Google
-                    </button>
-                    <p className={styles['forgot-pass']}>
-                        <a href="">Quên Mật Khẩu?</a>
-                    </p>
-                </form>
-            </div>
-            <div className={styles['sub-cont']}>
-                <div className={styles.img}>
-                    <div className={`${styles['img__text']} ${styles['m--up']}`}>
-                        <h2 style={{ color: 'white' }}>Bạn chưa có tài khoản?</h2>
-                        <p>Đăng ký và đặt vé để trải nghiệm những nơi thú vị!</p>
-                    </div>
-                    <div className={`${styles['img__text']} ${styles['m--in']}`}>
-                        <h2 style={{ color: 'white' }}>Bạn đã đăng ký?</h2>
-                        <p>Nếu bạn đã có tài khoản, chỉ cần đăng nhập. Chúng tôi nhớ bạn!</p>
-                    </div>
-                    <div className={styles['img__btn']} onClick={handleToggle}>
-                        <span className={styles['m--up']}>Đăng Ký</span>
-                        <span className={styles['m--in']}>Đăng Nhập</span>
-                    </div>
-                </div>
-                <div className={styles['form-container']}>
-                    <div className={`${styles.form} ${styles['sign-up']}`}>
-                        <h2>Đăng Ký</h2>
-                        <form>
-                            <label>
-                                <span>Tên người dùng</span>
-                                <input
-                                    name="username"
+                    </Grid>
+                    {!isLogin && (
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Confirm Password"
+                                type={showConfirmPassword ? "text" : "password"}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                error={!!errors.confirmPassword}
+                                helperText={errors.confirmPassword}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <MdLock />
+                                        </InputAdornment>
+                                    ),
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle confirm password visibility"
+                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                edge="end"
+                                            >
+                                                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                required
+                            />
+                        </Grid>
+                    )}
+                    {!isLogin && (
+                        <>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="User Name"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
-                                    type="text"
-                                    autoComplete="off"
+                                    error={!!errors.username}
+                                    helperText={errors.username}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <MdPerson />
+                                            </InputAdornment>
+                                        ),
+                                    }}
                                     required
                                 />
-                            </label>
-                            <label>
-                                <span>Email</span>
-                                <input
-                                    id="email"
-                                    name="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    type="email"
-                                    autoComplete="off"
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Phone Number"
+                                    value={phoneNumber}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    error={!!errors.phoneNumber}
+                                    helperText={errors.phoneNumber}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <MdPhone />
+                                            </InputAdornment>
+                                        ),
+                                    }}
                                     required
                                 />
-                            </label>
-                            <label>
-                                <span>Mật khẩu</span>
-                                <input
-                                    id="pw"
-                                    name="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    type="password"
-                                    autoComplete="new-password"
-                                    required
-                                />
-                            </label>
-                            <button type="button" className={styles.submit} onClick={handleRegister}>Đăng Ký</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControl fullWidth error={!!errors.gender} required>
+                                    <InputLabel>Gender</InputLabel>
+                                    <Select
+                                        value={gender}
+                                        onChange={(e) => setGender(e.target.value)}
+                                        label="Gender"
+                                    >
+                                        <MenuItem value="Male">Male</MenuItem>
+                                        <MenuItem value="Female">Female</MenuItem>
+                                        <MenuItem value="Other">Other</MenuItem>
+                                    </Select>
+                                    {errors.gender && (
+                                        <Typography variant="caption" color="error">
+                                            {errors.gender}
+                                        </Typography>
+                                    )}
+                                </FormControl>
+                            </Grid>
+                        </>
+                    )}
+                </Grid>
+                {errors.submit && (
+                    <Typography color="error" align="center" gutterBottom>
+                        {errors.submit}
+                    </Typography>
+                )}
+                <StyledButton
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    color="primary"
+                >
+                    {isLogin ? "Login" : "Register"}
+                </StyledButton>
+                {isLogin && (
+                    <Box mt={2} textAlign="center">
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            startIcon={<FcGoogle />}
+                            onClick={handleGoogleLogin}
+                        >
+                            Đăng nhập bằng Google
+                        </Button>
+                        <StyledLink href="#" onClick={handleForgotPassword}>
+                            Forgot password?
+                        </StyledLink>
+                    </Box>
+                )}
+                <Button fullWidth onClick={toggleForm} sx={{ mt: 2 }}>
+                    {isLogin ? "Need an account? Register" : "Already have an account? Login"}
+                </Button>
+            </StyledForm>
+        </StyledContainer>
     );
 };
 
-export default Authenticate;
+export default Authentication;

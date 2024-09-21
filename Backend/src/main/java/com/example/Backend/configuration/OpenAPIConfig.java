@@ -12,10 +12,11 @@ import java.util.List;
 
 @Configuration
 public class OpenAPIConfig {
-
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI().info(new Info().title("Api Document")
+        return new OpenAPI().info(new Info()
+                        .title("Api Document")
+                        .version("v1.0.0")
                 ).components(
                         new Components().addSecuritySchemes("bearerAuth",
                                 new SecurityScheme()

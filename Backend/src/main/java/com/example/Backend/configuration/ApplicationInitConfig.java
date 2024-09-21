@@ -53,12 +53,12 @@ public class ApplicationInitConfig {
                 }
             }
 
-            if (userRepository.findByEmail("manager").isEmpty()) {
+            if (userRepository.findByEmail("manager@gmail.com").isEmpty()) {
                 log.info("Add Manager account");
                 Set<Role> roles = new HashSet<>(roleRepository.findAll());
 
                 User user = User.builder()
-                        .email("manager")
+                        .email("manager@gmail.com")
                         .username("manager")
                         .password(passwordEncoder.encode("manager"))
                         .roles(roles)

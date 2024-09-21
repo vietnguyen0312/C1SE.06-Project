@@ -5,6 +5,7 @@ import MainLayoutPublic from '../Layout/PublicLayout/MainLayout';
 import Error403 from '../Layout/PublicLayout/Error403';
 import { Navigate, Outlet } from "react-router-dom";
 import Authentication from '../components/Authentication';
+import OtpSubmit from '../components/OtpSubmit';
 
 const UnthorizedRoute = () => {
     const isAuthenticated = localStorage.getItem('token');
@@ -42,7 +43,12 @@ const PublicRouters = [
     {
         path: "/403",
         element: <Error403 />
+    },
+    {
+        path: "/otp-submit",
+        element: <OtpSubmit />
     }
+
 ];
 
 export default PublicRouters;

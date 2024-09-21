@@ -10,6 +10,17 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: vietnguyen0312@gmail.com
+    password: tglrlkfbfamvlghz
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 outbound:
   identity:
@@ -21,3 +32,4 @@ jwt:
   signerKey: "fJn3xzOOIjzVhaRYqAbtI0g9AC0hUXRwATg9k1RNaVWYtSdXT5mdjHEsVJYowipI"
   valid-duration: 3600 # in second
   refreshable-duration: 360000 # in seconds
+

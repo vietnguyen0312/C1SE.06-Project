@@ -32,12 +32,7 @@ public class UserCreationRequest {
     @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "INVALID")
     String phoneNumber;
 
-    @Past(message = "DOB_PAST")
-    Date dob;
-
     @NotBlank(message = "NOT_BLANK")
     @Pattern(regexp = "^(Male|Female|Other)$", message = "GENDER_INVALID")
     String gender;
-
-    String nation;
 }

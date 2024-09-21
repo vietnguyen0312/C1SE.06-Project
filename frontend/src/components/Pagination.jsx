@@ -1,30 +1,25 @@
 import React from 'react';
-import '../Style/Pagination.css'
+import { Pagination as MuiPagination } from '@mui/material';
 
-const Pagination = ({ itemsPerPage, totalItems, paginate, currentPage }) => {
-    const pageNumbers = [];
+const CustomPagination = ({ itemsPerPage, totalItems, paginate, currentPage }) => {
+    const totalPageNumbers = Math.ceil(totalItems / itemsPerPage);
 
-    for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i++) {
-        pageNumbers.push(i);
-    }
+    const handlePageChange = (event, value) => {
+        paginate(value);
+    };
 
     return (
-        <div className="row mt-5">
-            <div className="col text-center">
-                <div className='block-27'>
-                    <ul className='pagination'>
-                        {pageNumbers.map(number => (
-                            <li key={number} className={`${currentPage === number ? 'active' : ''}`}>
-                                <a onClick={() => paginate(number)} href='#!' className='page-link'>
-                                    {number}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <MuiPagination
+            count={totalPageNumbers}
+            page={currentPage}
+            onChange={handlePageChange}
+            variant="outlined"
+            size="large"
+            showFirstButton
+            showLastButton
+            sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+        />
     );
 };
 
-export default Pagination;
+export default CustomPagination;
