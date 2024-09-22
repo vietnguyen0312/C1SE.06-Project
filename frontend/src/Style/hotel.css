@@ -1,0 +1,225 @@
+.hotel .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1040;
+    /* Điều chỉnh z-index nếu cần */
+}
+
+.hotel .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 1000px;
+    max-height: 100%;
+    overflow-y: auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1050;
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.hotel .modal-header {
+    padding: 16px;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    /* Sắp xếp theo cột */
+    align-items: flex-start;
+    /* Căn trái các phần tử */
+}
+
+.hotel .modal-header h3 {
+    margin: 0;
+    font-size: 1.8rem;
+    /* Tăng kích thước chữ tiêu đề */
+    font-weight: bold;
+    /* Làm nổi bật tiêu đề */
+    white-space: nowrap;
+    /* Ngăn ngắt dòng */
+    overflow: hidden;
+    /* Ẩn nội dung thừa */
+    text-overflow: ellipsis;
+    /* Hiển thị dấu ba chấm nếu nội dung quá dài */
+}
+
+.hotel .modal-body {
+    padding: 24px;
+    /* Tăng khoảng cách cho nội dung bên trong */
+}
+
+.hotel .close {
+    cursor: pointer;
+    font-size: 1.5rem;
+    border: none;
+    background: #000;
+    /* Màu nền đen cho nút đóng */
+    color: #fff;
+    /* Màu chữ trắng */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin-top: 2px;
+    margin-right: 2px;
+}
+
+.hotel .close:hover {
+    background: #444;
+    /* Thay đổi màu nền khi hover */
+}
+
+.hotel .img-fluid {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+    .hotel .modal {
+        width: 90%;
+    }
+}
+
+
+
+.hotel .room-card {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 16px;
+    margin: 16px 0;
+}
+
+.hotel .room-card img {
+    max-width: 150px;
+    height: auto;
+    margin-right: 20px;
+}
+
+.hotel .room-card h4 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.hotel .room-card p {
+    margin: 4px 0;
+    font-size: 16px;
+}
+
+
+
+.hotel .room-booking-container {
+    min-height: 100vh;
+    display: flex;
+    background: linear-gradient(to bottom right, #e0f2fe, #4f46e5);
+    align-items: flex-start;
+    /* Căn chỉnh theo đầu để không bị giữa */
+    justify-content: space-between;
+    /* Giữa các phần */
+    padding: 20px;
+}
+
+.hotel .booking-form {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    max-width: 500px;
+    width: 100%;
+    flex: 1;
+    /* Chiếm một nửa không gian */
+    margin-right: 10px;
+    /* Khoảng cách bên phải */
+}
+
+.hotel .available-rooms {
+    background: #4f46e5;
+    color: white;
+    padding: 24px;
+    border-radius: 8px;
+    flex: 1;
+    /* Chiếm một nửa không gian */
+}
+
+.hotel .booking-form h2 {
+    font-size: 24px;
+    margin-bottom: 24px;
+    color: #4b5563;
+}
+
+.hotel .form-group {
+    margin-bottom: 16px;
+}
+
+.hotel .input-container {
+    position: relative;
+}
+
+.hotel .input-container input,
+.hotel .input-container select {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    outline: none;
+}
+
+.hotel .input-container input:focus,
+.hotel .input-container select:focus {
+    border-color: #4f46e5;
+}
+
+.hotel button {
+    width: 100%;
+    padding: 12px;
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.hotel button:disabled {
+    background-color: #a1a1aa;
+}
+
+.hotel .available-rooms h3 {
+    font-size: 20px;
+    margin-bottom: 16px;
+}
+
+.hotel .room-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.hotel .room-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.hotel .room-card h4 {
+    font-weight: bold;
+    color: #4b5563;
+}
+
+.hotel .room-card p {
+    color: #6b7280;
+}
