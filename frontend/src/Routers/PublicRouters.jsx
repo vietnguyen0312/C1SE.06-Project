@@ -1,4 +1,4 @@
-import Home from '../Layout/PublicLayout/Home';
+import Home from '../Layout/PublicLayout/Home/Home';
 import Blogs from '../components/Blogs';
 import Services from '../components/Services'
 import MainLayoutPublic from '../Layout/PublicLayout/MainLayout';
@@ -6,7 +6,8 @@ import Error403 from '../Layout/PublicLayout/Error403';
 import { Navigate, Outlet } from "react-router-dom";
 import Authentication from '../components/Authentication';
 import OtpSubmit from '../components/OtpSubmit';
-
+import About from '../Layout/PublicLayout/About/About';
+import Contact from '../Layout/PublicLayout/Contact/Contact'
 const UnthorizedRoute = () => {
     const isAuthenticated = localStorage.getItem('token');
     return isAuthenticated ? <Navigate to="/" /> : <Outlet />;
@@ -28,6 +29,14 @@ const PublicRouters = [
             {
                 path: "blogs",
                 element: <Blogs />
+            },
+            {
+                path: "about",
+                element: <About />
+            },
+            {
+                path: "contact",
+                element: <Contact />
             },
         ],
     },
