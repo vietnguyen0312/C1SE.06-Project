@@ -1,15 +1,18 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import axios from '../Configuration/AxiosConfig';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Thêm dòng này để tích hợp Bootstrap JS
+import { NavMenuLink, NavMenuItem } from '../Layout/PublicLayout/Header/style';
 
 const GetUserInfo = () => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
         const fetchUser = async () => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            const response = await axios.get('/users/myInfo');
+            const token = localStorage.getItem('token');
+            if (token) {
+                const response = await axios.get('/users/myInfo');
                 setUser(response.result);
             }
         };
@@ -29,19 +32,30 @@ const GetUserInfo = () => {
 
 const UserInfo = () => {
     const { user, handleLogout } = GetUserInfo();
+    const [activeDropdown, setActiveDropdown] = useState(null);
 
     return (
         <>
             {user ? (
-                <li className="menu-has-children">
-                    <li><a href="/profile">{user.username}</a></li>
-                    <ul>
-                        <li><a href='/profile'>Thông tin cá nhân</a></li>
-                        <li><a href='' onClick={handleLogout}>Đăng xuất</a></li>
+                <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('service')} onMouseLeave={() => setActiveDropdown(null)}>
+                    <NavMenuLink href="/profile" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'service'}>
+                        {user.username}
+                    </NavMenuLink>
+                    <ul className={`dropdown-menu ${activeDropdown === 'service' ? 'show' : ''}`} aria-labelledby="blogDropdown">
+                        <li>
+                            <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/profile">
+                                Thông tin cá nhân
+                            </NavMenuLink>
+                        </li>
+                        <li>
+                            <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="" onClick={handleLogout}>
+                                Đăng xuất
+                            </NavMenuLink>
+                        </li>
                     </ul>
-                </li>
+                </NavMenuItem>
             ) : (
-                <li><a href="/authentication">Đăng nhập</a></li>
+                <NavMenuItem><NavMenuLink href="/authentication">Đăng nhập</NavMenuLink></NavMenuItem>
             )}
         </>
     );
