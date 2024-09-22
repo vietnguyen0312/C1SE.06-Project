@@ -9,6 +9,7 @@ import OtpSubmit from '../components/OtpSubmit';
 import About from '../Layout/PublicLayout/About/About';
 import Contact from '../Layout/PublicLayout/Contact/Contact'
 import Hotel from '../components/Hotels';
+import BlogHome from '../Layout/PublicLayout/BlogHome/BlogHome';
 const UnthorizedRoute = () => {
     const isAuthenticated = localStorage.getItem('token');
     return isAuthenticated ? <Navigate to="/" /> : <Outlet />;
@@ -42,6 +43,10 @@ const PublicRouters = [
             {
                 path: "hotels",
                 element: <Hotel />
+            },
+            {
+                path: "blogHome",
+                element: <BlogHome />
             },
         ],
     },

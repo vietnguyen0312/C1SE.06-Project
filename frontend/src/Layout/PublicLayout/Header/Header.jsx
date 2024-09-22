@@ -21,6 +21,7 @@ import {
   WrapperAICD } from '../Header/style.js';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Thêm dòng này để tích hợp Bootstrap JS
 
 
 function Header() {
@@ -54,7 +55,7 @@ function Header() {
     };
   }, []);
 
-
+  const [activeDropdown, setActiveDropdown] = useState(null); 
 
   return (
     <WrapperHeader className={isSticky ? 'sticky' : ''} >
@@ -94,20 +95,20 @@ function Header() {
                 <NavMenuItem><NavMenuLink href="/packages">PACKAGES</NavMenuLink></NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/hotels">HOTELS</NavMenuLink></NavMenuItem>
                 <NavMenuItem><NavMenuLink href="#">INSURENCE</NavMenuLink></NavMenuItem>
-                <NavMenuItem className="nav-item dropdown">
-                  <NavMenuLink href="#" className="nav-link dropdown-toggle" id="blogDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('blog')} onMouseLeave={() => setActiveDropdown(null)}>
+                  <NavMenuLink href="#" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'blog'}>
                     BLOG
                   </NavMenuLink>
-                  <ul className="dropdown-menu" aria-labelledby="blogDropdown">
-                    <li><NavMenuLink style={{ color: 'black' }}  className="dropdown-item" href="blog-home.html" >Blog Home</NavMenuLink></li>
-                    <li><NavMenuLink style={{ color: 'black' }}   className="dropdown-item" href="blog-single.html">Blog Single</NavMenuLink></li>
+                  <ul className={`dropdown-menu ${activeDropdown === 'blog' ? 'show' : ''}`} aria-labelledby="blogDropdown">
+                    <li><NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="blogHome">Blog Home</NavMenuLink></li>
+                    <li><NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="blog-single.html">Blog Single</NavMenuLink></li>
                   </ul>
                 </NavMenuItem>
-                <NavMenuItem className="nav-item dropdown">
-                  <NavMenuLink href="#" className="nav-link dropdown-toggle" id="pagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('pages')} onMouseLeave={() => setActiveDropdown(null)}>
+                  <NavMenuLink href="#" className="nav-link dropdown-toggle" id="pagesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded={activeDropdown === 'pages'}>
                     PAGES
                   </NavMenuLink>
-                  <ul className="dropdown-menu" aria-labelledby="pagesDropdown">
+                  <ul className={`dropdown-menu ${activeDropdown === 'pages' ? 'show' : ''}`} aria-labelledby="pagesDropdown">
                     <li><NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="elements.html">Elements</NavMenuLink></li>
                     <li className="dropdown-submenu">
                       <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="#">Level 2</NavMenuLink>
