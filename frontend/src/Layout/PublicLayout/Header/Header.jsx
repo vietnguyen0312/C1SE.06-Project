@@ -24,6 +24,8 @@ import ServiceTypeKList from '../../../Service/ServiceTypeList.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Thêm dòng này để tích hợp Bootstrap JS
 import UserInfo from '../../../Service/UserInfo.jsx';
+import BlogTypeList from '../../../Service/BlogTypeList.jsx'  
+
 
 
 function Header() {
@@ -104,13 +106,13 @@ function Header() {
                 </NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/hotels">Khách sạn</NavMenuLink></NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/contact">Liên hệ</NavMenuLink></NavMenuItem>
+                
                 <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('blog')} onMouseLeave={() => setActiveDropdown(null)}>
-                  <NavMenuLink href="#" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'blog'}>
+                  <NavMenuLink href="/blogs" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'blog'}>
                     Tin tức
                   </NavMenuLink>
                   <ul className={`dropdown-menu ${activeDropdown === 'blog' ? 'show' : ''}`} aria-labelledby="blogDropdown">
-                    <li><NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="blogHome">Blog Home</NavMenuLink></li>
-                    <li><NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="blog-single.html">Blog Single</NavMenuLink></li>
+                    <BlogTypeList/>
                   </ul>
                 </NavMenuItem>
                 <UserInfo />
