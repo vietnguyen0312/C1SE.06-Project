@@ -8,6 +8,7 @@ import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Bill.BillTicketDetailsMapper;
 import com.example.Backend.repository.Bill.BillTicketDetailsRepository;
+import com.example.Backend.repository.Bill.BillTicketRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +23,7 @@ import java.util.List;
 @Slf4j
 public class BillTicketDetailsService {
     BillTicketDetailsRepository billTicketDetailsRepository;
+    BillTicketRepository billTicketRepository;
     BillTicketDetailsMapper billTicketDetailsMapper;
 
     public BillTicketDetailsResponse createBillTicketDetails(BillTicketDetailsRequest request) {
@@ -35,7 +37,10 @@ public class BillTicketDetailsService {
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    public List<BillTicketDetailsResponse> getBillTicketDetailsByBillTicket(BillTicket billTicket) {
-        return billTicketDetailsRepository.findAllByBillTicket(billTicket).stream().map(billTicketDetailsMapper::toBillTicketDetailsResponse).toList();
+    public List<BillTicketDetailsResponse> getBillTicketDetailsByBillTicket(String  idBillTicket) {
+        BillTicket billTicket = billTicketRepository.findById(idBillTicket)
+                .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED));
+        return billTicketDetailsRepository.findAllByBillTicket(billTicket)
+                .stream().map(billTicketDetailsMapper::toBillTicketDetailsResponse).toList();
     }
 }
