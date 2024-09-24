@@ -6,13 +6,11 @@ import { FcGoogle } from "react-icons/fc";
 import {
     Box,
     Button,
-    Checkbox,
     FormControl,
     InputLabel,
     MenuItem,
     Select,
     Container,
-    FormControlLabel,
     Grid,
     IconButton,
     InputAdornment,
@@ -22,7 +20,8 @@ import {
     Link
 } from "@mui/material";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { MdEmail, MdLock, MdPerson, MdPhone, MdCake, MdFlag } from "react-icons/md";
+import { MdEmail, MdLock, MdPerson, MdPhone } from "react-icons/md";
+import { login } from "../Service/Login";
 
 const StyledContainer = styled(Container)(({ theme }) => ({
     minHeight: "100vh",
@@ -57,13 +56,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
         transform: "scale(1.05)",
     },
 }));
-
-const commonEmailDomains = [
-    "gmail.com",
-    "yahoo.com",
-    "hotmail.com",
-    "outlook.com",
-];
 
 const StyledLink = styled(Link)(({ theme }) => ({
     display: "block",
@@ -110,59 +102,55 @@ const Authentication = () => {
         return re.test(String(email).toLowerCase());
     };
 
+    const validatePhoneNumber = (phoneNumber) => {
+        const re = /^\+?[0-9. ()-]{7,25}$/;
+        return re.test(String(phoneNumber));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = {};
 
         if (!validateEmail(email)) {
-            newErrors.email = "Please enter a valid email address";
+            newErrors.email = "Vui lòng nhập đúng định dạng email";
         }
 
         if (!isLogin) {
-            if (!username) {
-                newErrors.username = "User name is required";
+            if (!username || username.length < 3 || username.length > 50) {
+                newErrors.username = "Tên người dùng phải có độ dài từ 3 đến 50 ký tự";
             }
-            if (!phoneNumber) {
-                newErrors.phoneNumber = "Phone number is required";
+            if (!phoneNumber || !validatePhoneNumber(phoneNumber)) {
+                newErrors.phoneNumber = "Vui lòng nhập số điện thoại hợp lệ";
             }
-            if (!gender) {
-                newErrors.gender = "Gender is required";
+            if (!gender || !["Male", "Female", "Other"].includes(gender)) {
+                newErrors.gender = "Giới tính phải là Male, Female, hoặc Other";
             }
             if (password !== confirmPassword) {
-                newErrors.confirmPassword = "Passwords do not match";
+                newErrors.confirmPassword = "Mật khẩu không khớp";
             }
-            if (!password || !confirmPassword) {
-                newErrors.password = "Both password fields are required";
+            if (!password || password.length < 8) {
+                newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự";
             }
         } else {
             if (!password) {
-                newErrors.password = "Password is required";
+                newErrors.password = "Mật khẩu là bắt buộc";
             }
         }
 
         if (!email) {
-            newErrors.email = "Email is required";
+            newErrors.email = "Email là bắt buộc";
         }
 
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
             if (isLogin) {
-                const response = await axios.post('/auth/token', { email, password });
-                const token = response.result.token;
-                localStorage.setItem('token', token);
-                const roles = getRoles(token);
-                const redirectPath = getRedirectPath(roles);
+                const redirectPath = await login(email, password);
                 navigate(redirectPath);
             } else {
-                await axios.post('/users', {
-                    username, email, password,
-                    phoneNumber, gender
-                });
-                navigate('/otp-submit');
+                navigate('/otp-submit', { state: { email, phoneNumber, username, gender, password, isRegister: true } });
             }
         }
-
     };
 
     const toggleForm = () => {
@@ -184,24 +172,6 @@ const Authentication = () => {
 
     const handleForgotPassword = () => {
         alert("Forgot password clicked");
-    };
-
-    const getRoles = (token) => {
-        let jwtData = token.split('.')[1];
-        let decodedJwtJsonData = window.atob(jwtData);
-        let decodedJwtData = JSON.parse(decodedJwtJsonData);
-        let roles = decodedJwtData.scope.split(' ');
-        return roles;
-    };
-
-    const getRedirectPath = (roles) => {
-        if (roles.includes('MANAGER'))
-            return '/manager';
-        else if (roles.includes('EMPLOYER'))
-            return '/employer';
-        else if (roles.includes('EMPLOYEE'))
-            return '/employee';
-        return '/';
     };
 
     return (

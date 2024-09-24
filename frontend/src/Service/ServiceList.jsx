@@ -13,10 +13,12 @@ export class ServiceList extends Component {
         this.state = {
             services: [],
             loading: true,
-            currentPage: 1,
-            servicesPerPage: 6,
             selectedService: null,
             isModalOpen: false,
+            currentPage: 1,
+            totalPages: 0,
+            pageSize: 6,
+            totalElements: 0,
             filterByServiceTypeId: props.serviceTypeId || null,
             limit: props.limit || null
         }
@@ -25,24 +27,36 @@ export class ServiceList extends Component {
     getServices = async () => {
         let response;
         if (this.state.filterByServiceTypeId === null) {
-            response = await axios.get('/services');
+            response = await axios.get('/services', { params: { page: this.state.currentPage, size: this.state.pageSize } });
             if (this.state.limit) {
-                response.result = response.result.slice(0, this.state.limit);
+                response.result.data = response.result.data.slice(0, this.state.limit);
+                this.setState({ services: response.result.data, loading: false });
+                return;
             }
         } else {
-            response = await axios.get(`/services/findByServiceType/${this.state.filterByServiceTypeId}`);
+            response = await axios.get(`/services/findByServiceType/${this.state.filterByServiceTypeId}`,
+                { params: { page: this.state.currentPage, size: this.state.pageSize } });
         }
-        this.setState({ services: response.result, loading: false });
+        this.setState({
+            services: response.result.data,
+            loading: false,
+            totalPages: response.result.totalPages,
+            totalElements: response.result.totalElements
+        });
     }
 
     componentDidMount = () => {
         this.getServices()
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
         if (prevProps.serviceTypeId !== this.props.serviceTypeId) {
             this.setState({ filterByServiceTypeId: this.props.serviceTypeId }, this.getServices);
         }
+        if (prevState.currentPage !== this.state.currentPage) {
+            this.getServices();
+        }
+
     }
 
     setSelectedService = (service) => {
@@ -53,25 +67,20 @@ export class ServiceList extends Component {
         this.setState({ isModalOpen: false })
     }
 
-    paginate = (pageNumber) => this.setState({ currentPage: pageNumber });
+    paginate = (pageNumber) => {
+        this.setState({ currentPage: pageNumber });
+    }
 
     render() {
-        const { currentPage, servicesPerPage, services, loading } = this.state;
-        const indexOfLastService = currentPage * servicesPerPage;
-        const indexOfFirstService = indexOfLastService - servicesPerPage;
-        const currentServices = services.slice(indexOfFirstService, indexOfLastService);
-
-        const totalPages = Math.ceil(services.length / servicesPerPage);
-
         return (
             <>
                 <div className='row'>
-                    {loading && (
+                    {this.state.loading && (
                         <div className="loading-container">
                             <LoadingIcons.TailSpin stroke="#000" />
                         </div>
                     )}
-                    {currentServices.map(service => (
+                    {this.state.services.map(service => (
                         <div className="col-md-4 ftco-animate container" key={service.id}>
                             <div className="project-wrap">
                                 <a className="img" style={{ backgroundImage: `url(/img/service/${service.image})` }}></a>
@@ -148,12 +157,12 @@ export class ServiceList extends Component {
                     )}
                 </div>
 
-                {totalPages > 1 && (
+                {this.state.totalPages > 1 && (
                     <Pagination
-                        itemsPerPage={servicesPerPage}
-                        totalItems={services.length}
                         paginate={this.paginate}
-                        currentPage={currentPage}
+                        currentPage={this.state.currentPage}
+                        totalPages={this.state.totalPages}
+                        serviceTypeId={this.state.filterByServiceTypeId}
                     />
                 )}
             </>

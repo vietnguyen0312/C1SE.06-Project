@@ -7,12 +7,12 @@ const Services = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const serviceTypeId = searchParams.get('serviceTypeId');
-
+  const page = searchParams.get('page');
   return (
     <>
       <section className="ftco-section">
         <div className="container">
-          <ServiceList serviceTypeId={serviceTypeId} />
+          <ServiceList serviceTypeId={serviceTypeId} currentPage={page} />
         </div>
       </section>
     </>

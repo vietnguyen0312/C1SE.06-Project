@@ -1,16 +1,22 @@
 import React from 'react';
 import { Pagination as MuiPagination } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
-const CustomPagination = ({ itemsPerPage, totalItems, paginate, currentPage }) => {
-    const totalPageNumbers = Math.ceil(totalItems / itemsPerPage);
+const CustomPagination = ({ currentPage, totalPages, paginate, serviceTypeId }) => {
+    const navigate = useNavigate();
 
     const handlePageChange = (event, value) => {
         paginate(value);
+        if (serviceTypeId) {
+            navigate(`/services?serviceTypeId=${serviceTypeId}&page=${value}`);
+        } else {
+            navigate(`/services?page=${value}`);
+        }
     };
 
     return (
         <MuiPagination
-            count={totalPageNumbers}
+            count={totalPages}
             page={currentPage}
             onChange={handlePageChange}
             variant="outlined"

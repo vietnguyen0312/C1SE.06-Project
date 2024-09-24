@@ -1,16 +1,16 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.dto.request.Service.ServiceRequest;
-import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.Service.ServiceResponse;
-import com.example.Backend.dto.response.User.UserResponse;
 import com.example.Backend.service.Service.ServiceService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.query.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,9 +31,11 @@ public class ServiceController {
     }
 
     @GetMapping
-    ApiResponse<List<ServiceResponse>> getAllService() {
-        return ApiResponse.<List<ServiceResponse>>builder()
-                .result(serviceService.getAllServices())
+    ApiResponse<PageResponse<ServiceResponse>> getServiceList(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+        return ApiResponse.<PageResponse<ServiceResponse>>builder()
+                .result(serviceService.getAllServices(page, size))
                 .build();
     }
 
@@ -45,9 +47,12 @@ public class ServiceController {
     }
 
     @GetMapping("/findByServiceType/{idServiceType}")
-    ApiResponse<List<ServiceResponse>> getByServiceType(@PathVariable("idServiceType") String idServiceType) {
-        return ApiResponse.<List<ServiceResponse>>builder()
-                .result(serviceService.getServiceByServiceType(idServiceType))
+    ApiResponse<PageResponse<ServiceResponse>> getByServiceType(
+            @PathVariable("idServiceType") String idServiceType,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+        return ApiResponse.<PageResponse<ServiceResponse>>builder()
+                .result(serviceService.getServiceByServiceType(idServiceType, page, size))
                 .build();
     }
 

@@ -1,6 +1,7 @@
 package com.example.Backend.service.Service;
 
 import com.example.Backend.dto.request.Service.ServiceRequest;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.entity.Service.ServiceEntity;
 import com.example.Backend.entity.Service.ServiceType;
@@ -13,6 +14,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -40,10 +44,20 @@ public class ServiceService {
         }
     }
 
-    public List<ServiceResponse> getAllServices() {
-        return serviceRepository.findAll().stream()
-                .map(serviceMapper::toResponse)
-                .collect(Collectors.toList());
+    public PageResponse<ServiceResponse> getAllServices(int page, int size) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "name").ascending();
+
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        var pageData = serviceRepository.findAll(pageable);
+
+        return PageResponse.<ServiceResponse>builder()
+                .currentPage(page)
+                .totalPages(pageData.getTotalPages())
+                .pageSize(size)
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(serviceMapper::toResponse).toList())
+                .build();
     }
 
     public ServiceResponse getServiceById(String id) {
@@ -66,10 +80,21 @@ public class ServiceService {
         serviceRepository.deleteById(id);
     }
 
-    public List<ServiceResponse> getServiceByServiceType(String idServiceType) {
-        return serviceRepository.findAllByServiceType(serviceTypeRepository.findById(idServiceType)
-                .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED)))
-                .stream().map(serviceMapper::toResponse).toList();
+    public PageResponse<ServiceResponse> getServiceByServiceType(String idServiceType, int page, int size) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "name").ascending();
+
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        var pageData = serviceRepository.findAllByServiceType(serviceTypeRepository.findById(idServiceType)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)), pageable);
+
+        return PageResponse.<ServiceResponse>builder()
+                .currentPage(page)
+                .totalPages(pageData.getTotalPages())
+                .pageSize(size)
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(serviceMapper::toResponse).toList())
+                .build();
     }
 
 }

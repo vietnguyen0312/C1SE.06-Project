@@ -48,7 +48,7 @@ class ServiceTypeList extends Component {
                 )}
                 {serviceTypes.map(serviceTypes => (
                     <li key={serviceTypes.id}>
-                        <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href={`/services?serviceTypeId=${serviceTypes.id}`}>
+                        <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href={`/services?serviceTypeId=${serviceTypes.id}&page=1`}>
                             {serviceTypes.name}
                         </NavMenuLink>
                     </li>

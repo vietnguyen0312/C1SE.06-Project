@@ -97,7 +97,7 @@ function Header() {
                 <NavMenuItem><NavMenuLink href="/">Trang chủ</NavMenuLink></NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/about">Giới thiệu</NavMenuLink></NavMenuItem>
                 <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('service')} onMouseLeave={() => setActiveDropdown(null)}>
-                  <NavMenuLink href="/services" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'service'}>
+                  <NavMenuLink href="/services?page=1" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'service'}>
                     Dịch vụ
                   </NavMenuLink>
                   <ul className={`dropdown-menu ${activeDropdown === 'service' ? 'show' : ''}`} aria-labelledby="blogDropdown">
