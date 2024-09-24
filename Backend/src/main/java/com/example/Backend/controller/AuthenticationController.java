@@ -1,12 +1,10 @@
 package com.example.Backend.controller;
 
 import com.example.Backend.dto.request.AuthenticationRequest;
-import com.example.Backend.dto.request.IntrospectRequest;
 import com.example.Backend.dto.request.LogoutRequest;
 import com.example.Backend.dto.request.RefreshRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.AuthenticationResponse;
-import com.example.Backend.dto.response.IntrospectResponse;
 import com.example.Backend.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
 import lombok.AccessLevel;
