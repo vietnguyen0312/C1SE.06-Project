@@ -3,6 +3,7 @@ package com.example.Backend.service.Blog;
 import com.example.Backend.dto.request.Blog.BlogCreateRequest;
 import com.example.Backend.dto.request.Blog.BlogUpdateRequest;
 import com.example.Backend.dto.response.Blog.BlogResponse;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.entity.Blog.Blog;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
@@ -14,11 +15,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.data.domain.Sort;
 
 @Service
 @RequiredArgsConstructor
@@ -51,18 +55,38 @@ public class BlogService {
         blogRepository.deleteById(id);
     }
 
-    public List<BlogResponse> getAllBlog() {
-        return blogRepository.findAll().stream().map(blogMapper::toBlogResponse).toList();
+    public PageResponse<BlogResponse> getAllBlog(int page , int size) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "dateTimeEdit").descending();
+
+        Pageable pageable = PageRequest.of(page-1, size, sort);
+        var pageData = blogRepository.findAll(pageable);
+
+        return PageResponse.<BlogResponse>builder()
+                .currentPage(page)
+                .totalPages(pageData.getTotalPages())
+                .pageSize(size)
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(blogMapper::toBlogResponse).toList())
+                .build();
     }
 
     public BlogResponse getBlogById(String id) {
         return blogMapper.toBlogResponse(blogRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    public List<BlogResponse> getBlogByBlogType(String idBlogType) {
-        return blogRepository.findAllByBlogType(blogTypeRepository.findById(idBlogType)
-                .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED)))
-                .stream().map(blogMapper::toBlogResponse).toList();
+    public PageResponse<BlogResponse> getBlogByBlogType(String idBlogType, int page , int size) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "dateTimeEdit").descending();
+        Pageable pageable = PageRequest.of(page-1, size, sort);
+        var pageData = blogRepository.findAllByBlogType( blogTypeRepository.findById(idBlogType)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)), pageable);
+
+        return PageResponse.<BlogResponse>builder()
+                .currentPage(page)
+                .totalPages(pageData.getTotalPages())
+                .pageSize(size)
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(blogMapper::toBlogResponse).toList())
+                .build();
     }
 
 }

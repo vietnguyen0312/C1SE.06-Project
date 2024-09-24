@@ -4,6 +4,7 @@ import com.example.Backend.dto.request.Blog.BlogCreateRequest;
 import com.example.Backend.dto.request.Blog.BlogUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Blog.BlogResponse;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.service.Blog.BlogService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -30,10 +31,13 @@ public class BlogController {
     }
 
     @GetMapping
-    ApiResponse<List<BlogResponse>> getAllBlogs() {
-        return ApiResponse.<List<BlogResponse>>builder()
-                .result(blogService.getAllBlog())
-                .build();
+    ApiResponse<PageResponse<BlogResponse>> getAllBlogs(
+            @RequestParam (value = "page" , required = false, defaultValue = "1") int page,
+            @RequestParam (value = "size" , required = false , defaultValue = "6") int size
+    ) {
+            return ApiResponse.<PageResponse<BlogResponse>>builder()
+                    .result(blogService.getAllBlog(page, size))
+                    .build()    ;
     }
 
     @GetMapping("/{id}")
@@ -44,9 +48,12 @@ public class BlogController {
     }
 
     @GetMapping("/findByBlogType/{idBlogType}")
-    ApiResponse<List<BlogResponse>> getBlogsByBlogType(@PathVariable("idBlogType") String idBlogType) {
-        return ApiResponse.<List<BlogResponse>>builder()
-                .result(blogService.getBlogByBlogType(idBlogType))
+    ApiResponse<PageResponse<BlogResponse>> getBlogsByBlogType(@PathVariable("idBlogType") String idBlogType,
+        @RequestParam (value = "page" , required = false , defaultValue = "1") int page,
+        @RequestParam (value = "size" , required = false , defaultValue = "6") int size
+    ) {
+        return ApiResponse.<PageResponse<BlogResponse>>builder()
+                .result(blogService.getBlogByBlogType(idBlogType, page, size))
                 .build();
     }
     @PutMapping("/{id}")

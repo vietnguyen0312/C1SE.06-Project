@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import LoadingIcons from 'react-loading-icons';
 import axios from '../Configuration/AxiosConfig';
-import Pagination from '../components/Pagination';
+import { Pagination as MuiPagination } from '@mui/material';
+
 import { format } from 'date-fns';
 import { BannerSection2 } from '../Layout/PublicLayout/Home/style';
 import styled from 'styled-components';
@@ -284,10 +285,12 @@ export class BlogList extends Component {
       blogs: [],
       loading: true,
       currentPage: 1,
-      blogsPerPage: 6,
+      totalPages: 0,
+      pageSize: 6,
+      totalElements: 10,
       searchTerm: '',
       filteredBlogs: [],
-       selectedBlog: null,
+      selectedBlog: null,
       currentImageIndex: {},
       filterByBlogTypeId: props.blogTypeId || null,
       limit: props.limit || null,
@@ -318,30 +321,41 @@ export class BlogList extends Component {
   };
 
   getBlogs = async () => {
-    
-     let responseBlogs;
-     if (this.state.filterByBlogTypeId === null) {
-      responseBlogs = await axios.get('/blogs');
-      if (this.state.limit) {
-          responseBlogs.result = responseBlogs.result.slice(0, this.state.limit);
+   
+      let responseBlogs;
+      let blogsWithImages =[] ;
+      if (this.state.filterByBlogTypeId === null) {
+        responseBlogs = await axios.get('/blogs', { params: { page: this.state.currentPage, size: this.state.pageSize } });
+        if (this.state.limit) {
+          responseBlogs.result.data = responseBlogs.result.data.slice(0, this.state.limit);
+        }
+      } else {
+        responseBlogs = await axios.get(`/blogs/findByBlogType/${this.state.filterByBlogTypeId}`,{ params: { page: this.state.currentPage, size: this.state.pageSize } });
       }
-    } else {
-      responseBlogs = await axios.get(`/blogs/findByBlogType/${this.state.filterByBlogTypeId}`);
-    }
-      const blogsWithImages = await Promise.all(
-      responseBlogs.result.map(async (blog) => {
-          const imageResponse = await axios.get(`/images/findImagesByBlog/${blog.id}`);
-          return {
-            ...blog,
-            images: imageResponse.result.map((image) => image.image),
-          };
-        })
-      );
 
-      this.setState({ blogs: blogsWithImages, filteredBlogs: blogsWithImages, loading: false });
-      setTimeout(() => {
-        this.setState({ visibleBlogs: visibleBlogs.map(() => true) }); // Set all to true after a short delay
-      }, 100);
+           blogsWithImages = await Promise.all(
+          responseBlogs.result.data.map(async (blog) => {
+            // Gọi API thứ hai để lấy hình ảnh cho mỗi blog
+            const imageResponse = await axios.get(`/images/findImagesByBlog/${blog.id}`);
+            
+            // Kiểm tra và xử lý dữ liệu hình ảnh
+            const images = Array.isArray(imageResponse.result) ? 
+              imageResponse.result.map((image) => image.image) : [];
+            return {
+              ...blog,
+              images: images || [], // Ensure images is always an array
+            };
+          })
+        );
+
+        this.setState({
+          blogs: blogsWithImages,
+          filteredBlogs: blogsWithImages,
+          loading: false,
+          totalPages: responseBlogs.result.totalPages,
+          totalElements: responseBlogs.result.totalElements,
+        });
+      
     
   };
 
@@ -354,17 +368,34 @@ export class BlogList extends Component {
     const filteredBlogs = blogs.filter((blog) =>
       blog.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    this.setState({ filteredBlogs });
+  
+    const filteredBlogsWithImages = filteredBlogs.map((filteredBlog) => {
+      const originalBlog = this.state.filteredBlogs.find((blog) => blog.id === filteredBlog.id);
+      return {
+        ...filteredBlog,
+        images: originalBlog?.images || [], // Kết hợp ảnh từ blog gốc đã được tải trước đó
+      };
+    });
+  
+    this.setState({ filteredBlogs: filteredBlogsWithImages });
   };
 
-  paginate = (pageNumber) => this.setState({ currentPage: pageNumber });
+  paginate = (pageNumber) => {
+    this.setState({ currentPage: pageNumber, loading: true }, this.getBlogs);
+  };
+  
 
   handleImageChange = (blogId, direction) => {
     this.setState((prevState) => {
       const currentIndex = prevState.currentImageIndex[blogId] || 0;
       const blog = prevState.blogs.find((b) => b.id === blogId);
+      
+      if (!blog || !blog.images || blog.images.length === 0) {
+        return prevState; // Nếu không có ảnh nào, thoát sớm
+      }
+  
       const newIndex = (currentIndex + (direction === 'next' ? 1 : -1) + blog.images.length) % blog.images.length;
-
+  
       return {
         currentImageIndex: {
           ...prevState.currentImageIndex,
@@ -373,98 +404,119 @@ export class BlogList extends Component {
       };
     });
   };
+  
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.blogTypeId !== this.props.blogTypeId) {
+        this.setState({ filterByBlogTypeId: this.props.blogTypeId }, this.getBlogs);
+    }
+    if (prevState.currentPage !== this.state.currentPage) {
+        this.getBlogs();
+    }
+  }
 
   render() {
-    const { currentPage, blogsPerPage, filteredBlogs, loading, searchTerm, currentImageIndex, visibleBlogs } = this.state;
-    const indexOfLastBlog = currentPage * blogsPerPage;
-    const indexOfFirstBlog = indexOfLastBlog - blogsPerPage;
-    const currentBlogs = filteredBlogs.slice(indexOfFirstBlog, indexOfLastBlog);
+    const { loading, filteredBlogs, currentImageIndex, searchTerm, visibleBlogs,currentPage,  totalPages } = this.state;
+    const blogTypeId = this.state.filterByBlogTypeId;
+    const linkPath = blogTypeId 
+    ? `/blogs?blogTypeId=${blogTypeId}&page=${currentPage}` 
+    : `/blogs?page=${currentPage}`; // Đảm bảo sử dụng currentPage ở đây
 
+    
     return (
       <div>
-      <BannerSection2>
-        <Overlay />
-        <Container>
+        <BannerSection2>
+          <Overlay />
+          <Container>
             <Row>
-            <AboutContent>
+              <AboutContent>
                 <Title1>Tin Tức</Title1>
                 <LinkNav>
-                    <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Home</StyledLink>
-                    <Arrow data-aos="fade-left" data-aos-delay="200">→</Arrow>
-                    <StyledLink to="/about" data-aos="fade-left" data-aos-delay="0">About Us</StyledLink>
+                  <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Home</StyledLink>
+                  <Arrow data-aos="fade-left" data-aos-delay="200">→</Arrow>
+                  <StyledLink to="/about" data-aos="fade-left" data-aos-delay="0">About Us</StyledLink>
                 </LinkNav>
-            </AboutContent>
+              </AboutContent>
             </Row>
-        </Container>
+          </Container>
         </BannerSection2>
-      <Body2>
-        <Title>Thông Tin Văn Hóa - Ẩm Thực</Title>
 
-        <SearchBar>
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={this.handleInputChange}
-            placeholder="Nhập tại đây"
-          />
-          <button onClick={this.handleSearch}>Tìm kiếm</button>
-        </SearchBar>
+        <Body2>
+          <Title>Thông Tin Văn Hóa - Ẩm Thực</Title>
 
-        {loading ? (
-          <LoadingIcons.SpinningCircles />
-        ) : (
-          <Grid>
-            {currentBlogs.map((post, index) => (
-              <AnimatedBlogCard
-                key={post.id}
-                id={`blog-${index}`}
-                className={visibleBlogs[index] ? 'visible' : ''} // Add class based on visibility
-              >
-                {post.images.length > 0 && (
-                  <div style={{ position: 'relative' }}>
-                    <BlogImage
-                      src={`/img/blog/${post.images[currentImageIndex[post.id] || 0]}`}
-                      alt={post.title}
-                    />
-                    <NavButton className="left" onClick={() => this.handleImageChange(post.id, 'prev')}>
-                      &lt;
-                    </NavButton>
-                    <NavButton className="right" onClick={() => this.handleImageChange(post.id, 'next')}>
-                      &gt;
-                    </NavButton>
-                  </div>
-                )}
-                <BlogContent>
-                  <BlogTitle>{post.title}</BlogTitle>
-                  <BlogBody>{post.contentOpen}</BlogBody>
-                  <BlogInfoDate>
-                    <BlogIcon src="/img/time.png" alt="Blog Type Icon" />
-                    <span>{format(new Date(post.dateTimeEdit), 'dd/MM/yyyy')}</span>
-                  </BlogInfoDate>
-                  <BlogInfoBlogType>
-                    <BlogIcon src="/img/tag.png" alt="Blog Type Icon" />
-                    <span>{post.blogType?.name}</span>
-                  </BlogInfoBlogType>
-                  <BlogInfoUser>
-                    <BlogIcon src="/img/user.png" alt="User Icon" />
-                    <span>{post.user?.username}</span>
-                  </BlogInfoUser>
-                </BlogContent>
-                <BlogButton onClick={() => this.setSelectedBlog(post)}>Xem chi tiết...</BlogButton>
-              </AnimatedBlogCard>
-            ))}
-          </Grid>
-        )}
+          <SearchBar>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={this.handleInputChange}
+              placeholder="Nhập tại đây"
+            />
+            <button onClick={this.handleSearch}>Tìm kiếm</button>
+          </SearchBar>
 
-        {filteredBlogs.length > blogsPerPage && (
-          <Pagination
-            itemsPerPage={blogsPerPage}
-            totalItems={filteredBlogs.length}
-            paginate={this.paginate}
-            currentPage={currentPage}
-          />
-        )}
-      </Body2>
+          {loading ? (
+            <LoadingIcons.SpinningCircles />
+          ) : (
+            <Grid>
+              {filteredBlogs.map((post, index) => (
+                <AnimatedBlogCard
+                  key={post.id}
+                  id={`blog-${index}`}
+                  className={visibleBlogs[index] ? 'visible' : ''} // Add class based on visibility
+                >
+                  {post.images && post.images.length > 0 && (
+                    <div style={{ position: 'relative' }}>
+                      <BlogImage
+                        src={`/img/blog/${post.images[currentImageIndex[post.id] || 0]}`}
+                        alt={post.title}
+                      />
+                      <NavButton className="left" onClick={() => this.handleImageChange(post.id, 'prev')}>
+                        &lt;
+                      </NavButton>
+                      <NavButton className="right" onClick={() => this.handleImageChange(post.id, 'next')}>
+                        &gt;
+                      </NavButton>
+                    </div>
+                  )}
+                  <BlogContent>
+                    <BlogTitle>{post.title}</BlogTitle>
+                    <BlogBody>{post.contentOpen}</BlogBody>
+                    <BlogInfoDate>
+                      <BlogIcon src="/img/time.png" alt="Blog Type Icon" />
+                      <span>{format(new Date(post.dateTimeEdit), 'dd/MM/yyyy')}</span>
+                    </BlogInfoDate>
+                    <BlogInfoBlogType>
+                      <BlogIcon src="/img/tag.png" alt="Blog Type Icon" />
+                      <span>{post.blogType?.name}</span>
+                    </BlogInfoBlogType>
+                    <BlogInfoUser>
+                      <BlogIcon src="/img/user.png" alt="User Icon" />
+                      <span>{post.user?.username}</span>
+                    </BlogInfoUser>
+                  </BlogContent>
+                  <BlogButton onClick={() => this.setSelectedBlog(post)}>Xem chi tiết...</BlogButton>
+                </AnimatedBlogCard>
+              ))}
+            </Grid>
+          )}
+        </Body2>
+        {this.state.totalPages > 1 && (
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+        <MuiPagination
+            count={totalPages}
+            page={currentPage}
+            variant="outlined"
+            size="large"
+            showFirstButton
+            showLastButton
+            onChange={(event, page) => {
+                this.paginate(page); // Gọi hàm paginate để cập nhật trang
+            }}
+            sx={{ display: 'flex', justifyContent: 'center' }}
+        />
+    </div>
+)}
+
       </div>
     );
   }
