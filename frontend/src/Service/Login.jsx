@@ -1,6 +1,6 @@
 import axios from '../Configuration/AxiosConfig';
 
-const getRoles = (token) => {
+export const getRoles = (token) => {
     let jwtData = token.split('.')[1];
     let decodedJwtJsonData = window.atob(jwtData);
     let decodedJwtData = JSON.parse(decodedJwtJsonData);
@@ -8,7 +8,7 @@ const getRoles = (token) => {
     return roles;
 };
 
-const getRedirectPath = (roles) => {
+export const getRedirectPath = (roles) => {
     if (roles.includes('MANAGER'))
         return '/manager';
     else if (roles.includes('EMPLOYER'))

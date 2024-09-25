@@ -22,7 +22,6 @@ public class UserResponse {
     Date dob;
     String gender;
     String avatar;
-    String nation;
     CustomerType customerType;
     Set<RoleResponse> roles;
 }

@@ -23,7 +23,7 @@ import {
 import ServiceTypeKList from '../../../Service/ServiceTypeList.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Thêm dòng này để tích hợp Bootstrap JS
-import UserInfo from '../../../Service/UserInfo.jsx';
+import IsLogin from '../../../Service/IsLogin.jsx';
 import BlogTypeList from '../../../Service/BlogTypeList.jsx'  
 
 
@@ -115,7 +115,7 @@ function Header() {
                     <BlogTypeList/>
                   </ul>
                 </NavMenuItem>
-                <UserInfo />
+                <IsLogin />
               </NavMenu>
             </nav>
           </WrapperAICD>

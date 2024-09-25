@@ -47,9 +47,9 @@ public class ServiceController {
                 .build();
     }
 
-    @GetMapping("/findAllByServiceType")
+    @GetMapping("/findByServiceType")
     ApiResponse<PageResponse<ServiceResponse>> getByServiceType(
-            @RequestParam("idServiceType") List<String> idServiceType,
+            @RequestParam("serviceTypeId") List<String> idServiceType,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "6") int size,
             @RequestParam(value = "search", required = false, defaultValue = "") String search) {

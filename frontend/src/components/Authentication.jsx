@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdEmail, MdLock, MdPerson, MdPhone } from "react-icons/md";
-import { login } from "../Service/Login";
+import { login, getRedirectPath, getRoles } from "../Service/Login";
 
 const StyledContainer = styled(Container)(({ theme }) => ({
     minHeight: "100vh",
@@ -91,6 +91,7 @@ const Authentication = () => {
                 localStorage.setItem('token', response.result.token);
                 const roles = getRoles(response.result.token);
                 const redirectPath = getRedirectPath(roles);
+                console.log(redirectPath);
                 navigate(redirectPath);
             }
         };

@@ -41,9 +41,6 @@ public class User {
     @Column(length = 255)
     String avatar;
 
-    @Column(length = 255)
-    String nation;
-
     @ManyToOne
     @JoinColumn(name = "customerType_id")
     CustomerType customerType;
