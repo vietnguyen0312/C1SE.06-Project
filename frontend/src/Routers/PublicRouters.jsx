@@ -12,6 +12,7 @@ import Hotels from '../Layout/PublicLayout/Hotels/Hotels';
 import BlogHome from '../Layout/PublicLayout/BlogHome/BlogHome';
 import Booking from '../Layout/PublicLayout/Hotels/Booking';
 import BlogDetail from '../Service/BlogForDetail';
+import UserProfile from '../Layout/PublicLayout/UserProfile/UserProfile';
 
 const UnthorizedRoute = () => {
     const isAuthenticated = localStorage.getItem('token');
@@ -58,6 +59,10 @@ const PublicRouters = [
             {
                 path: "booking",
                 element: <Booking />
+            },
+            {
+                path: "userProfile",
+                element: <UserProfile />
             },
            
         ],
