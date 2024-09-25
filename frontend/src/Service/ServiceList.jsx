@@ -5,7 +5,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import '../Style/Service.css'
 import '../Style/Loading.css'
 import axios from '../Configuration/AxiosConfig'
-import Pagination from '../components/Pagination'
+import { Pagination } from '@mui/material';
 
 export class ServiceList extends Component {
     constructor(props) {
@@ -68,7 +68,9 @@ export class ServiceList extends Component {
     }
 
     paginate = (pageNumber) => {
-        this.setState({ currentPage: pageNumber });
+        this.setState({ currentPage: pageNumber, loading: true }, () => {
+            this.getServices();
+        });
     }
 
     render() {
@@ -159,10 +161,14 @@ export class ServiceList extends Component {
 
                 {this.state.totalPages > 1 && (
                     <Pagination
-                        paginate={this.paginate}
-                        currentPage={this.state.currentPage}
-                        totalPages={this.state.totalPages}
-                        serviceTypeId={this.state.filterByServiceTypeId}
+                        count={this.state.totalPages}
+                        page={this.state.currentPage}
+                        onChange={(event, page) => this.paginate(page)}
+                        variant="outlined"
+                        size="large"
+                        showFirstButton
+                        showLastButton
+                        sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
                     />
                 )}
             </>

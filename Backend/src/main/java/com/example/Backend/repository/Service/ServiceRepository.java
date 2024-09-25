@@ -8,10 +8,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<ServiceEntity, String> {
-    boolean existsByName(String name);
-    Page<ServiceEntity> findAllByServiceType(ServiceType serviceType, Pageable pageable);
+    Page<ServiceEntity> findByNameOrDescriptionContaining(String name, String description, Pageable pageable);
+
+    Page<ServiceEntity> findByServiceTypeIn(List<ServiceType> serviceType, Pageable pageable);
+
+    Page<ServiceEntity> findByServiceTypeInAndNameOrDescriptionContaining(List<ServiceType> serviceType, String name,
+                                                                         String description, Pageable pageable);
 }

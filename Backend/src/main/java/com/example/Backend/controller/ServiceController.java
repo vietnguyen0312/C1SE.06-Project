@@ -33,9 +33,10 @@ public class ServiceController {
     @GetMapping
     ApiResponse<PageResponse<ServiceResponse>> getServiceList(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size,
+            @RequestParam(value = "search", required = false, defaultValue = "") String search) {
         return ApiResponse.<PageResponse<ServiceResponse>>builder()
-                .result(serviceService.getAllServices(page, size))
+                .result(serviceService.getAllServices(page, size, search))
                 .build();
     }
 
@@ -46,13 +47,14 @@ public class ServiceController {
                 .build();
     }
 
-    @GetMapping("/findByServiceType/{idServiceType}")
+    @GetMapping("/findAllByServiceType")
     ApiResponse<PageResponse<ServiceResponse>> getByServiceType(
-            @PathVariable("idServiceType") String idServiceType,
+            @RequestParam("idServiceType") List<String> idServiceType,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size,
+            @RequestParam(value = "search", required = false, defaultValue = "") String search) {
         return ApiResponse.<PageResponse<ServiceResponse>>builder()
-                .result(serviceService.getServiceByServiceType(idServiceType, page, size))
+                .result(serviceService.getServiceByServiceType(idServiceType, page, size, search))
                 .build();
     }
 
