@@ -5,8 +5,10 @@ import com.example.Backend.dto.response.AuthenticationResponse;
 import com.example.Backend.dto.response.IntrospectResponse;
 import com.example.Backend.entity.Cart.Cart;
 import com.example.Backend.entity.InvalidatedToken;
+import com.example.Backend.entity.User.CustomerType;
 import com.example.Backend.entity.User.Role;
 import com.example.Backend.entity.User.User;
+import com.example.Backend.enums.CustomerTypeEnum;
 import com.example.Backend.enums.RoleEnum;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
@@ -14,6 +16,7 @@ import com.example.Backend.repository.Cart.CartRepository;
 import com.example.Backend.repository.HttpClient.OutboundUserClient;
 import com.example.Backend.repository.InvalidatedTokenRepository;
 import com.example.Backend.repository.HttpClient.OutboundIdentityClient;
+import com.example.Backend.repository.User.CustomerTypeRepository;
 import com.example.Backend.repository.User.UserRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
@@ -43,6 +46,7 @@ import java.util.*;
 public class AuthenticationService {
     UserRepository userRepository;
     CartRepository cartRepository;
+    CustomerTypeRepository customerTypeRepository;
     InvalidatedTokenRepository invalidatedTokenRepository;
     OutboundIdentityClient outboundIdentityClient;
     OutboundUserClient outboundUserClient;
@@ -102,8 +106,6 @@ public class AuthenticationService {
 
         var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
 
-        log.info("User info: {}", userInfo);
-
         Set<Role> roles = new HashSet<>();
         roles.add(Role.builder()
                 .name(RoleEnum.ROLE_CUSTOMER.getName())
@@ -112,9 +114,11 @@ public class AuthenticationService {
 
         var user = userRepository.findByEmail(userInfo.getEmail())
                 .orElseGet(()->{
+                    CustomerType customerType = customerTypeRepository.findByName(CustomerTypeEnum.BRONZE.getName());
                     User newUser = userRepository.save(User.builder()
                             .email(userInfo.getEmail())
                             .username(userInfo.getName())
+                            .customerType(customerType)
                             .roles(roles)
                             .build());
                     cartRepository.save(Cart.builder()

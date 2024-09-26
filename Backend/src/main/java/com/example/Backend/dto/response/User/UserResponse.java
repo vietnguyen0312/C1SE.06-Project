@@ -18,8 +18,8 @@ public class UserResponse {
     String id;
     String username;
     String email;
+    String password;
     String phoneNumber;
-    Date dob;
     String gender;
     String avatar;
     CustomerType customerType;
