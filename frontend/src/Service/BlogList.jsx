@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import LoadingIcons from 'react-loading-icons';
 import axios from '../Configuration/AxiosConfig';
 import { Pagination as MuiPagination } from '@mui/material';
-
+import { Link } from 'react-router-dom'; 
 import { format } from 'date-fns';
 import { BannerSection2 } from '../Layout/PublicLayout/Home/style';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 
 const Overlay = styled.div`
 position: absolute;
@@ -47,13 +46,7 @@ const LinkNav = styled.p`
   color: white;
   font-size: 16px;
 `;
-const StyledLink = styled(Link)`
-  color: white;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-  }
-`;
+
 
 const Arrow = styled.span`
   margin: 0 10px;
@@ -96,7 +89,7 @@ export const BlogCard = styled.div`
 export const BlogImage = styled.img`
   width: 100%;
   height: 200px;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.3s ease, filter 0.3s ease;
 
   ${BlogCard}:hover & {
@@ -133,7 +126,7 @@ export const BlogBody = styled.p`
   background-color: #f5f7fa;
   padding: 5px;
   border-radius: 4px;
-  height: 100px;
+  height: 80px;
   font-size: 0.8rem; 
 `;
 
@@ -287,7 +280,6 @@ export class BlogList extends Component {
       currentPage: 1,
       totalPages: 0,
       pageSize: 6,
-      totalElements: 10,
       searchTerm: '',
       filteredBlogs: [],
       selectedBlog: null,
@@ -296,9 +288,20 @@ export class BlogList extends Component {
       limit: props.limit || null,
       visibleBlogs: [], // Track visible blogs
     };
+    this.debounceTimeout = null;
   }
+  
+  debounce = (func, delay) => {
+    return (...args) => {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  };
 
   componentDidMount() {
+    this.debouncedSearch = this.debounce(this.handleSearch, 500);
     this.getBlogs();
     window.addEventListener('scroll', this.handleScroll);
   }
@@ -321,69 +324,67 @@ export class BlogList extends Component {
   };
 
   getBlogs = async () => {
-   
-      let responseBlogs;
-      let blogsWithImages =[] ;
-      if (this.state.filterByBlogTypeId === null) {
-        responseBlogs = await axios.get('/blogs', { params: { page: this.state.currentPage, size: this.state.pageSize } });
-        if (this.state.limit) {
-          responseBlogs.result.data = responseBlogs.result.data.slice(0, this.state.limit);
-        }
-      } else {
-        responseBlogs = await axios.get(`/blogs/findByBlogType/${this.state.filterByBlogTypeId}`,{ params: { page: this.state.currentPage, size: this.state.pageSize } });
-      }
+    const { currentPage, pageSize, searchTerm, filterByBlogTypeId, limit } = this.state;
+    this.setState({ loading: true });
 
-           blogsWithImages = await Promise.all(
-          responseBlogs.result.data.map(async (blog) => {
-            // Gọi API thứ hai để lấy hình ảnh cho mỗi blog
-            const imageResponse = await axios.get(`/images/findImagesByBlog/${blog.id}`);
-            
-            // Kiểm tra và xử lý dữ liệu hình ảnh
-            const images = Array.isArray(imageResponse.result) ? 
-              imageResponse.result.map((image) => image.image) : [];
-            return {
-              ...blog,
-              images: images || [], // Ensure images is always an array
-            };
-          })
-        );
+    let responseBlogs;
+    let blogsWithImages = [];
 
-        this.setState({
-          blogs: blogsWithImages,
-          filteredBlogs: blogsWithImages,
-          loading: false,
-          totalPages: responseBlogs.result.totalPages,
-          totalElements: responseBlogs.result.totalElements,
-        });
-      
-    
+    // Xây dựng URL API theo các tham số
+    const params = {
+      page: currentPage,
+      size: pageSize,
+      search: searchTerm || null,
+    };
+
+    // Gọi API theo `blogTypeId` nếu có, nếu không gọi API toàn bộ blogs
+    if (filterByBlogTypeId) {
+      responseBlogs = await axios.get(`/blogs/findByBlogType/${filterByBlogTypeId}`, { params });
+    } else {
+      responseBlogs = await axios.get('/blogs', { params });
+    }
+
+    if (limit) {
+      responseBlogs.result.data = responseBlogs.result.data.slice(0, limit);
+    }
+
+    // Lấy hình ảnh cho mỗi blog
+    blogsWithImages = await Promise.all(
+      responseBlogs.result.data.map(async (blog) => {
+        const imageResponse = await axios.get(`/images/findImagesByBlog/${blog.id}`);
+        const images = Array.isArray(imageResponse.result)
+          ? imageResponse.result.map((image) => image.image)
+          : [];
+        return {
+          ...blog,
+          images: images || [], // Đảm bảo `images` luôn là một mảng
+        };
+      })
+    );
+
+    // Cập nhật state
+    this.setState({
+      blogs: blogsWithImages,
+      filteredBlogs: blogsWithImages,
+      loading: false,
+      totalPages: responseBlogs.result.totalPages,
+      totalElements: responseBlogs.result.totalElements,
+    });
   };
 
   handleInputChange = (event) => {
-    this.setState({ searchTerm: event.target.value }, this.handleSearch);
+    this.setState({ searchTerm: event.target.value });
+    this.debouncedSearch(); 
   };
 
   handleSearch = () => {
-    const { searchTerm, blogs } = this.state;
-    const filteredBlogs = blogs.filter((blog) =>
-      blog.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  
-    const filteredBlogsWithImages = filteredBlogs.map((filteredBlog) => {
-      const originalBlog = this.state.filteredBlogs.find((blog) => blog.id === filteredBlog.id);
-      return {
-        ...filteredBlog,
-        images: originalBlog?.images || [], // Kết hợp ảnh từ blog gốc đã được tải trước đó
-      };
-    });
-  
-    this.setState({ filteredBlogs: filteredBlogsWithImages });
+    // Gọi lại API để tìm kiếm
+    this.setState({ currentPage: 1 }, this.getBlogs);
   };
 
   paginate = (pageNumber) => {
     this.setState({ currentPage: pageNumber, loading: true }, this.getBlogs);
   };
-  
 
   handleImageChange = (blogId, direction) => {
     this.setState((prevState) => {
@@ -391,7 +392,7 @@ export class BlogList extends Component {
       const blog = prevState.blogs.find((b) => b.id === blogId);
       
       if (!blog || !blog.images || blog.images.length === 0) {
-        return prevState; // Nếu không có ảnh nào, thoát sớm
+        return prevState; 
       }
   
       const newIndex = (currentIndex + (direction === 'next' ? 1 : -1) + blog.images.length) % blog.images.length;
@@ -404,25 +405,21 @@ export class BlogList extends Component {
       };
     });
   };
-  
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.blogTypeId !== this.props.blogTypeId) {
-        this.setState({ filterByBlogTypeId: this.props.blogTypeId }, this.getBlogs);
+      this.setState({ filterByBlogTypeId: this.props.blogTypeId }, this.getBlogs);
     }
     if (prevState.currentPage !== this.state.currentPage) {
-        this.getBlogs();
+      this.getBlogs();
     }
   }
 
   render() {
-    const { loading, filteredBlogs, currentImageIndex, searchTerm, visibleBlogs,currentPage,  totalPages } = this.state;
+    const { loading, filteredBlogs, currentImageIndex, searchTerm, visibleBlogs, currentPage, totalPages } = this.state;
     const blogTypeId = this.state.filterByBlogTypeId;
-    const linkPath = blogTypeId 
-    ? `/blogs?blogTypeId=${blogTypeId}&page=${currentPage}` 
-    : `/blogs?page=${currentPage}`; // Đảm bảo sử dụng currentPage ở đây
 
-    
+
     return (
       <div>
         <BannerSection2>
@@ -432,9 +429,9 @@ export class BlogList extends Component {
               <AboutContent>
                 <Title1>Tin Tức</Title1>
                 <LinkNav>
-                  <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Home</StyledLink>
+                  {/* <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Home</StyledLink> */}
                   <Arrow data-aos="fade-left" data-aos-delay="200">→</Arrow>
-                  <StyledLink to="/about" data-aos="fade-left" data-aos-delay="0">About Us</StyledLink>
+                  {/* <StyledLink to="/about" data-aos="fade-left" data-aos-delay="0">About Us</StyledLink> */}
                 </LinkNav>
               </AboutContent>
             </Row>
@@ -494,29 +491,33 @@ export class BlogList extends Component {
                       <span>{post.user?.username}</span>
                     </BlogInfoUser>
                   </BlogContent>
-                  <BlogButton onClick={() => this.setSelectedBlog(post)}>Xem chi tiết...</BlogButton>
+                  <BlogButton>
+                <Link to={`/blogDetail/${post.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                  Xem chi tiết...
+                </Link>
+              </BlogButton>
                 </AnimatedBlogCard>
               ))}
             </Grid>
           )}
         </Body2>
-        {this.state.totalPages > 1 && (
-    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-        <MuiPagination
-            count={totalPages}
-            page={currentPage}
-            variant="outlined"
-            size="large"
-            showFirstButton
-            showLastButton
-            onChange={(event, page) => {
-                this.paginate(page); // Gọi hàm paginate để cập nhật trang
-            }}
-            sx={{ display: 'flex', justifyContent: 'center' }}
-        />
-    </div>
-)}
 
+        {this.state.totalPages > 1 && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+            <MuiPagination
+              count={totalPages}
+              page={currentPage}
+              variant="outlined"
+              size="large"
+              showFirstButton
+              showLastButton
+              onChange={(event, page) => {
+                this.paginate(page); 
+              }}
+              sx={{ display: 'flex', justifyContent: 'center' }}
+            />
+          </div>
+        )}
       </div>
     );
   }

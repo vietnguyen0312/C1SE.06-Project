@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -55,11 +57,18 @@ public class BlogService {
         blogRepository.deleteById(id);
     }
 
-    public PageResponse<BlogResponse> getAllBlog(int page , int size) {
+    public PageResponse<BlogResponse> getAllBlog(int page , int size , String search) {
         Sort sort = Sort.by(Sort.Direction.DESC, "dateTimeEdit").descending();
 
         Pageable pageable = PageRequest.of(page-1, size, sort);
-        var pageData = blogRepository.findAll(pageable);
+
+        Page<Blog> pageData;
+
+        if(StringUtils.hasLength(search)){
+           pageData = blogRepository.findByTitleOrBodyOrContentOpenContaining(search,search,search,pageable);
+        }else {
+            pageData = blogRepository.findAll(pageable);
+        }
 
         return PageResponse.<BlogResponse>builder()
                 .currentPage(page)
@@ -74,12 +83,17 @@ public class BlogService {
         return blogMapper.toBlogResponse(blogRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    public PageResponse<BlogResponse> getBlogByBlogType(String idBlogType, int page , int size) {
+    public PageResponse<BlogResponse> getBlogByBlogType(List<String> idBlogType, int page , int size, String search) {
         Sort sort = Sort.by(Sort.Direction.DESC, "dateTimeEdit").descending();
         Pageable pageable = PageRequest.of(page-1, size, sort);
-        var pageData = blogRepository.findAllByBlogType( blogTypeRepository.findById(idBlogType)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)), pageable);
-
+        Page<Blog> pageData;
+        if(StringUtils.hasLength(search)){
+            pageData = blogRepository.findByBlogTypeInAndTitleOrBodyOrContentOpenContaining(blogTypeRepository.findAllById(idBlogType), search,search,search,pageable);
+        }
+        else
+        {
+            pageData = blogRepository.findByBlogTypeIn(blogTypeRepository.findAllById(idBlogType),pageable);
+        }
         return PageResponse.<BlogResponse>builder()
                 .currentPage(page)
                 .totalPages(pageData.getTotalPages())

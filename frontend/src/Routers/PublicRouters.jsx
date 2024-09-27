@@ -37,8 +37,8 @@ const PublicRouters = [
                 element: <Blogs />
             },
             {
-                path: "blogDetail",  
-                element: <BlogDetail />
+                path: "blogDetail/:id",  
+                element: <BlogDetail/> 
             },
             {
                 path: "about",

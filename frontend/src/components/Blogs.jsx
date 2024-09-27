@@ -12,7 +12,7 @@ const Blogs = () => {
   
   return (
     <>
-      <section className="ftco-section ">
+      <section >
         <BlogList blogTypeId={blogTypeId} /> 
       </section>
     </>

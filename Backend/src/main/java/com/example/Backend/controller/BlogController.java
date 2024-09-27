@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
 public class BlogController {
     BlogService blogService;
 
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping
     ApiResponse<BlogResponse> createBlog(@RequestBody @Valid BlogCreateRequest request) {
         return ApiResponse.<BlogResponse>builder()
@@ -33,10 +35,11 @@ public class BlogController {
     @GetMapping
     ApiResponse<PageResponse<BlogResponse>> getAllBlogs(
             @RequestParam (value = "page" , required = false, defaultValue = "1") int page,
-            @RequestParam (value = "size" , required = false , defaultValue = "6") int size
+            @RequestParam (value = "size" , required = false , defaultValue = "6") int size,
+            @RequestParam (value = "search", required = false ,defaultValue = "") String search
     ) {
             return ApiResponse.<PageResponse<BlogResponse>>builder()
-                    .result(blogService.getAllBlog(page, size))
+                    .result(blogService.getAllBlog(page, size ,search))
                     .build()    ;
     }
 
@@ -47,15 +50,18 @@ public class BlogController {
                 .build();
     }
 
+
     @GetMapping("/findByBlogType/{idBlogType}")
-    ApiResponse<PageResponse<BlogResponse>> getBlogsByBlogType(@PathVariable("idBlogType") String idBlogType,
+    ApiResponse<PageResponse<BlogResponse>> getBlogsByBlogType(@PathVariable("idBlogType") List<String> idBlogType,
         @RequestParam (value = "page" , required = false , defaultValue = "1") int page,
-        @RequestParam (value = "size" , required = false , defaultValue = "6") int size
+        @RequestParam (value = "size" , required = false , defaultValue = "6") int size,
+        @RequestParam (value = "search", required = false ,defaultValue = "") String search
     ) {
         return ApiResponse.<PageResponse<BlogResponse>>builder()
-                .result(blogService.getBlogByBlogType(idBlogType, page, size))
+                .result(blogService.getBlogByBlogType( idBlogType, page, size , search))
                 .build();
     }
+    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/{id}")
     ApiResponse<BlogResponse> updateBlog(@PathVariable("id") String id,@RequestBody @Valid BlogUpdateRequest request) {
         return ApiResponse.<BlogResponse>builder()
@@ -63,6 +69,7 @@ public class BlogController {
                 .build();
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("/{id}")
     ApiResponse<String> deleteBlog(@PathVariable("id") String id) {
         blogService.deleteBlog(id);
