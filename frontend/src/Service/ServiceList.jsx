@@ -34,8 +34,9 @@ export class ServiceList extends Component {
                 return;
             }
         } else {
-            response = await axios.get(`/services/findByServiceType/${this.state.filterByServiceTypeId}`,
-                { params: { page: this.state.currentPage, size: this.state.pageSize } });
+            response = await axios.get('/services/findByServiceType',
+                { params: { page: this.state.currentPage, size: this.state.pageSize, 
+                    serviceTypeId: this.state.filterByServiceTypeId } });
         }
         this.setState({
             services: response.result.data,

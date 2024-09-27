@@ -40,8 +40,6 @@ public class UserUpdateRequest {
 
     String avatar;
 
-    String nation;
-
     @NotNull(message = "NOT_NULL")
     CustomerType customerType;
 

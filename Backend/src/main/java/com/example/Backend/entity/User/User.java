@@ -3,6 +3,7 @@ package com.example.Backend.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.Set;
@@ -41,9 +42,6 @@ public class User {
     @Column(length = 255)
     String avatar;
 
-    @Column(length = 255)
-    String nation;
-
     @ManyToOne
     @JoinColumn(name = "customerType_id")
     CustomerType customerType;
@@ -56,8 +54,11 @@ public class User {
 
     @PrePersist
     public void prePersist() {
-        if (status == null) {
+        if (!StringUtils.hasLength(status)) {
             status = "Đang hoạt động";
+        }
+        if (!StringUtils.hasLength(avatar)){
+            avatar = "avatar-default.jpg";
         }
     }
 }

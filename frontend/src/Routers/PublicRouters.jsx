@@ -1,6 +1,5 @@
 import Home from '../Layout/PublicLayout/Home/Home';
 import Blogs from '../components/Blogs';
-import Services from '../components/Services'
 import MainLayoutPublic from '../Layout/PublicLayout/MainLayout';
 import Error403 from '../Layout/PublicLayout/Error403';
 import { Navigate, Outlet } from "react-router-dom";
@@ -12,7 +11,7 @@ import Hotels from '../Layout/PublicLayout/Hotels/Hotels';
 import BlogHome from '../Layout/PublicLayout/BlogHome/BlogHome';
 import Booking from '../Layout/PublicLayout/Hotels/Booking';
 import BlogDetail from '../Service/BlogForDetail';
-import UserProfile from '../Layout/PublicLayout/UserProfile/UserProfile';
+import ServiceLayout from '../Layout/PublicLayout/ServiceLayout/ServiceLayout';
 
 const UnthorizedRoute = () => {
     const isAuthenticated = localStorage.getItem('token');
@@ -30,7 +29,7 @@ const PublicRouters = [
             },
             {
                 path: "services",
-                element: <Services />
+                element: <ServiceLayout />
             },
             {
                 path: "blogs",
@@ -59,10 +58,6 @@ const PublicRouters = [
             {
                 path: "booking",
                 element: <Booking />
-            },
-            {
-                path: "userProfile",
-                element: <UserProfile />
             },
            
         ],

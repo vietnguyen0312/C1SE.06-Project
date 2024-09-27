@@ -38,12 +38,12 @@ const UserInfo = () => {
         <>
             {user ? (
                 <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('service')} onMouseLeave={() => setActiveDropdown(null)}>
-                    <NavMenuLink href="/profile" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'service'}>
+                    <NavMenuLink href="/customer/userProfile" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'service'}>
                         {user.username}
                     </NavMenuLink>
                     <ul className={`dropdown-menu ${activeDropdown === 'service' ? 'show' : ''}`} aria-labelledby="blogDropdown">
                         <li>
-                            <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/profile">
+                            <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/customer/userProfile">
                                 Thông tin cá nhân
                             </NavMenuLink>
                         </li>
