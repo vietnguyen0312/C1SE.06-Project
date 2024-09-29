@@ -174,7 +174,7 @@ const Payment = styled.div`
   }
 `;
 
-const Booking = () => {
+const Bookings = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [showRoomSelection, setShowRoomSelection] = useState(false);
@@ -263,18 +263,18 @@ const Booking = () => {
           )}
           <p>Giá phòng: {formatCurrency(roomPrice)}</p>
 
-          <div 
-            style={{ 
-              display: 'flex', 
-              flexWrap: 'wrap', 
-              justifyContent: 'center', 
-              borderBottom: '1px solid #f8b600' 
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              borderBottom: '1px solid #f8b600'
             }}
           >
             {prices.map((price, index) => (
-              <ChooseRoom 
-                key={index} 
-                data-aos="fade-up" 
+              <ChooseRoom
+                key={index}
+                data-aos="fade-up"
                 data-aos-delay={index * 100}
               >
                 <PriceSquare onClick={() => handlePriceClick(price)} />
@@ -283,9 +283,9 @@ const Booking = () => {
             ))}
           </div>
           <Payment>
-              <p>Tổng giá trị:</p>
-              <p>{formatCurrency(totalPrice + roomPrice)}</p>
-              <Link to="/">Đặt phòng</Link>
+            <p>Tổng giá trị:</p>
+            <p>{formatCurrency(totalPrice + roomPrice)}</p>
+            <Link to="/">Đặt phòng</Link>
           </Payment>
         </RoomSelection>
       )}
@@ -293,4 +293,4 @@ const Booking = () => {
   );
 };
 
-export default Booking;
+export default Bookings;

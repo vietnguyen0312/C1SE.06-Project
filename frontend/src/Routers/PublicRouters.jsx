@@ -7,11 +7,11 @@ import Authentication from '../components/Authentication';
 import OtpSubmit from '../components/OtpSubmit';
 import About from '../Layout/PublicLayout/About/About';
 import Contact from '../Layout/PublicLayout/Contact/Contact'
-import Hotels from '../Layout/PublicLayout/Hotels/Hotels';
 import BlogHome from '../Layout/PublicLayout/BlogHome/BlogHome';
-import Booking from '../Layout/PublicLayout/Hotels/Booking';
 import BlogDetail from '../Service/BlogForDetail';
 import ServiceLayout from '../Layout/PublicLayout/ServiceLayout/ServiceLayout';
+import Hotel from '../components/Hotels';
+import Booking from '../components/Booking';
 
 const UnthorizedRoute = () => {
     const isAuthenticated = localStorage.getItem('token');
@@ -36,8 +36,8 @@ const PublicRouters = [
                 element: <Blogs />
             },
             {
-                path: "blogDetail/:id",  
-                element: <BlogDetail/> 
+                path: "blogDetail/:id",
+                element: <BlogDetail />
             },
             {
                 path: "about",
@@ -49,7 +49,7 @@ const PublicRouters = [
             },
             {
                 path: "hotels",
-                element: <Hotels />
+                element: <Hotel />
             },
             {
                 path: "blogHome",
@@ -59,7 +59,7 @@ const PublicRouters = [
                 path: "booking",
                 element: <Booking />
             },
-           
+
         ],
     },
     {
