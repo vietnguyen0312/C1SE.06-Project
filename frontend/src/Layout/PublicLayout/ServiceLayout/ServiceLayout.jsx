@@ -154,7 +154,7 @@ const ServiceLayout = () => {
             <NavMenuLink href="#" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'Tất cả danh mục'}>
               Tất cả danh mục
             </NavMenuLink>
-            <ul className={`dropdown-menu ${activeDropdown === 'Tất cả danh mục' ? 'show' : ''}`} aria-labelledby="blogDropdown" style={{ listStyle: 'none', padding: 0 ,marginTop:'10px'}} >
+            <ul className={`dropdown-menu ${activeDropdown === 'Tất cả danh mục' ? 'show' : ''}`} aria-labelledby="blogDropdown" style={{ listStyle: 'none', padding: 0 }} >
               <li><NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/services?serviceTypeId=1">Danh mục 1</NavMenuLink></li>
               <li><NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/services?serviceTypeId=2">Danh mục 2</NavMenuLink></li>
             </ul>
