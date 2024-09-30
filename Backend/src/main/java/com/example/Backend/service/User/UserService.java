@@ -104,8 +104,10 @@ public class UserService {
     public UserResponse changePassword(String id, UserChangePasswordRequest request) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-        if (StringUtils.hasLength(user.getPassword()))
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword()))
+            throw new AppException(ErrorCode.PASSWORD_INCORRECT);
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
         return userMapper.toUserResponse(userRepository.save(user));
     }

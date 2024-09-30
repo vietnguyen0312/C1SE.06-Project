@@ -89,6 +89,7 @@ const ModalContent = styled.div`
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   z-index: 1001;
+  position: relative;
 `;
 
 const ModalInput = styled.input`
@@ -110,6 +111,13 @@ const CloseButton = styled.button`
   cursor: pointer;
 `;
 
+const ErrorText = styled.p`
+  color: red;
+  font-size: 14px;
+  margin-top: -15px;
+  margin-bottom: 10px;
+`;
+
 const Gender = styled.div`
   display: flex;
   align-items: center;
@@ -126,6 +134,10 @@ const UserProfile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editedUserInfo, setEditedUserInfo] = useState({});
     const [isConfirmEnabled, setIsConfirmEnabled] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordError, setPasswordError] = useState('');
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -143,6 +155,10 @@ const UserProfile = () => {
 
     const handleModalClose = () => {
         setIsModalOpen(false);
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setPasswordError('');
     };
 
     const handleModalOpen = () => {
@@ -173,8 +189,25 @@ const UserProfile = () => {
         setIsConfirmEnabled(false);
     };
 
-    const handleChangePassword = () => {
-        setIsModalOpen(false);
+    const validatePasswords = () => {
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            setPasswordError('All fields are required.');
+            return false;
+        }
+        if (newPassword !== confirmPassword) {
+            setPasswordError('New password and confirm password do not match.');
+            return false;
+        }
+        return true;
+    };
+
+    const handleChangePassword = async () => {
+        if (!validatePasswords()) return;
+
+        console.log(newPassword);
+
+        await axios.post(`/users/change-password/${userInfo.id}`, { currentPassword: currentPassword, newPassword: newPassword });
+        handleModalClose();
     };
 
     const formatPhoneNumber = (phoneNumber) => {
@@ -190,42 +223,45 @@ const UserProfile = () => {
         return `${maskedName}@${domain}`;
     };
 
+    const handleLogout = async () => {
+        const token = localStorage.getItem('token');
+        localStorage.removeItem('token');
+        localStorage.removeItem('userInfo');
+        await axios.post('/auth/logout', { token });
+        window.location.href = '/';
+    };
+
     const renderCustomerTypeBackground = (type, text, icon) => {
         switch (type) {
             case 'Đồng':
                 return (
-                    <>
-                        <ProfileRole style={{ background: 'linear-gradient(to right, #CDB38B, #FFDEAD)', width: '100%' }}>
-                            <EmojiEventsIcon style={{ color: '#8B4513', marginRight: '10px', backgroundColor: 'black', borderRadius: '50%', padding: '4px' }} />
-                            <span style={{ marginRight: '10px', color: 'white' }}>{text}</span>
-                            <span style={{ color: 'white', fontWeight: 'bold' }}>{type}</span>
-                        </ProfileRole>
-                    </>
+                    <ProfileRole style={{ background: 'linear-gradient(to right, #CDB38B, #FFDEAD)', width: '100%' }}>
+                        <EmojiEventsIcon style={{ color: '#8B4513', marginRight: '10px', backgroundColor: 'black', borderRadius: '50%', padding: '4px' }} />
+                        <span style={{ marginRight: '10px', color: 'white' }}>{text}</span>
+                        <span style={{ color: 'white', fontWeight: 'bold' }}>{type}</span>
+                    </ProfileRole>
                 );
             case 'Bạc':
                 return (
-                    <>
-                        <ProfileRole style={{ background: 'linear-gradient(to right, #696969, #CFCFCF)', width: '100%' }}>
-                            <EmojiEventsIcon style={{ color: '#888888', marginRight: '10px', backgroundColor: 'black', borderRadius: '50%', padding: '4px' }} />
-                            <span style={{ marginRight: '10px', color: 'white' }}>{text}</span>
-                            <span style={{ color: 'white', fontWeight: 'bold' }}>{type}</span>
-                        </ProfileRole>
-                    </>
+                    <ProfileRole style={{ background: 'linear-gradient(to right, #696969, #CFCFCF)', width: '100%' }}>
+                        <EmojiEventsIcon style={{ color: '#888888', marginRight: '10px', backgroundColor: 'black', borderRadius: '50%', padding: '4px' }} />
+                        <span style={{ marginRight: '10px', color: 'white' }}>{text}</span>
+                        <span style={{ color: 'white', fontWeight: 'bold' }}>{type}</span>
+                    </ProfileRole>
                 );
             case 'Vàng':
                 return (
-                    <>
-                        <ProfileRole style={{ background: 'linear-gradient(to right, #F9F400, #FFFAB3)', width: '100%' }}>
-                            <EmojiEventsIcon style={{ color: '#FFFF00', marginRight: '10px', backgroundColor: 'black', borderRadius: '50%', padding: '4px' }} />
-                            <span style={{ marginRight: '10px', color: 'Black' }}>{text}</span>
-                            <span style={{ color: 'Black', fontWeight: 'bold' }}>{type}</span>
-                        </ProfileRole>
-                    </>
+                    <ProfileRole style={{ background: 'linear-gradient(to right, #F9F400, #FFFAB3)', width: '100%' }}>
+                        <EmojiEventsIcon style={{ color: '#FFFF00', marginRight: '10px', backgroundColor: 'black', borderRadius: '50%', padding: '4px' }} />
+                        <span style={{ marginRight: '10px', color: 'Black' }}>{text}</span>
+                        <span style={{ color: 'Black', fontWeight: 'bold' }}>{type}</span>
+                    </ProfileRole>
                 );
             default:
                 return null;
         }
     };
+
     return (
         <>
             <UserProfileContainer>
@@ -255,7 +291,7 @@ const UserProfile = () => {
                             Đổi mật khẩu
                         </ProfileLink>
                     )}
-                    <ProfileLink>
+                    <ProfileLink onClick={handleLogout}>
                         <LogoutOutlined />
                         Đăng xuất
                     </ProfileLink>
@@ -317,11 +353,26 @@ const UserProfile = () => {
                 {isModalOpen && (
                     <ModalOverlay onClick={handleModalClose}>
                         <ModalContent onClick={(e) => e.stopPropagation()}>
-                            <CloseButton onClick={handleModalClose}>×</CloseButton>
-                            <ModalInput type="password" placeholder="Nhập mật khẩu hiện tại" />
-                            <ModalInput type="password" placeholder="Nhập mật khẩu mới" />
-                            <ModalInput type="password" placeholder="Nhập lại mật khẩu mới" />
-                            <ButtonCPN text="Đổi mật khẩu" onClick={handleChangePassword}/>
+                            <ModalInput
+                                type="password"
+                                placeholder="Nhập mật khẩu hiện tại"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                            />
+                            <ModalInput
+                                type="password"
+                                placeholder="Nhập mật khẩu mới"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                            <ModalInput
+                                type="password"
+                                placeholder="Nhập lại mật khẩu mới"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                            />
+                            {passwordError && <ErrorText>{passwordError}</ErrorText>}
+                            <ButtonCPN text="Đổi mật khẩu" onClick={handleChangePassword} />
                         </ModalContent>
                     </ModalOverlay>
                 )}

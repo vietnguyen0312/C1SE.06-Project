@@ -7,12 +7,12 @@ import lombok.Getter;
 @Getter
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_KEY(1001, "Uncategorized error", HttpStatus.BAD_REQUEST),
     EXISTED(1002, "Existed", HttpStatus.BAD_REQUEST),
     NOT_EXISTED(1003, "Not existed", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1004, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1005, "You do not have permission", HttpStatus.FORBIDDEN),
 
+    PASSWORD_INCORRECT(1999,"Password not correct", HttpStatus.BAD_REQUEST),
     NOT_BLANK(2001, "This field is mandatory", HttpStatus.BAD_REQUEST),
     USERNAME_SIZE(2002, "Username must be between {min} and {max} characters", HttpStatus.BAD_REQUEST),
     INVALID(2003, "This field is invalid", HttpStatus.BAD_REQUEST),

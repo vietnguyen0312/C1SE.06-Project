@@ -64,7 +64,7 @@ public class UserController {
                 .build();
     }
 
-    @PutMapping("/change-password/{id}")
+    @PostMapping("/change-password/{id}")
     ApiResponse<UserResponse> changePassword(@PathVariable("id") String id, @RequestBody @Valid UserChangePasswordRequest request) {
         return ApiResponse
                 .<UserResponse>builder()

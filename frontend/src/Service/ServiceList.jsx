@@ -68,12 +68,13 @@ export class ServiceList extends Component {
         if (prevProps.serviceTypeId !== this.props.serviceTypeId || prevProps.search !== this.props.search) {
             this.setState({
                 filterByServiceTypeId: this.props.serviceTypeId,
-                filterBySearch: this.props.search
+                filterBySearch: this.props.search,
+                loading: true
             }, this.getServices);
         }
-        
+
         if (prevState.currentPage !== this.state.currentPage) {
-            this.getServices();
+            this.setState({ loading: true }, this.getServices);
         }
 
     }

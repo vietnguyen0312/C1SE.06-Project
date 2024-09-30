@@ -1,6 +1,7 @@
 package com.example.Backend.dto.request.User;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -12,7 +13,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserChangePasswordRequest {
 
-    @NotBlank
+    @NotBlank(message = "NOT_BLANK")
+    String currentPassword;
+
+    @NotBlank(message = "NOT_BLANK")
     @Size(min = 8, message = "MIN_SIZE")
-    String password;
+    String newPassword;
 }
