@@ -8,7 +8,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { SearchOutlined } from '@ant-design/icons';
 
-
 const Overlay = styled.div`
   position: absolute;
   top: 0;
@@ -78,8 +77,6 @@ export const NavMenuItem = styled.li`
   font-weight: bold;
   cursor: pointer;
 
-
-
   &:hover > ul {
     display: block;
   }
@@ -90,7 +87,8 @@ export const NavMenuLink = styled.a`
   text-decoration: none;
   transition: color 0.3s ease;
   padding: 10px 15px;
-  display: block;
+  display: flex;
+  align-items: center;
 
   &:hover {
     color: #f8b600;
@@ -100,20 +98,20 @@ export const NavMenuLink = styled.a`
 const SearchInput = styled.input`
   border: none;
   margin-left: 10px;
-  outline: none; 
+  outline: none;
   width: 300px;
+  border-left: 1px solid #ccc;
+  padding-left: 13px;
   &:focus {
-    outline: none; 
+    outline: none;
   }
 `;
 
 const SearchIcon = styled(SearchOutlined)`
-  margin:0 5px;
-  cursor: pointer;
+  margin: 0 5px;
   user-select: none;
-  background-color: #f8b600;
   padding: 10px;
-  color: white;
+  color: black;
   border-radius: 10px;
   width: 45px;
   height: 30px;
@@ -122,13 +120,46 @@ const SearchIcon = styled(SearchOutlined)`
   justify-content: center;
 `;
 
-const ServiceLayout = () => {
+const CheckmarkContainer = styled.span`
+  padding: 4px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; 
+  height: 20px; 
+  border: 1px solid #f8b600;
+  border-radius: 4px;
+  background-color: ${(props) => (props.selected ? '#f8b600' : 'transparent')};
+`;
 
+const categories = ['Danh mục 1', 'Danh mục 2', 'Danh mục 3', 'Danh mục 4'];
+
+const ServiceLayout = () => {
   useEffect(() => {
     AOS.init({ duration: 2000 });
   }, []);
 
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  const handleSelectCategory = (category) => {
+    if (category === 'Tất cả danh mục') {
+      if (selectedCategories.length === categories.length) {
+        setSelectedCategories([]); 
+      } else {
+        setSelectedCategories(categories); 
+      }
+    } else {
+      setSelectedCategories((prevSelected) => {
+        if (prevSelected.includes(category)) {
+          return prevSelected.filter((item) => item !== category);
+        } else {
+          return [...prevSelected, category];
+        }
+      });
+    }
+  };
 
   return (
     <>
@@ -148,15 +179,51 @@ const ServiceLayout = () => {
         </Container>
       </BannerSection2>
 
-      <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center',marginRight: '40vh',padding:'20px 0',  userSelect: 'none' }}>
+      <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', marginRight: '40vh', padding: '20px 0', userSelect: 'none' }}>
         <Item>
-          <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('Tất cả danh mục')} onMouseLeave={() => setActiveDropdown(null)}>
-            <NavMenuLink href="#" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'Tất cả danh mục'}>
-              Tất cả danh mục
+          <NavMenuItem
+            className="nav-item dropdown"
+            onMouseEnter={() => setActiveDropdown('danh mục')}
+            onMouseLeave={() => setActiveDropdown(null)}
+          >
+            <NavMenuLink
+              href="#"
+              className="nav-link dropdown-toggle"
+              id="blogDropdown"
+              role="button"
+              aria-expanded={activeDropdown === 'danh mục'}
+            >
+              Danh mục
             </NavMenuLink>
-            <ul className={`dropdown-menu ${activeDropdown === 'Tất cả danh mục' ? 'show' : ''}`} aria-labelledby="blogDropdown" style={{ listStyle: 'none', padding: 0 }} >
-              <li><NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/services?serviceTypeId=1">Danh mục 1</NavMenuLink></li>
-              <li><NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/services?serviceTypeId=2">Danh mục 2</NavMenuLink></li>
+            <ul className={`dropdown-menu ${activeDropdown === 'danh mục' ? 'show' : ''}`} aria-labelledby="blogDropdown" style={{ listStyle: 'none', padding: 0 }}>
+              <li>
+                <NavMenuLink
+                  style={{ color: 'black' }}
+                  className="dropdown-item"
+                  href="#"
+                  onClick={() => handleSelectCategory('Tất cả danh mục')}
+                >
+                  <CheckmarkContainer selected={selectedCategories.length === categories.length}>
+                    {selectedCategories.length === categories.length && '✔️'}
+                  </CheckmarkContainer>
+                  Tất cả danh mục
+                </NavMenuLink>
+              </li>
+              {categories.map((category) => (
+                <li key={category}>
+                  <NavMenuLink
+                    style={{ color: 'black' }}
+                    className="dropdown-item"
+                    href="#"
+                    onClick={() => handleSelectCategory(category)}
+                  >
+                    <CheckmarkContainer selected={selectedCategories.includes(category)}>
+                      {selectedCategories.includes(category) && '✔️'}
+                    </CheckmarkContainer>
+                    {category}
+                  </NavMenuLink>
+                </li>
+              ))}
             </ul>
           </NavMenuItem>
           <SearchInput type="text" placeholder="Tìm kiếm" />
