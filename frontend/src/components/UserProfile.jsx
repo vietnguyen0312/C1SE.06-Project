@@ -121,8 +121,6 @@ const Role = styled.div`
 `;
 
 const UserProfile = () => {
-
-
     const [userInfo, setUserInfo] = useState({});
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);

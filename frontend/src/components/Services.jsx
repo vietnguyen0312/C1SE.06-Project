@@ -1,28 +1,175 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import ServiceList from '../Service/ServiceList'
-import FilterBar from './FilterBar'
 import axios from '../Configuration/AxiosConfig'
-import { useLocation } from 'react-router-dom'
+import styled from 'styled-components';
 import '../Style/Service.css'
+import { SearchOutlined } from '@ant-design/icons';
+import _ from 'lodash';
+
+const Item = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  margin: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  width: auto;
+`;
+
+const SearchInput = styled.input`
+  border: none;
+  margin-left: 10px;
+  outline: none;
+  width: 300px;
+  border-left: 1px solid #ccc;
+  padding-left: 13px;
+  &:focus {
+    outline: none;
+  }
+`;
+
+const SearchIcon = styled(SearchOutlined)`
+  margin: 0 5px;
+  user-select: none;
+  padding: 10px;
+  color: black;
+  border-radius: 10px;
+  width: 45px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const CheckmarkContainer = styled.span`
+  padding: 4px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; 
+  height: 20px; 
+  border: 1px solid #f8b600;
+  border-radius: 4px;
+  background-color: ${(props) => (props.selected ? '#f8b600' : 'transparent')};
+`;
+
+export const NavMenuItem = styled.li`
+  position: relative;
+  list-style: none;
+  margin-right: 0;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover > ul {
+    display: block;
+  }
+`;
+
+export const NavMenuLink = styled.a`
+  color: black;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    color: #f8b600;
+  }
+`;
 
 const Services = () => {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const serviceTypeId = searchParams.get('serviceTypeId');
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [selectedServiceType, setselectedServiceType] = useState([]);
+  const [serviceTypes, setServiceTypes] = useState([]);
+  const [search, setSearch] = useState('');
+
   useEffect(() => {
     const fetchServiceType = async () => {
       const response = await axios.get('/serviceTypes');
-      const data = await response.json();
-      console.log(data);
+      setServiceTypes(response.result);
+      setselectedServiceType(response.result);
     };
     fetchServiceType();
-  }, [serviceTypeId]);
+  }, []);
+
+  const handleSearch = (keyword) => {
+    setSearch(keyword);
+  };
+
+  const handleSelectCategory = (serviceType) => {
+    if (serviceType === 'Tất cả danh mục') {
+      setselectedServiceType(serviceTypes);
+    } else {
+      setselectedServiceType((prevSelected) => {
+        if (prevSelected.includes(serviceType)) {
+          if (prevSelected.length > 1) {
+            return prevSelected.filter((item) => item !== serviceType);
+          }
+        } else {
+          return [...prevSelected, serviceType];
+        }
+        return prevSelected;
+      });
+    }
+  };
 
   return (
     <>
       <section className="ftco-section">
         <div className="container">
-          <ServiceList serviceTypeId={serviceTypeId}/>
+          <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', marginRight: '40vh', padding: '20px 0', userSelect: 'none' }}>
+            <Item>
+              <NavMenuItem
+                className="nav-item dropdown"
+                onMouseEnter={() => setActiveDropdown('danh mục')}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <NavMenuLink
+                  className="nav-link dropdown-toggle"
+                  id="blogDropdown"
+                  role="button"
+                  aria-expanded={activeDropdown === 'danh mục'}
+                >
+                  Danh mục
+                </NavMenuLink>
+                <ul className={`dropdown-menu ${activeDropdown === 'danh mục' ? 'show' : ''}`} aria-labelledby="blogDropdown" style={{ listStyle: 'none', padding: 0 }}>
+                  <li>
+                    <NavMenuLink
+                      style={{ color: 'black' }}
+                      className="dropdown-item"
+                      onClick={() => handleSelectCategory('Tất cả danh mục')}
+                    >
+                      <CheckmarkContainer selected={selectedServiceType.length === serviceTypes.length}>
+                        {selectedServiceType.length === serviceTypes.length && '✔️'}
+                      </CheckmarkContainer>
+                      Tất cả danh mục
+                    </NavMenuLink>
+                  </li>
+                  {serviceTypes.map((serviceType) => (
+                    <li key={serviceType.id}>
+                      <NavMenuLink
+                        style={{ color: 'black' }}
+                        className="dropdown-item"
+                        onClick={() => handleSelectCategory(serviceType)}
+                      >
+                        <CheckmarkContainer selected={selectedServiceType.includes(serviceType)}>
+                          {selectedServiceType.includes(serviceType) && '✔️'}
+                        </CheckmarkContainer>
+                        {serviceType.name}
+                      </NavMenuLink>
+                    </li>
+                  ))}
+                </ul>
+              </NavMenuItem>
+              <SearchInput type="text" placeholder="Tìm kiếm" onChange={_.debounce((e) => handleSearch(e.target.value), 700)}/>
+              <SearchIcon />
+            </Item>
+          </div>
+          <ServiceList serviceTypeId={selectedServiceType.length === serviceTypes.length
+            ? null : selectedServiceType.map(type => type.id).join(',')} search={search} />
         </div>
       </section>
     </>

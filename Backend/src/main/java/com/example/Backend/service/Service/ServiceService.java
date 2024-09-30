@@ -4,6 +4,7 @@ import com.example.Backend.dto.request.Service.ServiceRequest;
 import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.entity.Service.ServiceEntity;
+import com.example.Backend.entity.Service.ServiceType;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Service.ServiceMapper;
@@ -88,11 +89,13 @@ public class ServiceService {
 
         Page<ServiceEntity> pageData;
 
+        List<ServiceType> serviceTypes = serviceTypeRepository.findAllById(idServiceType);
+
         if (StringUtils.hasLength(search))
-            pageData = serviceRepository.findByServiceTypeInAndNameOrDescriptionContaining
-                    (serviceTypeRepository.findAllById(idServiceType), search, search, pageable);
+            pageData = serviceRepository.findByServiceTypeInAndNameContainingOrServiceTypeInAndDescriptionContaining
+                    (serviceTypes, search, serviceTypes, search, pageable);
         else
-            pageData = serviceRepository.findByServiceTypeIn(serviceTypeRepository.findAllById(idServiceType), pageable);
+            pageData = serviceRepository.findByServiceTypeIn(serviceTypes, pageable);
 
         return PageResponse.<ServiceResponse>builder()
                 .currentPage(page)

@@ -96,17 +96,9 @@ function Header() {
               <NavMenu>
                 <NavMenuItem><NavMenuLink href="/">Trang chủ</NavMenuLink></NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/about">Giới thiệu</NavMenuLink></NavMenuItem>
-                <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('service')} onMouseLeave={() => setActiveDropdown(null)}>
-                  <NavMenuLink href="/services" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'service'}>
-                    Dịch vụ
-                  </NavMenuLink>
-                  <ul className={`dropdown-menu ${activeDropdown === 'service' ? 'show' : ''}`} aria-labelledby="blogDropdown">
-                    <ServiceTypeKList />
-                  </ul>
-                </NavMenuItem>
+                <NavMenuItem><NavMenuLink href="/services">Dịch vụ</NavMenuLink></NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/hotels">Khách sạn</NavMenuLink></NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/contact">Liên hệ</NavMenuLink></NavMenuItem>
-                
                 <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('blog')} onMouseLeave={() => setActiveDropdown(null)}>
                   <NavMenuLink href="/blogs" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'blog'}>
                     Tin tức

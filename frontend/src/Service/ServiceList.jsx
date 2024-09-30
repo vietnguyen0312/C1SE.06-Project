@@ -19,6 +19,7 @@ export class ServiceList extends Component {
             totalPages: 0,
             pageSize: 6,
             totalElements: 0,
+            filterBySearch: props.search || null,
             filterByServiceTypeId: props.serviceTypeId || null,
             limit: props.limit || null
         }
@@ -28,7 +29,13 @@ export class ServiceList extends Component {
     getServices = async () => {
         let response;
         if (this.state.filterByServiceTypeId === null) {
-            response = await axios.get('/services', { params: { page: this.state.currentPage, size: this.state.pageSize } });
+            response = await axios.get('/services', {
+                params: {
+                    page: this.state.currentPage,
+                    size: this.state.pageSize,
+                    search: this.state.filterBySearch
+                }
+            });
             if (this.state.limit) {
                 response.result.data = response.result.data.slice(0, this.state.limit);
                 this.setState({ services: response.result.data, loading: false });
@@ -38,8 +45,10 @@ export class ServiceList extends Component {
             response = await axios.get('/services/findByServiceType',
                 {
                     params: {
-                        page: this.state.currentPage, size: this.state.pageSize,
-                        serviceTypeId: this.state.filterByServiceTypeId
+                        page: this.state.currentPage,
+                        size: this.state.pageSize,
+                        serviceTypeId: this.state.filterByServiceTypeId,
+                        search: this.state.filterBySearch
                     }
                 });
         }
@@ -56,9 +65,13 @@ export class ServiceList extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.serviceTypeId !== this.props.serviceTypeId) {
-            this.setState({ filterByServiceTypeId: this.props.serviceTypeId }, this.getServices);
+        if (prevProps.serviceTypeId !== this.props.serviceTypeId || prevProps.search !== this.props.search) {
+            this.setState({
+                filterByServiceTypeId: this.props.serviceTypeId,
+                filterBySearch: this.props.search
+            }, this.getServices);
         }
+        
         if (prevState.currentPage !== this.state.currentPage) {
             this.getServices();
         }

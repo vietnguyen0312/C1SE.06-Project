@@ -15,6 +15,10 @@ public interface ServiceRepository extends JpaRepository<ServiceEntity, String> 
 
     Page<ServiceEntity> findByServiceTypeIn(List<ServiceType> serviceType, Pageable pageable);
 
-    Page<ServiceEntity> findByServiceTypeInAndNameOrDescriptionContaining(List<ServiceType> serviceType, String name,
-                                                                         String description, Pageable pageable);
+    Page<ServiceEntity> findByServiceTypeInAndNameContainingOrServiceTypeInAndDescriptionContaining(
+            List<ServiceType> serviceType1,
+            String name,
+            List<ServiceType> serviceType2,
+            String description,
+            Pageable pageable);
 }
