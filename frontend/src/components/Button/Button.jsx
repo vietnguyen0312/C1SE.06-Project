@@ -24,11 +24,16 @@ const StyledButton = styled.button`
     transform: translateY(0); /* Không hiệu ứng khi click */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Đổ bóng bình thường */
   }
+    
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 `;
 
-const ButtonCPN = ({ text, onClick, type = "button" }) => {
+const ButtonCPN = ({ text, onClick, type = "button", disabled = false }) => {
   return (
-    <StyledButton type={type} onClick={onClick}>
+    <StyledButton type={type} onClick={onClick} disabled={disabled}>
       {text}
     </StyledButton>
   );

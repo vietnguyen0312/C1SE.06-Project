@@ -21,30 +21,19 @@ public class UserUpdateRequest {
     @Size(min = 3, max = 50, message = "USERNAME_SIZE")
     String username;
 
+    @NotBlank(message = "NOT_BLANK")
     @Email(message = "INVALID")
-    @NotBlank(message = "NOT_BLANK")
     String email;
-
-    @NotBlank(message = "NOT_BLANK")
-    @Size(min = 8, message = "MIN_SIZE")
-    String password;
 
     @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "INVALID")
     String phoneNumber;
-
-    @Past(message = "DOB_PAST")
-    Date dob;
 
     @Pattern(regexp = "^(Male|Female|Other)$", message = "GENDER_INVALID")
     String gender;
 
     String avatar;
 
-    @NotNull(message = "NOT_NULL")
     CustomerType customerType;
 
-    @NotBlank(message = "NOT_BLANK")
     String status;
-
-    Set<String> roles;
 }

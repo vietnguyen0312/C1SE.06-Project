@@ -32,10 +32,6 @@ public class User {
     @Column(length = 50)
     String phoneNumber;
 
-    @Column
-    @Temporal(TemporalType.DATE)
-    Date dob;
-
     @Column(length = 10)
     String gender;
 

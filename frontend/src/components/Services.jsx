@@ -9,8 +9,6 @@ const Services = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const serviceTypeId = searchParams.get('serviceTypeId');
-  const [serviceTypes, setServiceTypes] = useState([]);
-
   useEffect(() => {
     const fetchServiceType = async () => {
       const response = await axios.get('/serviceTypes');
@@ -27,7 +25,6 @@ const Services = () => {
           <ServiceList serviceTypeId={serviceTypeId}/>
         </div>
       </section>
-      <FilterBar />
     </>
   )
 }

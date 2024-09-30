@@ -1,5 +1,6 @@
 package com.example.Backend.controller;
 
+import com.example.Backend.dto.request.User.UserChangePasswordRequest;
 import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
@@ -60,6 +61,14 @@ public class UserController {
         return ApiResponse
                 .<UserResponse>builder()
                 .result(userService.updateUser(id, request))
+                .build();
+    }
+
+    @PutMapping("/change-password/{id}")
+    ApiResponse<UserResponse> changePassword(@PathVariable("id") String id, @RequestBody @Valid UserChangePasswordRequest request) {
+        return ApiResponse
+                .<UserResponse>builder()
+                .result(userService.changePassword(id, request))
                 .build();
     }
 

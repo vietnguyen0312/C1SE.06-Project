@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { BannerSection2 } from '../Home/style';
+import Services from '../../../components/Services';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -80,6 +81,8 @@ const ServiceLayout = () => {
             </Row>
         </Container>
         </BannerSection2>
+
+        <Services />
 
     </>
   );

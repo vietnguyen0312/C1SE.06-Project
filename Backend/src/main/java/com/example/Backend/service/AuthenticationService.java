@@ -106,14 +106,13 @@ public class AuthenticationService {
 
         var userInfo = outboundUserClient.getUserInfo("json", response.getAccessToken());
 
-        Set<Role> roles = new HashSet<>();
-        roles.add(Role.builder()
-                .name(RoleEnum.ROLE_CUSTOMER.getName())
-                .description(RoleEnum.ROLE_CUSTOMER.getDescription())
-                .build());
-
         var user = userRepository.findByEmail(userInfo.getEmail())
                 .orElseGet(()->{
+                    Set<Role> roles = new HashSet<>();
+                    roles.add(Role.builder()
+                            .name(RoleEnum.ROLE_CUSTOMER.getName())
+                            .description(RoleEnum.ROLE_CUSTOMER.getDescription())
+                            .build());
                     CustomerType customerType = customerTypeRepository.findByName(CustomerTypeEnum.BRONZE.getName());
                     User newUser = userRepository.save(User.builder()
                             .email(userInfo.getEmail())

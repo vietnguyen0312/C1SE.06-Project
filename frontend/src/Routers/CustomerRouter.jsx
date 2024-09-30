@@ -1,6 +1,6 @@
 import MainLayout from "../Layout/PublicLayout/MainLayout";
 import ProtectedRoute from "./ProtectedRouter";
-import UserProfile from "../Layout/PublicLayout/UserProfile/UserProfile";
+import UserProfileLayout from "../Layout/PublicLayout/UserProfile/UserProfileLayout";
 
 const CustomerRouter = [
     {
@@ -12,7 +12,7 @@ const CustomerRouter = [
                 children: [
                     {
                         path: "userProfile",
-                        element: <UserProfile />
+                        element: <UserProfileLayout />
                     },
                 ],
             }

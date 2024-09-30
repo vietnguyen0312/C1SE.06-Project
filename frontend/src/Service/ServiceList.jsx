@@ -22,6 +22,7 @@ export class ServiceList extends Component {
             filterByServiceTypeId: props.serviceTypeId || null,
             limit: props.limit || null
         }
+        this.serviceListRef = React.createRef(); // Add this line
     }
 
     getServices = async () => {
@@ -35,8 +36,12 @@ export class ServiceList extends Component {
             }
         } else {
             response = await axios.get('/services/findByServiceType',
-                { params: { page: this.state.currentPage, size: this.state.pageSize, 
-                    serviceTypeId: this.state.filterByServiceTypeId } });
+                {
+                    params: {
+                        page: this.state.currentPage, size: this.state.pageSize,
+                        serviceTypeId: this.state.filterByServiceTypeId
+                    }
+                });
         }
         this.setState({
             services: response.result.data,
@@ -70,6 +75,7 @@ export class ServiceList extends Component {
 
     paginate = (pageNumber) => {
         this.setState({ currentPage: pageNumber, loading: true }, () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             this.getServices();
         });
     }
@@ -77,7 +83,7 @@ export class ServiceList extends Component {
     render() {
         return (
             <>
-                <div className='row'>
+                <div className='row' ref={this.serviceListRef}>
                     {this.state.loading && (
                         <div className="loading-container">
                             <LoadingIcons.TailSpin stroke="#000" />
