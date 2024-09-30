@@ -1,7 +1,7 @@
 import Home from '../Layout/PublicLayout/Home/Home';
 import Blogs from '../components/Blogs';
 import MainLayoutPublic from '../Layout/PublicLayout/MainLayout';
-import Error403 from '../Layout/PublicLayout/Error403';
+import Error403 from '../Layout/PublicLayout/Error403/Error403';
 import { Navigate, Outlet } from "react-router-dom";
 import Authentication from '../components/Authentication';
 import OtpSubmit from '../components/OtpSubmit';
