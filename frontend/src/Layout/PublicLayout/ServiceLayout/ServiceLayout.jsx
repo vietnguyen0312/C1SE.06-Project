@@ -147,9 +147,9 @@ const ServiceLayout = () => {
   const handleSelectCategory = (category) => {
     if (category === 'Tất cả danh mục') {
       if (selectedCategories.length === categories.length) {
-        setSelectedCategories([]); 
+        setSelectedCategories([]);
       } else {
-        setSelectedCategories(categories); 
+        setSelectedCategories(categories);
       }
     } else {
       setSelectedCategories((prevSelected) => {
@@ -180,10 +180,6 @@ const ServiceLayout = () => {
         </Container>
       </BannerSection2>
 
-<<<<<<< HEAD
-        <Services />
-
-=======
       <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', marginRight: '40vh', padding: '20px 0', userSelect: 'none' }}>
         <Item>
           <NavMenuItem
@@ -235,7 +231,8 @@ const ServiceLayout = () => {
           <SearchIcon />
         </Item>
       </div>
->>>>>>> e48177896da0766253ca2374a0898ef906e0a295
+
+      <Services />
     </>
   );
 };
