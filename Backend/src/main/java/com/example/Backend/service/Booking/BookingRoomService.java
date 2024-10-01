@@ -46,7 +46,7 @@ public class BookingRoomService {
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
     public BookingRoomResponse updateBookingRoom(String id, BookingRoomUpdateRequest request) {
         BookingRoom bookingRoom = bookingRoomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -54,7 +54,7 @@ public class BookingRoomService {
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
     public void deleteBookingRoom(String id) {
         bookingRoomRepository.deleteById(id);
     }

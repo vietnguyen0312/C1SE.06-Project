@@ -75,7 +75,7 @@ public class RoomService {
         return roomMapper.toRoomResponse(updatedRoom);
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
     public RoomResponse getRoomById(String id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -88,7 +88,7 @@ public class RoomService {
                 .collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
     public void deleteRoom(String id) {
         roomRepository.deleteById(id);
     }

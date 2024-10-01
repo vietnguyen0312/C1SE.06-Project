@@ -63,7 +63,7 @@ public class BookingRoomDetailsService {
                 return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(bookingRoomDetails);
         }
 
-        @PreAuthorize("hasRole('MANAGER')")
+        @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
         public void deleteBookingRoomDetails(String id) {
                 if (!bookingRoomDetailsRepository.existsById(id)) {
                         throw new AppException(ErrorCode.NOT_EXISTED);
@@ -79,7 +79,7 @@ public class BookingRoomDetailsService {
                                 .toList();
         }
 
-        @PreAuthorize("hasRole('MANAGER')")
+        @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
         public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDetailsRequest request) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
