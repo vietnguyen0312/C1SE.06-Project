@@ -11,6 +11,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,8 @@ import java.util.List;
 public class RoomTypeService {
     RoomTypeRepository roomTypeRepository;
     RoomTypeMapper roomTypeMapper;
+
+    @PreAuthorize("hasRole('MANAGER')")
     public RoomTypeResponse createRoomType(RoomTypeRequest request) {
         RoomType roomType = roomTypeMapper.toRoomType(request);
         RoomType savedRoomType = roomTypeRepository.save(roomType);
@@ -29,12 +33,13 @@ public class RoomTypeService {
     }
 
     public List<RoomTypeResponse> getRoomTypesAll() {
-
         List<RoomType> roomTypes = roomTypeRepository.findAll();
         return roomTypes.stream()
                 .map(roomTypeMapper::toRoomTypeResponse)
                 .toList();
     }
+
+    @PreAuthorize("hasRole('MANAGER')")
     public void deleteRoomType(String id) {
         // Xóa RoomType theo ID
         roomTypeRepository.deleteById(id);

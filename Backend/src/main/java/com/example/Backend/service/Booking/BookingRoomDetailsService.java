@@ -1,6 +1,7 @@
 package com.example.Backend.service.Booking;
 
 import com.example.Backend.dto.request.Booking.BookingRoomDetailsRequest;
+import com.example.Backend.dto.request.Room.RoomCreationRequest;
 import com.example.Backend.dto.response.Booking.BookingRoomDetailsResponse;
 import com.example.Backend.entity.Booking.BookingRoom;
 import com.example.Backend.entity.Booking.BookingRoomDetails;
@@ -15,6 +16,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,87 +27,72 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class BookingRoomDetailsService {
-    BookingRoomDetailsRepository bookingRoomDetailsRepository;
-    BookingRoomDetailsMapper bookingRoomDetailsMapper;
-    RoomRepository roomRepository;
-    BookingRoomRepository bookingRoomRepository;
+        BookingRoomDetailsRepository bookingRoomDetailsRepository;
+        BookingRoomDetailsMapper bookingRoomDetailsMapper;
+        RoomRepository roomRepository;
+        BookingRoomRepository bookingRoomRepository;
 
-    public BookingRoomDetailsResponse createBookingRoomDetails(BookingRoomDetailsRequest request) {
-        // Tạo đối tượng BookingRoomDetails từ yêu cầu
-        BookingRoomDetails bookingRoomDetails = bookingRoomDetailsMapper.toBookingRoomDetails(request);
+        public BookingRoomDetailsResponse createBookingRoomDetails(BookingRoomDetailsRequest request) {
 
-        // Tìm đối tượng Room từ roomId trong yêu cầu
-        Room room = roomRepository.findById(request.getRoomId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                BookingRoomDetails bookingRoomDetails = bookingRoomDetailsMapper.toBookingRoomDetails(request);
 
-        // Tìm đối tượng BookingRoom từ bookingId trong yêu cầu
-        BookingRoom bookingRoom = bookingRoomRepository.findById(request.getBookingId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                Room room = roomRepository.findById(request.getRoomId())
+                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-        // Thiết lập mối quan hệ cho BookingRoomDetails
-        bookingRoomDetails.setRoom(room);
-        bookingRoomDetails.setBookingRoom(bookingRoom);
-        bookingRoomDetails.setPrice(request.getPrice());
+                BookingRoom bookingRoom = bookingRoomRepository.findById(request.getBookingId())
+                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-        // Lưu BookingRoomDetails vào cơ sở dữ liệu và trả về phản hồi
-        return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(bookingRoomDetailsRepository.save(bookingRoomDetails));
-    }
+                bookingRoomDetails.setRoom(room);
+                bookingRoomDetails.setBookingRoom(bookingRoom);
+                bookingRoomDetails.setPrice(request.getPrice());
 
-    public List<BookingRoomDetailsResponse> getAllBookingRoomDetails() {
-        List<BookingRoomDetails> bookingRoomDetailsList = bookingRoomDetailsRepository.findAll();
-        return bookingRoomDetailsList.stream()
-                .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
-                .toList();
-    }
-
-    public BookingRoomDetailsResponse getBookingRoomDetails(String id) {
-        BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-        return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(bookingRoomDetails);
-    }
-
-    public void deleteBookingRoomDetails(String id) {
-        if (!bookingRoomDetailsRepository.existsById(id)) {
-            throw new AppException(ErrorCode.NOT_EXISTED);
+                return bookingRoomDetailsMapper
+                                .toBookingRoomDetailsResponse(bookingRoomDetailsRepository.save(bookingRoomDetails));
         }
-        bookingRoomDetailsRepository.deleteById(id);
-    }
 
-    public List<BookingRoomDetailsResponse> getBookingRoomDetailsByBookingRoom(String bookingRoomId) {
-        // Tìm đối tượng BookingRoom dựa trên bookingRoomId
-        BookingRoom bookingRoom = bookingRoomRepository.findById(bookingRoomId)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        public List<BookingRoomDetailsResponse> getAllBookingRoomDetails() {
+                List<BookingRoomDetails> bookingRoomDetailsList = bookingRoomDetailsRepository.findAll();
+                return bookingRoomDetailsList.stream()
+                                .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
+                                .toList();
+        }
 
-        // Lấy danh sách BookingRoomDetails dựa trên BookingRoom và chuyển đổi nó thành phản hồi
-        return bookingRoomDetailsRepository.findAllByBookingRoom(bookingRoom).stream()
-                .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
-                .toList();
-    }
+        public BookingRoomDetailsResponse getBookingRoomDetailsById(String id) {
+                BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
+                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(bookingRoomDetails);
+        }
 
+        @PreAuthorize("hasRole('MANAGER')")
+        public void deleteBookingRoomDetails(String id) {
+                if (!bookingRoomDetailsRepository.existsById(id)) {
+                        throw new AppException(ErrorCode.NOT_EXISTED);
+                }
+                bookingRoomDetailsRepository.deleteById(id);
+        }
 
-    public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDetailsRequest request) {
-        // Tìm đối tượng BookingRoomDetails từ id
-        BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        public List<BookingRoomDetailsResponse> getBookingRoomDetailsByBookingRoom(String bookingRoomId) {
+                BookingRoom bookingRoom = bookingRoomRepository.findById(bookingRoomId)
+                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                return bookingRoomDetailsRepository.findAllByBookingRoom(bookingRoom).stream()
+                                .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
+                                .toList();
+        }
 
-        // Tìm đối tượng Room từ roomId trong request
-        Room room = roomRepository.findById(request.getRoomId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        @PreAuthorize("hasRole('MANAGER')")
+        public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDetailsRequest request) {
+                BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
+                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-        // Tìm đối tượng BookingRoom từ bookingId trong request
-        BookingRoom bookingRoom = bookingRoomRepository.findById(request.getBookingId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
-        // Cập nhật thông tin chi tiết
-        bookingRoomDetails.setRoom(room);
-        bookingRoomDetails.setBookingRoom(bookingRoom);
-        bookingRoomDetails.setPrice(request.getPrice());
-
-        // Lưu lại thông tin đã cập nhật
-        BookingRoomDetails updatedBookingRoomDetails = bookingRoomDetailsRepository.save(bookingRoomDetails);
-
-        // Trả về phản hồi đã cập nhật
-        return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(updatedBookingRoomDetails);
-    }
+                Room room = roomRepository.findById(request.getRoomId())
+                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                BookingRoom bookingRoom = bookingRoomRepository.findById(request.getBookingId())
+                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                bookingRoomDetails.setRoom(room);
+                bookingRoomDetails.setBookingRoom(bookingRoom);
+                bookingRoomDetails.setPrice(request.getPrice());
+                BookingRoomDetails updatedBookingRoomDetails = bookingRoomDetailsRepository.save(bookingRoomDetails);
+                return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(updatedBookingRoomDetails);
+        }
 
 }

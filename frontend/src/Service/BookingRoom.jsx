@@ -8,8 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import axios from "../Configuration/AxiosConfig";
 import ButtonCPN from '../components/Button/Button';
 import RoomCard from '../components/RoomCard';
-
-
+import { Navigate } from "react-router-dom";
 const Overlay = styled.div`
   position: absolute;
   top: 0;
@@ -126,28 +125,7 @@ const DateInfo = styled.div`
   gap: 20px;
 `;
 
-const PriceSquare = styled.div`
-  width: 80px;
-  height: 80px;
-  background-color: #f8b600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin: 0 50px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-  &:hover {
-    background-color: #dd9c00;
-  }
-`;
 
-const ChooseRoom = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
 const Payment = styled.div`
   display: flex;
   justify-content: space-between;
@@ -191,7 +169,8 @@ class BookingRoom extends Component {
             rooms: [],
             roomPrice: 0,
             roomId: props.roomTypeId,  // Lấy roomTypeId từ props
-            hasMore: true, // Kiểm soát việc tải thêm
+            hasMore: true,
+            selectedRoomsDetails: [], // Kiểm soát việc tải thêm
         };
         this.lastPostElementRef = createRef(); // Tạo ref cho phần tử cuối cùng
     }
@@ -205,13 +184,13 @@ class BookingRoom extends Component {
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && this.state.hasMore) {
                 this.fetchRoom(this.startDate);
-                console.log("Phần tử cuối đã xuất hiện, tải thêm dữ liệu..."); // Kiểm tra log khi phần tử cuối cùng xuất hiện
+                // console.log("Phần tử cuối đã xuất hiện, tải thêm dữ liệu..."); // Kiểm tra log khi phần tử cuối cùng xuất hiện
             }
         });
 
         if (this.lastPostElementRef.current) {
             observer.observe(this.lastPostElementRef.current); // Quan sát phần tử cuối cùng
-            console.log("Đã thiết lập quan sát cho phần tử cuối cùng");
+            // console.log("Đã thiết lập quan sát cho phần tử cuối cùng");
         }
     };
 
@@ -254,24 +233,81 @@ class BookingRoom extends Component {
 
     handleBookingClick = () => {
         const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+
         const { startDate, endDate } = this.state;
         if (startDate && endDate) {
-            if (startDate < currentDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            start.setHours(0, 0, 0, 0);
+            end.setHours(0, 0, 0, 0);
+            if (start < currentDate) {
                 alert('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại!');
                 return;
             }
-            if (endDate < startDate) {
+            if (end < start) {
                 alert('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu!');
                 return;
             }
             this.setState({ showRoomSelection: true });
             const formattedDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-${startDate.getDate()}`;
+            const formattedDate1 = this.formatDate(endDate);
             this.startDate = formattedDate;
+            this.endDate = formattedDate1;
             this.fetchRoom(formattedDate); // Gọi fetchRoom với ngày đã định dạng
         } else {
             alert('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!');
         }
     };
+
+    BookingRoom = async () => {
+        const token = localStorage.getItem('token'); // Lấy token từ localStorage
+        console.log(token);
+
+        const response = await axios.get('/users/myInfo');
+
+        console.log(response.result.id);
+        if (!response) {
+            window.location.href = '/authentication';
+            return null;
+        } else {
+            console.log(response.result);
+            console.log(this.startDate);
+            console.log(this.endDate);
+            console.log(this.state.totalPrice);
+
+            const user = response.result.id;
+
+
+            const checkInDate = this.startDate instanceof Date ? this.startDate.toISOString() : new Date(this.startDate).toISOString();
+            const checkOutDate = this.endDate instanceof Date ? this.endDate.toISOString() : new Date(this.endDate).toISOString();
+
+            const response1 = await axios.post('booking_room', {
+                userId: user,
+                checkInDate: checkInDate,
+                checkOutDate: checkOutDate,
+                total: this.state.totalPrice,
+                status: 'Đã xác nhận'
+            });
+
+            console.log(response1.result);
+            console.log(this.state.selectedRoomsDetails);
+
+            const gia = this.state.totalPrice / this.state.selectedRoomsDetails.length;
+            console.log(gia);
+            for (const room of this.state.selectedRoomsDetails) {
+                const response2 = await axios.post('booking_room_details', {
+                    roomId: room.id,
+                    bookingId: response1.result.id,
+                    price: gia
+                });
+
+                console.log(response2.result);
+            }
+        }
+
+    };
+
 
 
     formatDate(date) {
@@ -283,23 +319,28 @@ class BookingRoom extends Component {
     }
 
     handlePriceClick = (room) => {
-        const { selectedRooms, startDate, endDate, roomPrice } = this.state;
+        const { selectedRooms, selectedRoomsDetails, startDate, endDate, roomPrice } = this.state;
         const isSelected = selectedRooms.includes(room.roomNumber);
         const days = this.calculateDays(startDate, endDate);
         const priceForRoom = roomPrice * days;
 
         if (isSelected) {
+            // Nếu phòng đã được chọn, bỏ chọn
             this.setState((prevState) => ({
                 selectedRooms: prevState.selectedRooms.filter((item) => item !== room.roomNumber),
+                selectedRoomsDetails: prevState.selectedRoomsDetails.filter((item) => item.id !== room.id), // Cập nhật chi tiết phòng bằng ID
                 totalPrice: prevState.totalPrice - priceForRoom,
             }));
         } else {
+            // Nếu phòng chưa được chọn, thêm vào danh sách
             this.setState((prevState) => ({
                 selectedRooms: [...prevState.selectedRooms, room.roomNumber],
+                selectedRoomsDetails: [...prevState.selectedRoomsDetails, room], // Thêm thông tin chi tiết phòng
                 totalPrice: prevState.totalPrice + priceForRoom,
             }));
         }
     };
+
 
     formatCurrency = (value) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -310,9 +351,8 @@ class BookingRoom extends Component {
 
     componentDidUpdate() {
         if (this.lastPostElementRef.current) {
-            console.log("Phần tử cuối cùng sau khi render:", this.lastPostElementRef.current);
-            console.log(this.startDate);
-            // this.fetchRoom(this.startDate);
+            // console.log("Phần tử cuối cùng sau khi render:", this.lastPostElementRef.current);
+            // console.log(this.startDate);
             this.setupObserver()
         } else {
             console.log("Phần tử cuối cùng hiện không tồn tại hoặc chưa được gán ref!");
@@ -406,7 +446,7 @@ class BookingRoom extends Component {
                         <Payment>
                             <p>Tổng giá trị:</p>
                             <p>{this.formatCurrency(totalPrice)}</p>
-                            <Link to="/">Đặt phòng</Link>
+                            <ButtonCPN text="Đặt phòng" onClick={this.BookingRoom} />
                         </Payment>
                     </RoomSelection>
                 )}

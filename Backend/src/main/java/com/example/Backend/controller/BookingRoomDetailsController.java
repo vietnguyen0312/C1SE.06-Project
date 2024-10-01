@@ -21,8 +21,10 @@ public class BookingRoomDetailsController {
 
     // Tạo mới BookingRoomDetails
     @PostMapping
-    public ApiResponse<BookingRoomDetailsResponse> createBookingRoomDetails(@RequestBody @Valid BookingRoomDetailsRequest request) {
-        BookingRoomDetailsResponse bookingRoomDetailsResponse = bookingRoomDetailsService.createBookingRoomDetails(request);
+    public ApiResponse<BookingRoomDetailsResponse> createBookingRoomDetails(
+            @RequestBody @Valid BookingRoomDetailsRequest request) {
+        BookingRoomDetailsResponse bookingRoomDetailsResponse = bookingRoomDetailsService
+                .createBookingRoomDetails(request);
         return ApiResponse.<BookingRoomDetailsResponse>builder()
                 .result(bookingRoomDetailsResponse)
                 .build();
@@ -30,8 +32,10 @@ public class BookingRoomDetailsController {
 
     // Cập nhật BookingRoomDetails theo ID (giả sử có update method)
     @PutMapping("/{id}")
-    public ApiResponse<BookingRoomDetailsResponse> git (@PathVariable String id, @RequestBody @Valid BookingRoomDetailsRequest request) {
-        BookingRoomDetailsResponse bookingRoomDetailsResponse = bookingRoomDetailsService.updateBookingRoomDetails(id, request);
+    public ApiResponse<BookingRoomDetailsResponse> git(@PathVariable String id,
+            @RequestBody @Valid BookingRoomDetailsRequest request) {
+        BookingRoomDetailsResponse bookingRoomDetailsResponse = bookingRoomDetailsService.updateBookingRoomDetails(id,
+                request);
         return ApiResponse.<BookingRoomDetailsResponse>builder()
                 .result(bookingRoomDetailsResponse)
                 .build();
@@ -40,7 +44,7 @@ public class BookingRoomDetailsController {
     // Lấy BookingRoomDetails theo ID
     @GetMapping("/{id}")
     public ApiResponse<BookingRoomDetailsResponse> getBookingRoomDetailsById(@PathVariable String id) {
-        BookingRoomDetailsResponse bookingRoomDetailsResponse = bookingRoomDetailsService.getBookingRoomDetails(id);
+        BookingRoomDetailsResponse bookingRoomDetailsResponse = bookingRoomDetailsService.getBookingRoomDetailsById(id);
         return ApiResponse.<BookingRoomDetailsResponse>builder()
                 .result(bookingRoomDetailsResponse)
                 .build();
@@ -49,7 +53,8 @@ public class BookingRoomDetailsController {
     // Lấy tất cả BookingRoomDetails
     @GetMapping
     public ApiResponse<List<BookingRoomDetailsResponse>> getAllBookingRoomDetails() {
-        List<BookingRoomDetailsResponse> bookingRoomDetailsResponses = bookingRoomDetailsService.getAllBookingRoomDetails();
+        List<BookingRoomDetailsResponse> bookingRoomDetailsResponses = bookingRoomDetailsService
+                .getAllBookingRoomDetails();
         return ApiResponse.<List<BookingRoomDetailsResponse>>builder()
                 .result(bookingRoomDetailsResponses)
                 .build();
@@ -64,8 +69,10 @@ public class BookingRoomDetailsController {
 
     // Lấy danh sách BookingRoomDetails theo BookingRoom (tìm theo bookingRoomId)
     @GetMapping("/byBookingRoom/{bookingRoomId}")
-    public ApiResponse<List<BookingRoomDetailsResponse>> getBookingRoomDetailsByBookingRoom(@PathVariable("bookingRoomId") String bookingRoomId) {
-        List<BookingRoomDetailsResponse> bookingRoomDetailsResponses = bookingRoomDetailsService.getBookingRoomDetailsByBookingRoom(bookingRoomId);
+    public ApiResponse<List<BookingRoomDetailsResponse>> getBookingRoomDetailsByBookingRoom(
+            @PathVariable("bookingRoomId") String bookingRoomId) {
+        List<BookingRoomDetailsResponse> bookingRoomDetailsResponses = bookingRoomDetailsService
+                .getBookingRoomDetailsByBookingRoom(bookingRoomId);
         return ApiResponse.<List<BookingRoomDetailsResponse>>builder()
                 .result(bookingRoomDetailsResponses)
                 .build();

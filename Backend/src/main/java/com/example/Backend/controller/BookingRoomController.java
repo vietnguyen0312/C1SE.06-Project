@@ -32,7 +32,8 @@ public class BookingRoomController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<BookingRoomResponse> updateBookingRoom(@PathVariable String id, @RequestBody @Valid BookingRoomUpdateRequest request) {
+    public ApiResponse<BookingRoomResponse> updateBookingRoom(@PathVariable String id,
+            @RequestBody @Valid BookingRoomUpdateRequest request) {
         BookingRoomResponse bookingRoomResponse = bookingRoomService.updateBookingRoom(id, request);
         return ApiResponse.<BookingRoomResponse>builder()
                 .result(bookingRoomResponse)
@@ -41,7 +42,7 @@ public class BookingRoomController {
 
     @GetMapping("/{id}")
     public ApiResponse<BookingRoomResponse> getBookingRoomById(@PathVariable String id) {
-        BookingRoomResponse bookingRoomResponse = bookingRoomService.getBookingRoom(id);
+        BookingRoomResponse bookingRoomResponse = bookingRoomService.getBookingRoomById(id);
         return ApiResponse.<BookingRoomResponse>builder()
                 .result(bookingRoomResponse)
                 .build();

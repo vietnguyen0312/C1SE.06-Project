@@ -14,6 +14,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,17 +30,10 @@ public class BookingRoomService {
     UserRepository userRepository;
 
     public BookingRoomResponse createBookingRoom(BookingRoomCreationRequest request) {
-        // Tạo đối tượng BookingRoom từ yêu cầu
         BookingRoom bookingRoom = bookingRoomMapper.toBookingRoom(request);
-
-        // Tìm đối tượng User từ ID trong yêu cầu
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
-        // Thiết lập mối quan hệ cho BookingRoom
         bookingRoom.setUser(user);
-
-        // Lưu BookingRoom vào cơ sở dữ liệu và trả về phản hồi
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
 
@@ -46,20 +41,20 @@ public class BookingRoomService {
         return bookingRoomRepository.findAll().stream().map(bookingRoomMapper::toBookingRoomResponse).toList();
     }
 
-    public BookingRoomResponse getBookingRoom(String id) {
+    public BookingRoomResponse getBookingRoomById(String id) {
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public BookingRoomResponse updateBookingRoom(String id, BookingRoomUpdateRequest request) {
         BookingRoom bookingRoom = bookingRoomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
         bookingRoomMapper.updateBookingRoom(bookingRoom, request);
-
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public void deleteBookingRoom(String id) {
         bookingRoomRepository.deleteById(id);
     }

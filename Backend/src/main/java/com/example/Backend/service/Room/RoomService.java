@@ -40,7 +40,7 @@ public class RoomService {
     RoomTypeRepository roomTypeRepository;
     BookingRoomDetailsRepository bookingRoomDetailsRepository;
 
-    // @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse createRoom(RoomCreationRequest request) {
         try {
 
@@ -58,28 +58,24 @@ public class RoomService {
         }
     }
 
-    // @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse updateRoom(String id, RoomUpdateRequest request) {
-        // Tìm phòng theo ID
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-        // Cập nhật trạng thái của phòng từ yêu cầu
         room.setStatus(request.getStatus());
 
-        // Cập nhật RoomType nếu có
         if (request.getRoomTypeId() != null && !request.getRoomTypeId().isEmpty()) {
             RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
                     .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
             room.setRoomType(roomType);
         }
 
-        // Lưu đối tượng phòng đã cập nhật và trả về phản hồi
         Room updatedRoom = roomRepository.save(room);
         return roomMapper.toRoomResponse(updatedRoom);
     }
 
-    // @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse getRoomById(String id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -92,6 +88,7 @@ public class RoomService {
                 .collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public void deleteRoom(String id) {
         roomRepository.deleteById(id);
     }
@@ -101,10 +98,7 @@ public class RoomService {
     }
 
     public List<RoomResponse> getAvailableRoomsByRoomType(RoomType roomType) {
-        // Lấy tất cả các phòng theo RoomType
         List<Room> rooms = roomRepository.findAllByRoomType(roomType);
-
-        // Lọc những phòng không có trong BookingRoomDetails hoặc có checkOutDate đã qua
         List<Room> availableRooms = rooms.stream()
                 .filter(room -> {
                     List<BookingRoomDetails> bookingDetails = bookingRoomDetailsRepository.findByRoom(room);
@@ -113,7 +107,6 @@ public class RoomService {
                 })
                 .collect(Collectors.toList());
 
-        // Trả về danh sách RoomResponse sau khi đã lọc
         return availableRooms.stream()
                 .map(roomMapper::toRoomResponse)
                 .collect(Collectors.toList());
