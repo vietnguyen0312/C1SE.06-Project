@@ -1,4 +1,4 @@
-  import styled from 'styled-components';
+  import styled, { keyframes } from 'styled-components';
 
   export const Container = styled.div`
     max-width: 1140px;
@@ -106,20 +106,11 @@
   `;
 
   export const BannerLeft = styled.div`
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
     color: white;
-    width: 50%;
-    margin-top: 70px;
-    h1 {
-      font-size: 48px;
-      margin-top: 80px;
-      line-height: 1.2;
-    }
-
-    p {
-      font-size: 18px;
-      margin-bottom: 30px;
-      line-height: 1.5;
-    }
     z-index:2;
     
   `;
@@ -186,3 +177,5 @@
     bottom: 0;
     background: rgba(4, 9, 30, 0.4);
   `;
+
+

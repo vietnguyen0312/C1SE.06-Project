@@ -1,0 +1,8 @@
+@font-face {
+    font-family: Allison;
+    src: url('./assets/Allison-Regular.ttf');
+  }
+.Allison{
+    font-family: Allison;
+}
+  
