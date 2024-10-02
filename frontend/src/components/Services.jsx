@@ -10,10 +10,10 @@ const Item = styled.div`
   display: flex;
   align-items: center;
   justify-content: end;
-  margin: 10px;
   border-radius: 10px;
   border: 1px solid #ccc;
   width: auto;
+  box-shadow: 0 0 10px 0 rgba(224, 234, 40, 0.995);
 `;
 
 const SearchInput = styled.input`
@@ -101,26 +101,28 @@ const Services = () => {
 
   const handleSelectCategory = (serviceType) => {
     if (serviceType === 'Tất cả danh mục') {
-      setselectedServiceType(serviceTypes);
+      if (selectedServiceType.length === serviceTypes.length) {
+        setselectedServiceType([]);
+      } else {
+        setselectedServiceType(serviceTypes);
+      }
     } else {
       setselectedServiceType((prevSelected) => {
         if (prevSelected.includes(serviceType)) {
-          if (prevSelected.length > 1) {
-            return prevSelected.filter((item) => item !== serviceType);
-          }
+          return prevSelected.filter((item) => item !== serviceType);
         } else {
           return [...prevSelected, serviceType];
         }
-        return prevSelected;
       });
     }
   };
+  
 
   return (
     <>
-      <section className="ftco-section">
+      <section style={{paddingBottom: '40px'}}>
         <div className="container">
-          <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', marginRight: '40vh', padding: '20px 0', userSelect: 'none' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '30px 0', userSelect: 'none' }}>
             <Item>
               <NavMenuItem
                 className="nav-item dropdown"

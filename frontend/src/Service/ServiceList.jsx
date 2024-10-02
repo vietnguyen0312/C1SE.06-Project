@@ -6,6 +6,93 @@ import '../Style/Service.css'
 import '../Style/Loading.css'
 import axios from '../Configuration/AxiosConfig'
 import { Pagination } from '@mui/material';
+import styled from 'styled-components';
+
+
+const ModalBackdrop = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+`;
+
+const ModalWrapper = styled.div`
+  display: block;
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease-out;
+`;
+
+const ModalContent = styled.div`
+  position: relative;
+  background: #fff;
+  border-radius: 4px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 15px;
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #dee2e6;
+`;
+
+const ModalTitle = styled.h3`
+  margin: 0;
+  color: black;
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+`;
+
+const ModalBody = styled.div`
+  padding: 15px;
+`;
+
+const ServiceTitle = styled.h3`
+  color: black;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  &:hover {
+    color: orange;
+  }
+`;
+
+const ServiceImage = styled.img`
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const ServiceDescription = styled.p`
+  margin-bottom: 0;
+`;
+
 
 export class ServiceList extends Component {
     constructor(props) {
@@ -23,7 +110,7 @@ export class ServiceList extends Component {
             filterByServiceTypeId: props.serviceTypeId || null,
             limit: props.limit || null
         }
-        this.serviceListRef = React.createRef(); // Add this line
+        this.serviceListRef = React.createRef(); 
     }
 
     getServices = async () => {
@@ -96,7 +183,7 @@ export class ServiceList extends Component {
 
     render() {
         return (
-            <>
+            <div style={{backgroundColor: '#f8f9fa'}}>
                 <div className='row' ref={this.serviceListRef}>
                     {this.state.loading && (
                         <div className="loading-container">
@@ -132,51 +219,34 @@ export class ServiceList extends Component {
                     ))}
 
                     {this.state.isModalOpen && this.state.selectedService && (
-                        <div className="modal-backdrop fade show" onClick={this.closeModal}>
-                            <div
-                                className={`modal custom-modal fade ${this.state.isModalOpen ? 'show' : ''}`}
-                                onClick={e => e.stopPropagation()}
-                                style={{ display: 'block' }}
-                            >
-                                <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-                                    <div className="modal-content">
-                                        <div className="modal-header">
-                                            <h3>{this.state.selectedService.serviceType.name}</h3>
-                                            <button
-                                                type="button"
-                                                className="close"
-                                                onClick={this.closeModal}
-                                                aria-label="Close"
-                                            >
-                                                <FontAwesomeIcon icon={faTimes} />
-                                            </button>
+                        <ModalBackdrop onClick={this.closeModal}>
+                            <ModalWrapper onClick={(e) => e.stopPropagation()}>
+                                <ModalContent>
+                                    <ModalHeader>
+                                        <ModalTitle>{this.state.selectedService.serviceType.name}</ModalTitle>
+                                        <CloseButton onClick={this.closeModal} aria-label="Close">
+                                            <FontAwesomeIcon icon={faTimes} />
+                                        </CloseButton>
+                                    </ModalHeader>
+                                    <ModalBody>
+                                        <div className="mb-3">
+                                            <ServiceTitle>{this.state.selectedService.name}</ServiceTitle>
                                         </div>
-                                        <div className="modal-body">
-                                            <div className="mb-3">
-                                                <h3
-                                                    style={{ color: 'black', cursor: 'pointer' }}
-                                                    onMouseOver={(e) => e.target.style.color = 'orange'}
-                                                    onMouseOut={(e) => e.target.style.color = 'black'}
-                                                >
-                                                    {this.state.selectedService.name}
-                                                </h3>
-                                            </div>
-                                            <div className="mb-3 text-center">
-                                                <img
-                                                    src={`/img/service/${this.state.selectedService.image}`}
-                                                    alt="Service Image"
-                                                    className="img-fluid"
-                                                />
-                                            </div>
-                                            <div>
-                                                <p><strong>Description:</strong></p>
-                                                <p>{this.state.selectedService.description}</p>
-                                            </div>
+                                        <div className="mb-3 text-center">
+                                            <ServiceImage
+                                                src={`/img/service/${this.state.selectedService.image}`}
+                                                alt="Service Image"
+                                                className="img-fluid"
+                                            />
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                        <div>
+                                            <p><strong>Description:</strong></p>
+                                            <ServiceDescription>{this.state.selectedService.description}</ServiceDescription>
+                                        </div>
+                                    </ModalBody>
+                                </ModalContent>
+                            </ModalWrapper>
+                        </ModalBackdrop>
                     )}
                 </div>
 
@@ -192,7 +262,7 @@ export class ServiceList extends Component {
                         sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
                     />
                 )}
-            </>
+            </div>
         )
     }
 }
