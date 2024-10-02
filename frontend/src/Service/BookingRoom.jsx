@@ -262,55 +262,32 @@ class BookingRoom extends Component {
     };
 
     BookingRoom = async () => {
-        const token = localStorage.getItem('token'); // Lấy token từ localStorage
-        console.log(token);
-        if (!token) {
-            window.location.href = '/authentication';
-            return null;
-        } else {
-            const response = await axios.get('/users/myInfo');
-            console.log(response.result.id);
-            console.log(response.result);
-            console.log(this.startDate);
-            console.log(this.endDate);
-            console.log(this.state.totalPrice);
-
-            const user = response.result.id;
-
-
-            const checkInDate = this.startDate instanceof Date ? this.startDate.toISOString() : new Date(this.startDate).toISOString();
-            const checkOutDate = this.endDate instanceof Date ? this.endDate.toISOString() : new Date(this.endDate).toISOString();
-
-            const response1 = await axios.post('booking_room', {
-                userId: user,
-                checkInDate: checkInDate,
-                checkOutDate: checkOutDate,
-                total: this.state.totalPrice,
-                status: 'Đã xác nhận'
+        const response = await axios.get('/users/myInfo');
+        const user = response.result.id;
+        const checkInDate = this.startDate instanceof Date ? this.startDate.toISOString() : new Date(this.startDate).toISOString();
+        const checkOutDate = this.endDate instanceof Date ? this.endDate.toISOString() : new Date(this.endDate).toISOString();
+        const response1 = await axios.post('booking_room', {
+            userId: user,
+            checkInDate: checkInDate,
+            checkOutDate: checkOutDate,
+            total: this.state.totalPrice,
+            status: 'Đã xác nhận'
+        });
+        const gia = this.state.totalPrice / this.state.selectedRoomsDetails.length;
+        console.log(gia);
+        for (const room of this.state.selectedRoomsDetails) {
+            const response2 = await axios.post('booking_room_details', {
+                roomId: room.id,
+                bookingId: response1.result.id,
+                price: gia
             });
-
-            console.log(response1.result);
-            console.log(this.state.selectedRoomsDetails);
-
-            const gia = this.state.totalPrice / this.state.selectedRoomsDetails.length;
-            console.log(gia);
-            for (const room of this.state.selectedRoomsDetails) {
-                const response2 = await axios.post('booking_room_details', {
-                    roomId: room.id,
-                    bookingId: response1.result.id,
-                    price: gia
-                });
-
-                console.log(response2.result);
-            }
+            console.log(response2.result);
         }
-
     };
 
 
-
     formatDate(date) {
-   
+
 
         if (!(date instanceof Date)) {
             throw new Error("Invalid date object");

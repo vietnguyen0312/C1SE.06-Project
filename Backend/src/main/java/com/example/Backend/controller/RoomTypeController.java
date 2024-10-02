@@ -37,14 +37,11 @@ public class RoomTypeController {
 
     @GetMapping("/{id}")
     ApiResponse<RoomTypeResponse> getRoomTypeById(@PathVariable String id) {
-        System.out.println("Received request to get RoomType with ID: " + id);
         RoomTypeResponse roomTypeResponse = roomTypeService.getRoomTypeById(id);
-        System.out.println("Retrieved RoomTypeResponse: " + roomTypeResponse);
         return ApiResponse.<RoomTypeResponse>builder()
                 .result(roomTypeResponse)
                 .build();
     }
-
 
     @DeleteMapping("/{id}")
     ApiResponse<Void> deleteRoomType(@PathVariable String id) {
