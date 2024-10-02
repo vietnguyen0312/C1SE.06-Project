@@ -264,14 +264,12 @@ class BookingRoom extends Component {
     BookingRoom = async () => {
         const token = localStorage.getItem('token'); // Lấy token từ localStorage
         console.log(token);
-
-        const response = await axios.get('/users/myInfo');
-
-        console.log(response.result.id);
-        if (!response) {
+        if (!token) {
             window.location.href = '/authentication';
             return null;
         } else {
+            const response = await axios.get('/users/myInfo');
+            console.log(response.result.id);
             console.log(response.result);
             console.log(this.startDate);
             console.log(this.endDate);
