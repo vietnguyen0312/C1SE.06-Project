@@ -9,6 +9,7 @@ import axios from "../Configuration/AxiosConfig";
 import ButtonCPN from '../components/Button/Button';
 import RoomCard from '../components/RoomCard';
 import { Navigate } from "react-router-dom";
+import { format } from 'date-fns';
 const Overlay = styled.div`
   position: absolute;
   top: 0;
@@ -311,6 +312,8 @@ class BookingRoom extends Component {
 
 
     formatDate(date) {
+   
+
         if (!(date instanceof Date)) {
             throw new Error("Invalid date object");
         }

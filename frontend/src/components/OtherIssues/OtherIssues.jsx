@@ -99,7 +99,7 @@ const OtherIssues = () => {
   }, []);
 
   return (
-    <Section>
+    <Section data-aos="fade-up" data-aos-delay="400">
       
       <ImgLeftWrapper>
         <ImgLeft src='img/home1.png' />

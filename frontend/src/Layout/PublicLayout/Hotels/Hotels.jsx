@@ -240,9 +240,10 @@ const ModalContent = styled.div`
 `;
 
 const ModalImage = styled.img`
-  width: 100%;
-  height: auto;
+  width: 100px;
+  height: 100px;
   border-radius: 7px;
+  
 `;
 
 const CloseButton = styled.button`
@@ -359,10 +360,12 @@ const Hotels = () => {
           <ModalContent onClick={(e) => e.stopPropagation()}>
             <CloseButton onClick={handleModalClose}>×</CloseButton>
             <ModalImage src={selectedRoom.img} alt={selectedRoom.name} />
+            <RoomInfo>
             <ModalTitle>{selectedRoom.name}</ModalTitle>
-            <ModalPrice>Giá : {selectedRoom.price}</ModalPrice>
+            <ModalPrice>Giá: {selectedRoom.price}</ModalPrice>
             <p>Mô Tả : {selectedRoom.description}</p>
             <ButtonCpn text="Đặt Phòng" />
+            </RoomInfo>
           </ModalContent>
         </ModalOverlay>
       )}

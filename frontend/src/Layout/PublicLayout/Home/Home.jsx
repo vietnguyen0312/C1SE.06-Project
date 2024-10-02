@@ -30,10 +30,10 @@ function Home() {
           <Overlay />
           <BannerContent>
             <BannerLeft >
-              <div className='Allison' style={{ fontSize: '170px' }} data-aos="fade-right" data-aos-delay="1000">
+              <div className='Allison' style={{ fontSize: '170px' }} data-aos="fade-right" data-aos-delay="500">
                 Healing Eco-Tourism
               </div>
-              <p style={{ fontSize: '17px', marginTop: '20px', letterSpacing: '2px' }}  data-aos="fade-up" data-aos-delay="1000">Chào Mừng Quý Khách Đến Với Chúng Tôi
+              <p style={{ fontSize: '17px', marginTop: '20px', letterSpacing: '2px' }} data-aos="fade-up" data-aos-delay="500">Chào Mừng Quý Khách Đến Với Chúng Tôi
               </p>
             </BannerLeft>
           </BannerContent>

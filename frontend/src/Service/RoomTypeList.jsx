@@ -233,8 +233,13 @@ const ModalContent = styled.div`
 
 const ModalImage = styled.img`
   width: 100%;
-  height: auto;
+  height: 50vh;
   border-radius: 7px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 const CloseButton = styled.button`
@@ -249,6 +254,7 @@ const CloseButton = styled.button`
 
 const ModalTitle = styled.h2`
   margin-top: 20px;
+  border-top: 1px solid #f8b600;
 `;
 
 const ModalPrice = styled.p`
