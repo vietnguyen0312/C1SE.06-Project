@@ -308,4 +308,3 @@ const BlogHome = () => {
   };
   
   export default BlogHome;
-  

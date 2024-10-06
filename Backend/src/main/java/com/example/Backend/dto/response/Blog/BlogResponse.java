@@ -7,6 +7,8 @@ import com.example.Backend.repository.Blog.BlogTypeRepository;
 import com.example.Backend.repository.User.UserRepository;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.Instant;
 import java.util.Date;
 @Data
 @NoArgsConstructor
@@ -18,7 +20,8 @@ public class BlogResponse {
     String title;
     String body;
     String contentOpen;
-    Date dateTimeEdit;
+    String CreatedDate;
+    Instant dateTimeEdit;
     String status;
     BlogType blogType ;
     User user;

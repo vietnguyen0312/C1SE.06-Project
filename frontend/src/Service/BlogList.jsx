@@ -61,11 +61,20 @@ export const Title = styled.h1`
 
 export const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, 1fr); 
   gap: 1.5rem;
   padding: 0 10px;
+  max-width: 1140px;
   width: 100%;
-  justify-content: center; // Căn giữa các cột
+  margin: 0 auto; 
+
+  @media (max-width: 900px) { 
+    grid-template-columns: repeat(2, 1fr); 
+  }
+
+  @media (max-width: 600px) { 
+    grid-template-columns: 1fr; 
+  }
 `;
 
 export const BlogCard = styled.div`

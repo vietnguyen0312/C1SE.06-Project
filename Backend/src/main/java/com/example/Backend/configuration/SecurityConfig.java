@@ -37,7 +37,7 @@ public class SecurityConfig {
             "/blogTypes", "/blogTypes/**", "/blogs", "/blogs/**", "/images", "/images/**",
             "/blogComments", "/blogComments/**", "/room_type","/room_type/**","/room","/room/**",
             "/booking_room","/booking_room/**", "/booking_room_details","/booking_room_details/**",
-            "/swagger-ui/**","/v3/api-docs/**", "/mails/send/*"};
+            "/swagger-ui/**","/v3/api-docs/**", "/mails/send/*", "/ws", "/ws/**", "/faq", "/faq/**"};
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
@@ -68,6 +68,7 @@ public class SecurityConfig {
         corsConfiguration.addAllowedOrigin("http://localhost:3000");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource urlBasedCorsConfigurationSource = new UrlBasedCorsConfigurationSource();
         urlBasedCorsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
