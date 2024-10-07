@@ -69,7 +69,7 @@ function Header() {
             <HeaderTopLeft>
               <HeaderTopLeftUL>
                 <HeaderTopLi><HeaderTopLeftLink href="/about">Về chúng tôi</HeaderTopLeftLink></HeaderTopLi>
-                <HeaderTopLi><HeaderTopLeftLink href="#">Buy Tickets</HeaderTopLeftLink></HeaderTopLi>
+                <HeaderTopLi><HeaderTopLeftLink href="/ticket">Buy Tickets</HeaderTopLeftLink></HeaderTopLi>
               </HeaderTopLeftUL>
             </HeaderTopLeft>
             <HeaderTopRight>
