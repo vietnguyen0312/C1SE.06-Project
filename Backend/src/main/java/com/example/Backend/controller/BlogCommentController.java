@@ -4,15 +4,19 @@ import com.example.Backend.dto.request.Blog.BlogCommentCreateRequest;
 import com.example.Backend.dto.request.Blog.BlogCommentUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Blog.BlogCommentResponse;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.service.Blog.BlogCommentService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/blogComments")
@@ -21,16 +25,21 @@ import java.util.List;
 @Slf4j
 public class BlogCommentController {
     BlogCommentService blogCommentService;
-
+    SimpMessagingTemplate simpMessagingTemplate;
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER', 'CUSTOMER', 'EMPLOYER')")
     @PostMapping
     ApiResponse<BlogCommentResponse> createBlogComment(@RequestBody @Valid BlogCommentCreateRequest request) {
+        BlogCommentResponse response = blogCommentService.createBlogComment(request);
+        simpMessagingTemplate.convertAndSend("/topic/comments", response);
+        System.out.println("Sent comment to WebSocket: " + response);
         return ApiResponse.<BlogCommentResponse>builder()
-                .result(blogCommentService.createBlogComment(request))
+                .result(response)
                 .build();
     }
-
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER', 'CUSTOMER', 'EMPLOYER')")
     @PutMapping("/{id}")
-    ApiResponse<BlogCommentResponse> updateBlogComment(@PathVariable String id, @RequestBody @Valid BlogCommentUpdateRequest request) {
+    ApiResponse<BlogCommentResponse> updateBlogComment(@PathVariable String id,
+            @RequestBody @Valid BlogCommentUpdateRequest request) {
         return ApiResponse.<BlogCommentResponse>builder()
                 .result(blogCommentService.updateBlogComment(request, id))
                 .build();
@@ -44,20 +53,25 @@ public class BlogCommentController {
     }
 
     @GetMapping("/byBlog/{idBlog}")
-    ApiResponse<List<BlogCommentResponse>> getBlogCommentsByBlogId(@PathVariable String idBlog) {
-        return ApiResponse.<List<BlogCommentResponse>>builder()
-                .result(blogCommentService.getBlogCommentByIdBlog(idBlog))
+    ApiResponse<PageResponse<BlogCommentResponse>> getBlogCommentsByBlogId(
+            @RequestParam(value = "page" , required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size" , required = false, defaultValue = "6") int size,
+            @PathVariable String idBlog) {
+        return ApiResponse.<PageResponse<BlogCommentResponse>>builder()
+                .result(blogCommentService.getBlogCommentByIdBlog(idBlog,page, size))
                 .build();
     }
 
     @GetMapping("/byUser/{userId}")
-    ApiResponse<List<BlogCommentResponse>> getBlogCommentsByUserId(@PathVariable String userId) {
-        return ApiResponse.<List<BlogCommentResponse>>builder()
-                .result(blogCommentService.getBlogCommentByUserId(userId))
+    ApiResponse<PageResponse<BlogCommentResponse>> getBlogCommentsByUserId(
+            @RequestParam(value = "page" , required = false,defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size,
+            @PathVariable String userId) {
+        return ApiResponse.<PageResponse<BlogCommentResponse>>builder()
+                .result(blogCommentService.getBlogCommentByUserId(userId, page, size ))
                 .build();
     }
-
-
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER', 'CUSTOMER', 'EMPLOYER')")
     @DeleteMapping("/{id}")
     ApiResponse<String> deleteBlogComment(@PathVariable String id) {
         blogCommentService.deleteBlogComment(id);

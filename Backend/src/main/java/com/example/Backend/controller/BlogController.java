@@ -24,7 +24,8 @@ import java.util.List;
 public class BlogController {
     BlogService blogService;
 
-    @PreAuthorize("hasRole('MANAGER')")
+
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     @PostMapping
     ApiResponse<BlogResponse> createBlog(@RequestBody @Valid BlogCreateRequest request) {
         return ApiResponse.<BlogResponse>builder()
@@ -61,7 +62,8 @@ public class BlogController {
                 .result(blogService.getBlogByBlogType( idBlogType, page, size , search))
                 .build();
     }
-    @PreAuthorize("hasRole('MANAGER')")
+
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     @PutMapping("/{id}")
     ApiResponse<BlogResponse> updateBlog(@PathVariable("id") String id,@RequestBody @Valid BlogUpdateRequest request) {
         return ApiResponse.<BlogResponse>builder()
@@ -69,7 +71,8 @@ public class BlogController {
                 .build();
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     @DeleteMapping("/{id}")
     ApiResponse<String> deleteBlog(@PathVariable("id") String id) {
         blogService.deleteBlog(id);
