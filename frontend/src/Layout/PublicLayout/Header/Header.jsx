@@ -69,7 +69,7 @@ function Header() {
             <HeaderTopLeft>
               <HeaderTopLeftUL>
                 <HeaderTopLi><HeaderTopLeftLink href="/about">Về chúng tôi</HeaderTopLeftLink></HeaderTopLi>
-                <HeaderTopLi><HeaderTopLeftLink href="#">Buy Tickets</HeaderTopLeftLink></HeaderTopLi>
+                <HeaderTopLi><HeaderTopLeftLink href="/tickets">Đặt vé</HeaderTopLeftLink></HeaderTopLi>
               </HeaderTopLeftUL>
             </HeaderTopLeft>
             <HeaderTopRight>
@@ -88,7 +88,7 @@ function Header() {
           <WrapperAICD className={isSticky ? 'sticky' : ''}>
             <Logo>
               <a href="/">
-                <img src="/image/favicon.ico" />
+                <img src="img/logo.png"/>
                 <span>Healing</span>
               </a>
             </Logo>
@@ -107,6 +107,7 @@ function Header() {
                     <BlogTypeList/>
                   </ul>
                 </NavMenuItem>
+                <NavMenuItem><NavMenuLink href="/tickets">Đặt vé</NavMenuLink></NavMenuItem>
                 <IsLogin />
               </NavMenu>
             </nav>

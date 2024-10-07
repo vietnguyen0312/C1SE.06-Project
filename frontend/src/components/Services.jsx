@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import ServiceList from '../Service/ServiceList'
 import axios from '../Configuration/AxiosConfig'
 import styled from 'styled-components';
-import '../Style/Service.css'
 import { SearchOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 
@@ -101,26 +100,26 @@ const Services = () => {
 
   const handleSelectCategory = (serviceType) => {
     if (serviceType === 'Tất cả danh mục') {
-      if (selectedServiceType.length === serviceTypes.length) {
-        setselectedServiceType([]);
-      } else {
-        setselectedServiceType(serviceTypes);
-      }
+      setselectedServiceType(serviceTypes);
     } else {
       setselectedServiceType((prevSelected) => {
         if (prevSelected.includes(serviceType)) {
-          return prevSelected.filter((item) => item !== serviceType);
+          // Prevent deselecting if it's the last selected item
+          if (prevSelected.length > 1) {
+            return prevSelected.filter((item) => item !== serviceType);
+          }
+          return prevSelected;
         } else {
           return [...prevSelected, serviceType];
         }
       });
     }
   };
-  
+
 
   return (
     <>
-      <section style={{paddingBottom: '40px'}}>
+      <section style={{ paddingBottom: '40px' }}>
         <div className="container">
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '30px 0', userSelect: 'none' }}>
             <Item>
@@ -166,7 +165,7 @@ const Services = () => {
                   ))}
                 </ul>
               </NavMenuItem>
-              <SearchInput type="text" placeholder="Tìm kiếm" onChange={_.debounce((e) => handleSearch(e.target.value), 700)}/>
+              <SearchInput type="text" placeholder="Tìm kiếm" onChange={_.debounce((e) => handleSearch(e.target.value), 700)} />
               <SearchIcon />
             </Item>
           </div>

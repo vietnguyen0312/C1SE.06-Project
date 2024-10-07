@@ -230,17 +230,10 @@ const Bookings = () => {
         <Row>
           <DatePickerContainer>
             <StyledDatePicker
-              selected={startDate}
-              onChange={date => setStartDate(date)}
-              selectsStart
-              startDate={startDate}
-              endDate={endDate}
-              placeholderText="Chọn ngày bắt đầu"
-            />
-            <StyledDatePicker
               selected={endDate}
               onChange={date => setEndDate(date)}
               selectsEnd
+              dateFormat="dddd, DDD, ddd, d, dd MMMM yyyy à HH'h'mm"
               startDate={startDate}
               endDate={endDate}
               minDate={startDate}

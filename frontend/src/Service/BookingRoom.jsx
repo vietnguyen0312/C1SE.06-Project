@@ -366,6 +366,7 @@ class BookingRoom extends Component {
                                 selected={startDate}
                                 onChange={(date) => this.setState({ startDate: date })}
                                 selectsStart
+                                dateFormat="dd 'Tháng' M yyyy"
                                 startDate={startDate}
                                 endDate={endDate}
                                 placeholderText="Chọn ngày bắt đầu"
@@ -375,6 +376,7 @@ class BookingRoom extends Component {
                                 onChange={(date) => this.setState({ endDate: date })}
                                 selectsEnd
                                 startDate={startDate}
+                                dateFormat="dd 'Tháng' M yyyy"
                                 endDate={endDate}
                                 minDate={startDate}
                                 placeholderText="Chọn ngày kết thúc"

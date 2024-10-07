@@ -2,12 +2,10 @@ import React, { Component } from 'react'
 import LoadingIcons from 'react-loading-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
-import '../Style/Service.css'
-import '../Style/Loading.css'
 import axios from '../Configuration/AxiosConfig'
 import { Pagination } from '@mui/material';
 import styled from 'styled-components';
-
+import '../Style/Service.css';
 
 const ModalBackdrop = styled.div`
   position: fixed;
