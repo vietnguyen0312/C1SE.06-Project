@@ -140,4 +140,18 @@ public class RoomService {
                 .build();
     }
 
+    public List<RoomResponse> getAvailableRooms() {
+        List<Room> rooms = roomRepository.findAll();
+        List<Room> availableRooms = rooms.stream()
+                .filter(room -> {
+                    List<BookingRoomDetails> bookingDetails = bookingRoomDetailsRepository.findByRoom(room);
+                    return bookingDetails.stream()
+                            .noneMatch(details -> details.getBookingRoom().getCheckOutDate().after(new Date()));
+                })
+                .collect(Collectors.toList());
+        return availableRooms.stream()
+                .map(roomMapper::toRoomResponse)
+                .collect(Collectors.toList());
+    }
+
 }

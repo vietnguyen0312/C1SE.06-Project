@@ -106,4 +106,13 @@ public class RoomController {
                                 .build();
         }
 
+        @GetMapping("/findByRoomType/entity")
+        public ApiResponse<List<RoomResponse>> getAvailableRooms() {
+                List<RoomResponse> availableRooms = roomService.getAvailableRooms();
+
+                return ApiResponse.<List<RoomResponse>>builder()
+                                .result(availableRooms)
+                                .build();
+        }
+
 }
