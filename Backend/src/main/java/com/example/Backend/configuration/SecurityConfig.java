@@ -22,15 +22,20 @@ import org.springframework.web.filter.CorsFilter;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final String[] AUTHENTICATED_ENDPOINTS = { "/auth/introspect", "/auth/token", "/auth/logout",
-            "/auth/refresh", "/auth/outbound/authentication", "/users" };
+    private final String[] POST_PUBLIC_ENDPOINTS = {
+            "/auth/introspect", "/auth/token", "/auth/logout",
+            "/auth/refresh", "/auth/outbound/authentication", "/users"
+    };
 
-    private final String[] PUBLIC_ENDPOINTS = { "/serviceTypes", "/serviceTypes/**", "/services", "/services/**",
+    private final String[] GET_PUBLIC_ENDPOINTS = {
+            "/serviceTypes", "/serviceTypes/**", "/services", "/services/**",
             "/ratingServices", "/ratingServices/**", "/services/**",
             "/blogTypes", "/blogTypes/**", "/blogs", "/blogs/**", "/images", "/images/**",
             "/blogComments", "/blogComments/**", "/room_type", "/room_type/**", "/room", "/room/**",
             "/booking_room", "/booking_room/**", "/booking_room_details", "/booking_room_details/**",
-            "/swagger-ui/**", "/v3/api-docs/**", "/mails/send/*", "/ws", "/ws/**", "/faq", "/faq/**" };
+            "/swagger-ui/**", "/v3/api-docs/**", "/mails/send/*", "/ws", "/faq", "/faq/**",
+            "/tickets","/tickets/**","/ticket-types","/ticket-types/**","/rate-services","/rate-services/**"
+    };
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
@@ -38,8 +43,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.authorizeHttpRequests(
-                request -> request.requestMatchers(HttpMethod.POST, AUTHENTICATED_ENDPOINTS).permitAll()
-                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                request -> request.requestMatchers(HttpMethod.POST, POST_PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET,GET_PUBLIC_ENDPOINTS).permitAll()
                         .anyRequest().authenticated());
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)

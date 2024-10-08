@@ -9,16 +9,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RateServiceResponse {
-
     String id;
     ServiceEntity serviceEntity;
     User user;
     int score;
     String comment;
+    String formatDate;
+    Instant dateUpdate;
 }

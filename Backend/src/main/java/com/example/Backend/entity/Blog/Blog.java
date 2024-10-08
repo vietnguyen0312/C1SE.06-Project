@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Entity
 @Table(name = "blog")
@@ -38,7 +38,7 @@ public class Blog {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    Date dateTimeEdit;
+    Instant dateTimeEdit;
 
     @Column(length = 50)
     String status;

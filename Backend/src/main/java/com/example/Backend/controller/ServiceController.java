@@ -10,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.query.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,11 +31,12 @@ public class ServiceController {
 
     @GetMapping
     ApiResponse<PageResponse<ServiceResponse>> getServiceList(
+            @RequestParam(value = "serviceTypeId", required = false) List<String> idServiceType,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "6") int size,
             @RequestParam(value = "search", required = false, defaultValue = "") String search) {
         return ApiResponse.<PageResponse<ServiceResponse>>builder()
-                .result(serviceService.getAllServices(page, size, search))
+                .result(serviceService.getServices(idServiceType, page, size, search))
                 .build();
     }
 
@@ -44,17 +44,6 @@ public class ServiceController {
     ApiResponse<ServiceResponse> getService(@PathVariable("id") String id) {
         return ApiResponse.<ServiceResponse>builder()
                 .result(serviceService.getServiceById(id))
-                .build();
-    }
-
-    @GetMapping("/findByServiceType")
-    ApiResponse<PageResponse<ServiceResponse>> getByServiceType(
-            @RequestParam(value = "serviceTypeId") List<String> idServiceType,
-            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "6") int size,
-            @RequestParam(value = "search", required = false, defaultValue = "") String search) {
-        return ApiResponse.<PageResponse<ServiceResponse>>builder()
-                .result(serviceService.getServiceByServiceType(idServiceType, page, size, search))
                 .build();
     }
 

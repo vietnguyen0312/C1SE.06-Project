@@ -34,23 +34,37 @@ public class ServiceService {
     public ServiceResponse createService(ServiceRequest request) {
         try {
             ServiceEntity serviceEntity = serviceMapper.toService(request);
+
             serviceEntity.setServiceType(serviceTypeRepository.findById(request.getServiceTypeId())
                     .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+
             return serviceMapper.toResponse(serviceRepository.save(serviceEntity));
         } catch (Exception e) {
             throw new AppException(ErrorCode.EXISTED);
         }
     }
 
-    public PageResponse<ServiceResponse> getAllServices(int page, int size, String search) {
+    public PageResponse<ServiceResponse> getServices(List<String> idServiceType, int page, int size, String search) {
         Sort sort = Sort.by(Sort.Direction.ASC, "name").ascending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
+
         Page<ServiceEntity> pageData;
-        if (StringUtils.hasLength(search))
-            pageData = serviceRepository.findByNameOrDescriptionContaining(search, search, pageable);
-        else
-            pageData = serviceRepository.findAll(pageable);
+
+        if (idServiceType == null || idServiceType.isEmpty()){
+            if (StringUtils.hasLength(search))
+                pageData = serviceRepository.findByNameOrDescriptionContaining(search, search, pageable);
+            else
+                pageData = serviceRepository.findAll(pageable);
+        } else {
+            List<ServiceType> serviceTypes = serviceTypeRepository.findAllById(idServiceType);
+
+            if (StringUtils.hasLength(search))
+                pageData = serviceRepository.findByServiceTypeInAndNameContainingOrServiceTypeInAndDescriptionContaining
+                        (serviceTypes, search, serviceTypes, search, pageable);
+            else
+                pageData = serviceRepository.findByServiceTypeIn(serviceTypes, pageable);
+        }
 
         return PageResponse.<ServiceResponse>builder()
                 .currentPage(page)
@@ -80,30 +94,6 @@ public class ServiceService {
     @PreAuthorize("hasRole('MANAGER')")
     public void deleteService(String id) {
         serviceRepository.deleteById(id);
-    }
-
-    public PageResponse<ServiceResponse> getServiceByServiceType(List<String> idServiceType, int page, int size, String search) {
-        Sort sort = Sort.by(Sort.Direction.ASC, "name").ascending();
-
-        Pageable pageable = PageRequest.of(page - 1, size, sort);
-
-        Page<ServiceEntity> pageData;
-
-        List<ServiceType> serviceTypes = serviceTypeRepository.findAllById(idServiceType);
-
-        if (StringUtils.hasLength(search))
-            pageData = serviceRepository.findByServiceTypeInAndNameContainingOrServiceTypeInAndDescriptionContaining
-                    (serviceTypes, search, serviceTypes, search, pageable);
-        else
-            pageData = serviceRepository.findByServiceTypeIn(serviceTypes, pageable);
-
-        return PageResponse.<ServiceResponse>builder()
-                .currentPage(page)
-                .totalPages(pageData.getTotalPages())
-                .pageSize(size)
-                .totalElements(pageData.getTotalElements())
-                .data(pageData.getContent().stream().map(serviceMapper::toResponse).toList())
-                .build();
     }
 
 }

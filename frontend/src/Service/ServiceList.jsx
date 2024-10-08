@@ -108,35 +108,25 @@ export class ServiceList extends Component {
             filterByServiceTypeId: props.serviceTypeId || null,
             limit: props.limit || null
         }
-        this.serviceListRef = React.createRef(); 
+        this.serviceListRef = React.createRef();
     }
 
     getServices = async () => {
-        let response;
-        if (this.state.filterByServiceTypeId === null) {
-            response = await axios.get('/services', {
-                params: {
-                    page: this.state.currentPage,
-                    size: this.state.pageSize,
-                    search: this.state.filterBySearch
-                }
-            });
-            if (this.state.limit) {
-                response.result.data = response.result.data.slice(0, this.state.limit);
-                this.setState({ services: response.result.data, loading: false });
-                return;
+        let response = await axios.get('/services', {
+            params: {
+                serviceTypeId: this.state.filterByServiceTypeId,
+                page: this.state.currentPage,
+                size: this.state.pageSize,
+                search: this.state.filterBySearch
             }
-        } else {
-            response = await axios.get('/services/findByServiceType',
-                {
-                    params: {
-                        page: this.state.currentPage,
-                        size: this.state.pageSize,
-                        serviceTypeId: this.state.filterByServiceTypeId,
-                        search: this.state.filterBySearch
-                    }
-                });
+        });
+
+        if (this.state.limit) {
+            response.result.data = response.result.data.slice(0, this.state.limit);
+            this.setState({ services: response.result.data, loading: false });
+            return;
         }
+
         this.setState({
             services: response.result.data,
             loading: false,
@@ -154,6 +144,7 @@ export class ServiceList extends Component {
             this.setState({
                 filterByServiceTypeId: this.props.serviceTypeId,
                 filterBySearch: this.props.search,
+                currentPage: 1,
                 loading: true
             }, this.getServices);
         }
@@ -181,7 +172,7 @@ export class ServiceList extends Component {
 
     render() {
         return (
-            <div style={{backgroundColor: '#f8f9fa'}}>
+            <div style={{ backgroundColor: '#f8f9fa' }}>
                 <div className='row' ref={this.serviceListRef}>
                     {this.state.loading && (
                         <div className="loading-container">

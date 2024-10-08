@@ -26,20 +26,17 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
-
-
-
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("http://localhost:3000") // Đồng bộ với CORS trong SecurityConfig
-                .withSockJS(); // Hỗ trợ các trình duyệt không hỗ trợ WebSocket
+                .setAllowedOrigins("http://localhost:3000")
+                .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic", "/queue"); // Cấu hình broker cho các subscription
-        config.setApplicationDestinationPrefixes("/app"); // Cấu hình prefix cho các endpoint client gửi đến server
+        config.enableSimpleBroker("/topic", "/queue");
+        config.setApplicationDestinationPrefixes("/app");
     }
 
 

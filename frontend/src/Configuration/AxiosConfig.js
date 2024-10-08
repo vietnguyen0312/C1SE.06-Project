@@ -29,7 +29,7 @@ instance.interceptors.response.use((response) => {
   if (error.response?.status === 401 && originalRequest) {
     const token = localStorage.getItem('token');
     if (!token) {
-      window.location.href = '/';
+      window.location.href = '/authentication';
     }
 
     if (!refreshTokenPromise) {

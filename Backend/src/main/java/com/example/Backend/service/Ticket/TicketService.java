@@ -4,7 +4,6 @@ import com.example.Backend.dto.request.Ticket.TicketCreationRequest;
 import com.example.Backend.dto.request.Ticket.TicketUpdateRequest;
 import com.example.Backend.dto.response.Ticket.TicketResponse;
 import com.example.Backend.entity.Ticket.Ticket;
-import com.example.Backend.entity.Ticket.TicketType;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Ticket.TicketMapper;
@@ -13,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,10 +32,10 @@ public class TicketService {
         return ticketMapper.toResponse(savedTicket);
     }
 
-    public List<TicketResponse> getAllTickets() {
-        return ticketRepository.findAll().stream()
-                .map(ticketMapper::toResponse)
-                .collect(Collectors.toList());
+    public List<TicketResponse> getTickets(String search) {
+        return ticketRepository.findFirst5ByServiceEntity_NameContainingOrServiceEntity_DescriptionContaining(search,search)
+                .stream().map(ticketMapper::toResponse)
+                .toList();
     }
 
     public TicketResponse getTicketById(String id) {
@@ -44,12 +44,14 @@ public class TicketService {
         return ticketMapper.toResponse(ticket);
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public void deleteTicket(String id) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         ticketRepository.delete(ticket);
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public TicketResponse updateTicket(TicketUpdateRequest request, String id) {
         Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         ticketMapper.updateTicket(ticket, request);

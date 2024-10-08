@@ -5,6 +5,9 @@ import com.example.Backend.entity.User.User;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+import java.util.Date;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +19,5 @@ public class RateRoomResponse {
     User user;
     int score;
     String comment;
+    Instant dateUpdate;
 }

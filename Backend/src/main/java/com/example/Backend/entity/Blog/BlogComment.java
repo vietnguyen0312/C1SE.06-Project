@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Entity
 @Table(name = "blog_comment")
@@ -31,5 +31,5 @@ public class BlogComment {
     String comment;
 
     @Column(nullable = false)
-    Date dateUpdate;
+    Instant dateUpdate;
 }

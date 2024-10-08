@@ -36,7 +36,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class UserService {
-    RoleRepository roleRepository;
     UserRepository userRepository;
     CartRepository cartRepository;
     CustomerTypeRepository customerTypeRepository;

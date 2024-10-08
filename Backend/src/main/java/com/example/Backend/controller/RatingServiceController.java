@@ -3,6 +3,7 @@ package com.example.Backend.controller;
 import com.example.Backend.dto.request.Rating.RateServiceCreationRequest;
 import com.example.Backend.dto.request.Rating.RateServiceUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.Rating.RateServiceResponse;
 import com.example.Backend.service.Rating.RateServiceService;
 import jakarta.validation.Valid;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/ratingServices")
+@RequestMapping("/rate-services")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
@@ -30,9 +31,13 @@ public class RatingServiceController {
     }
 
     @GetMapping
-    ApiResponse<List<RateServiceResponse>> getAllRateService(){
-        return ApiResponse.<List<RateServiceResponse>>builder()
-                .result(rateServiceService.getAllRateServices())
+    ApiResponse<PageResponse<RateServiceResponse>> getRateService(
+            @RequestParam(value = "serviceId", required = false) String idService,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size
+    ){
+        return ApiResponse.<PageResponse<RateServiceResponse>>builder()
+                .result(rateServiceService.getRateServices(idService,page,size))
                 .build();
     }
 
@@ -51,8 +56,8 @@ public class RatingServiceController {
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse deleteRateService(@PathVariable("id")String id){
+    ApiResponse<Void> deleteRateService(@PathVariable("id")String id){
         rateServiceService.deleteRateService(id);
-        return ApiResponse.builder().build();
+        return ApiResponse.<Void>builder().build();
     }
 }

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Entity
 @Table(name = "bill_ticket")
@@ -25,11 +25,11 @@ public class BillTicket {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    Date datePay;
+    Instant datePay;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    Date dateUse;
+    Instant dateUse;
 
     @Column(nullable = false)
     double total;

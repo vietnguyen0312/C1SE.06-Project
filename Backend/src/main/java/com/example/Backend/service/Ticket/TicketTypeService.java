@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class TicketTypeService {
     TicketTypeRepository ticketTypeRepository;
     TicketTypeMapper ticketTypeMapper;
 
+    @PreAuthorize("hasRole('MANAGER')")
     public TicketTypeResponse createTicketType(TicketTypeRequest request) {
         if (ticketTypeRepository.existsByName(request.getName())) {
             throw new AppException(ErrorCode.EXISTED);
@@ -45,6 +47,7 @@ public class TicketTypeService {
         return ticketTypeMapper.toResponse(ticketType);
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public TicketTypeResponse updateTicketType(String id, TicketTypeRequest request) {
         TicketType ticketType = ticketTypeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -54,6 +57,7 @@ public class TicketTypeService {
         return ticketTypeMapper.toResponse(updatedTicketType);
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public void deleteTicketType(String id) {
         TicketType ticketType = ticketTypeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));

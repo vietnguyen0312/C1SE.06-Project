@@ -36,4 +36,25 @@ public class TicketTypeController {
                 .build();
     }
 
+    @GetMapping("/{id}")
+    ApiResponse<TicketTypeResponse> getById(@PathVariable("id")String id) {
+        return ApiResponse.<TicketTypeResponse>builder()
+                .result(ticketTypeService.getTicketTypeById(id))
+                .build();
+    }
+
+    @PutMapping("/{id}")
+    ApiResponse<TicketTypeResponse> updateTicketType(@PathVariable("id")String id,@RequestBody @Valid TicketTypeRequest request){
+        return ApiResponse.<TicketTypeResponse>builder()
+                .result(ticketTypeService.updateTicketType(id,request))
+                .build();
+    }
+
+    @DeleteMapping("/{id}")
+    ApiResponse<String> updateTicketType(@PathVariable("id")String id){
+        ticketTypeService.deleteTicketType(id);
+        return ApiResponse.<String>builder()
+                .result("Delete Ticket Type Success")
+                .build();
+    }
 }

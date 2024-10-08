@@ -9,4 +9,6 @@ import java.util.List;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, String> {
+    List<Ticket> findFirst5ByServiceEntity_NameContainingOrServiceEntity_DescriptionContaining
+            (String name, String description);
 }

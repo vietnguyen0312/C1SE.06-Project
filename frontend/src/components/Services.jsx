@@ -170,7 +170,7 @@ const Services = () => {
             </Item>
           </div>
           <ServiceList serviceTypeId={selectedServiceType.length === serviceTypes.length
-            ? null : selectedServiceType.map(type => type.id).join(',')} search={search} />
+            ? null : selectedServiceType.map(type => type.id).join(',')} search={search}/>
         </div>
       </section>
     </>

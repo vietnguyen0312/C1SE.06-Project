@@ -1,39 +1,57 @@
 package com.example.Backend.service;
 
 import org.springframework.stereotype.Component;
-import java.time.*;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 
 @Component
 public class DateTimeFormatter {
 
-    public String format(Instant instant) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime dateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+    Map<Long, Function<Instant, String>> strategyMap = new LinkedHashMap<>();
 
-        long epochSecond = ChronoUnit.SECONDS.between(dateTime, now);
+    public DateTimeFormatter() {
+        strategyMap.put(60L, this::formatInSeconds);
+        strategyMap.put(3600L, this::formatInMinutes);
+        strategyMap.put(86400L, this::formatInHours);
+        strategyMap.put(Long.MAX_VALUE, this::formatInDate);
+    }
 
-        if (epochSecond < 60) {
-            return "vừa xong";
-        } else if (epochSecond < 3600) {
-            long elapsedMinutes = ChronoUnit.MINUTES.between(dateTime, now);
-            return elapsedMinutes + " phút";
-        } else if (epochSecond < 86400) {
-            long elapsedHours = ChronoUnit.HOURS.between(dateTime, now);
-            return elapsedHours + " giờ";
-        } else {
-            // Sử dụng Period để tính toán chính xác thời gian
-            Period period = Period.between(dateTime.toLocalDate(), now.toLocalDate());
+    public String format(Instant instant){
+        long elapseSeconds = ChronoUnit.SECONDS.between(instant, Instant.now());
 
-            if (period.getYears() > 0) {
-                return period.getYears() + " năm";
-            } else if (period.getMonths() > 0) {
-                return period.getMonths() + " tháng";
-            } else {
-                long elapsedDays = ChronoUnit.DAYS.between(dateTime, now);
-                return elapsedDays + " ngày";
-            }
-        }
+        var strategy = strategyMap.entrySet()
+                .stream()
+                .filter(longFunctionEntry -> elapseSeconds < longFunctionEntry.getKey())
+                .findFirst().get();
+        return strategy.getValue().apply(instant);
+    }
+
+    private String formatInSeconds(Instant instant){
+        long elapseSeconds = ChronoUnit.SECONDS.between(instant, Instant.now());
+        return String.format("%s giây", elapseSeconds);
+    }
+
+    private String formatInMinutes(Instant instant){
+        long elapseMinutes = ChronoUnit.MINUTES.between(instant, Instant.now());
+        return String.format("%s phút", elapseMinutes);
+    }
+
+    private String formatInHours(Instant instant){
+        long elapseHours = ChronoUnit.HOURS.between(instant, Instant.now());
+        return String.format("%s giờ", elapseHours);
+    }
+
+    private String formatInDate(Instant instant){
+        LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+        java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ISO_DATE;
+
+        return localDateTime.format(dateTimeFormatter);
     }
 }

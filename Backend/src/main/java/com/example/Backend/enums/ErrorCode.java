@@ -25,6 +25,8 @@ public enum ErrorCode {
     POSITIVE(2010, "This field must be greater than 0", HttpStatus.BAD_REQUEST),
     MAX_SIZE(2011, "This field must be at max {max} characters long", HttpStatus.BAD_REQUEST),
     DATE_FUTURE_OR_PRESENT(2008, "Date must be a future date or today  ", HttpStatus.BAD_REQUEST),
+    SCORE_MIN_1(2012, "Score value must be greater than or equal to 1", HttpStatus.BAD_REQUEST),
+    SCORE_MAX_5(2013, "Score value must be less than or equal to 5", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

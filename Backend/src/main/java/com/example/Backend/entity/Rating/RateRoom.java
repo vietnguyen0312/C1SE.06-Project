@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "rate_room")
 @Data
@@ -31,4 +33,7 @@ public class RateRoom {
 
     @Column(columnDefinition = "TEXT")
     String comment;
+
+    @Column(nullable = false)
+    Date dateUpdate;
 }

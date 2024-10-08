@@ -27,6 +27,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+
+import java.time.Instant;
 import java.util.Date;
 
 @Service
@@ -50,7 +52,7 @@ public class BlogCommentService {
 
         blogComment.setUser(user);
         blogComment.setBlog(blog);
-        blogComment.setDateUpdate(new Date());
+        blogComment.setDateUpdate(Instant.now());
         return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.save(blogComment));
     }
 
@@ -78,7 +80,7 @@ public class BlogCommentService {
                 ()-> new AppException(ErrorCode.NOT_EXISTED)),pageable);
         var listData = pageData.getContent().stream().map(blogComment -> {
             var blogCommentResponse = blogCommentMapper.toBlogCommentResponse(blogComment);
-            blogCommentResponse.setCreatedDate(dateTimeFormatter.format(blogComment.getDateUpdate().toInstant()));
+            blogCommentResponse.setCreatedDate(dateTimeFormatter.format(blogComment.getDateUpdate()));
             return blogCommentResponse;
         }).toList();
        return PageResponse.<BlogCommentResponse>builder()
@@ -99,7 +101,7 @@ public class BlogCommentService {
         var pageData = blogCommentRepository.findAllByUser(user, pageable);
         var listData = pageData.getContent().stream().map(blogComment -> {
             var blogCommentResponse = blogCommentMapper.toBlogCommentResponse(blogComment);
-            blogCommentResponse.setCreatedDate(dateTimeFormatter.format(blogComment.getDateUpdate().toInstant()));
+            blogCommentResponse.setCreatedDate(dateTimeFormatter.format(blogComment.getDateUpdate()));
             return blogCommentResponse;
         }).toList();
         return PageResponse.<BlogCommentResponse>builder()
