@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class BlogCommentController {
     BlogCommentService blogCommentService;
     SimpMessagingTemplate simpMessagingTemplate;
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER', 'CUSTOMER', 'EMPLOYER')")
+
     @PostMapping
     ApiResponse<BlogCommentResponse> createBlogComment(@RequestBody @Valid BlogCommentCreateRequest request) {
         BlogCommentResponse response = blogCommentService.createBlogComment(request);
@@ -36,7 +36,7 @@ public class BlogCommentController {
                 .result(response)
                 .build();
     }
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER', 'CUSTOMER', 'EMPLOYER')")
+
     @PutMapping("/{id}")
     ApiResponse<BlogCommentResponse> updateBlogComment(@PathVariable String id,
             @RequestBody @Valid BlogCommentUpdateRequest request) {
@@ -71,7 +71,7 @@ public class BlogCommentController {
                 .result(blogCommentService.getBlogCommentByUserId(userId, page, size ))
                 .build();
     }
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER', 'CUSTOMER', 'EMPLOYER')")
+
     @DeleteMapping("/{id}")
     ApiResponse<String> deleteBlogComment(@PathVariable String id) {
         blogCommentService.deleteBlogComment(id);

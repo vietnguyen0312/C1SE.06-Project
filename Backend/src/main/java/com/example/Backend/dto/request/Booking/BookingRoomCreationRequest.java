@@ -4,6 +4,7 @@ import com.example.Backend.entity.User.User;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.experimental.FieldDefaults;
 
@@ -18,10 +19,10 @@ public class BookingRoomCreationRequest {
     @NotNull(message = "NOT_NULL")
     String userId;
 
-    @Future(message = "DATE_FUTURE")
+    @FutureOrPresent(message = "DATE_FUTURE_OR_PRESENT")
     Date checkInDate;
 
-    @Future(message = "DATE_FUTURE")
+    @FutureOrPresent(message = "DATE_FUTURE_OR_PRESENT")
     Date checkOutDate;
 
     @Positive(message = "POSITIVE")

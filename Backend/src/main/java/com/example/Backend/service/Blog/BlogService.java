@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,6 +40,7 @@ public class BlogService {
     UserRepository userRepository;
     BlogMapper blogMapper;
 
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     public BlogResponse createBlog(BlogCreateRequest request) {
         try {
             Blog blog = blogMapper.toBlog(request);
@@ -49,12 +52,15 @@ public class BlogService {
         }
     }
 
+    @PostAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     public BlogResponse updateBlog(BlogUpdateRequest request, String id) {
         Blog blog = blogRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         blogMapper.updateBlog(blog, request);
         return blogMapper.toBlogResponse(blogRepository.save(blog));
     }
 
+
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     public void deleteBlog(String id) {
         blogRepository.deleteById(id);
     }

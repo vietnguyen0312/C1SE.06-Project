@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 
@@ -37,7 +39,7 @@ public class BlogCommentService {
     BlogCommentMapper blogCommentMapper;
     BlogRepository blogRepository;
     UserRepository userRepository;
-
+    @PreAuthorize("isAuthenticated()")
     public BlogCommentResponse createBlogComment(BlogCommentCreateRequest request) {
         BlogComment blogComment = blogCommentMapper.toBlogComment(request);
 
@@ -52,13 +54,14 @@ public class BlogCommentService {
         return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.save(blogComment));
     }
 
+    @PostAuthorize("isAuthenticated()")
     public BlogCommentResponse updateBlogComment(BlogCommentUpdateRequest request, String id) {
         BlogComment blogComment = blogCommentRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         blogCommentMapper.updateBlogComment(blogComment, request);
         return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.save(blogComment));
     }
-
+    @PreAuthorize("isAuthenticated()")
     public void deleteBlogComment(String id) {
         blogCommentRepository.deleteById(id);
     }

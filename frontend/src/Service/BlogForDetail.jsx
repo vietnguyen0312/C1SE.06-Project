@@ -353,15 +353,15 @@ const BlogDetail = () => {
   const [pageSize, setPageSize] = useState(3);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [showComments, setShowComments] = useState(true); // Thêm state để theo dõi trạng thái hiển thị bình luận
-  const stompClient = useRef(null); // Khai báo stompClient bằng useRef
+  const [showComments, setShowComments] = useState(true); 
+  const stompClient = useRef(null); 
 
 
   const fetchUser = async () => {
     const token = localStorage.getItem('token');
     if (token) {
         const response = await axios.get('/users/myInfo');
-        setUser(response.result); // Lưu thông tin người dùng vào state
+        setUser(response.result); 
 
     }
   };
@@ -398,7 +398,7 @@ const BlogDetail = () => {
   }, [id]);
   
   useEffect(() => {
-    // Khởi tạo kết nối WebSocket khi component được mount
+  
     const socket = new SockJS('http://localhost:8080/ws');
     stompClient.current = new Client({
       webSocketFactory: () => socket,
@@ -414,7 +414,9 @@ const BlogDetail = () => {
         if (message.body) {
             try {
                 const newComment = JSON.parse(message.body); 
-                setComments((prevComments) => [...prevComments, newComment]); 
+                console.log('Parsed comment:', newComment);
+                console.log('User Name:', newComment.user.username);
+                setComments(prevComments => [newComment, ...prevComments]);
             } catch (error) {
                 console.error('Error parsing JSON:', error);
             }
@@ -467,19 +469,17 @@ const BlogDetail = () => {
 
   };
   const submitComment = async (commentData) => {
-        console.log("lần 1"+commentData);
+        
         const response = await axios.post('/blogComments', commentData);
-        console.log("Comment submitted:", response);
-  
-};
+        return response.result;
+  };
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     
-    // Kiểm tra nếu người dùng đã đăng nhập và nội dung bình luận không rỗng
     if (commentContent.trim() === '' || !user) {
         console.warn("User hoặc commentContent null");
-        return; // Ngăn không cho gửi bình luận
+        return; 
     }
 
     const newComment = {
@@ -488,16 +488,9 @@ const BlogDetail = () => {
         comment: commentContent,
     };
 
-    try {
-        await submitComment(newComment); 
-        setCommentContent(''); 
-        setCurrentPage(1); 
-        const commentsData = await fetchComments(id); 
-        setComments(prevComments => [newComment, ...prevComments]); // Thêm bình luận mới vào đầu danh sách
+        const comment = await submitComment(newComment); 
+        setComments(prevComments => [comment, ...prevComments]); 
 
-    } catch (error) {
-        console.error("Error submitting comment:", error);
-    }
 };
 
   if (!post) {
@@ -536,9 +529,10 @@ const BlogDetail = () => {
             <Card>
               <CardHeader>
                 <CardTitle>{post.title}</CardTitle>
-               {post.user?.username && post.dateTimeEdit && (
+                {post.user?.username && post.dateTimeEdit && (
                   <p>Tác Giả: {post.user.username} | Ngày Đăng: {post.dateTimeEdit}</p>
-              )}
+                )}
+             
               </CardHeader>
               <CardContent>
                 {parseContent(post.body || '', images)} {/* Sử dụng post.body */}
@@ -574,13 +568,13 @@ const BlogDetail = () => {
         {comments.length === 0 ? ( 
             <p>Chưa có bình luận nào cho bài viết này.</p> 
         ) : (
-            comments.map((comment) => (
-                <CommentWrapper key={comment.id}>
+            comments.map((comment, index) => (
+                <CommentWrapper key={`${comment.id}-${index}`}> {/* Kết hợp id với index để tạo key duy nhất */}
                     <Avatar src="https://scontent.fdad1-4.fna.fbcdn.net/v/t39.30808-1/428604690_939439111067791_1227446939923103326_n.jpg?stp=dst-jpg_s200x200&_nc_cat=103&ccb=1-7&_nc_sid=50d2ac&_nc_ohc=c-_9xEv94csQ7kNvgEg6joX&_nc_ht=scontent.fdad1-4.fna&_nc_gid=AhXvmhMkpSclaa8MoFXimu8&oh=00_AYBEE-itfc7Bh_bysvs3MD55OKMVyQaGm-V0jBItF4zF5g&oe=6701C121" alt="Avatar" />
                     <CommentContent>
                         <CommentContainer>
                             <CommentBody>
-                                <UserName>{comment.user.username}</UserName>
+                            <UserName>{comment.user ? comment.user.username : 'Người dùng không xác định'}</UserName>
                                 <CommentText>{comment.comment}</CommentText>
                             </CommentBody>
                             <CommentFooter>

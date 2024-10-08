@@ -25,16 +25,9 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 @Configuration
 @EnableWebSocketMessageBroker
-@EnableWebSecurity
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtDecoder jwtDecoder;
-    private final JwtAuthenticationConverter jwtAuthenticationConverter;
 
-    public WebsocketConfig(JwtDecoder jwtDecoder, JwtAuthenticationConverter jwtAuthenticationConverter) {
-        this.jwtDecoder = jwtDecoder;
-        this.jwtAuthenticationConverter = jwtAuthenticationConverter;
-    }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -49,55 +42,5 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
         config.setApplicationDestinationPrefixes("/app"); // Cấu hình prefix cho các endpoint client gửi đến server
     }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/ws/**")
-                )
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/ws/**").authenticated()
-                        .anyRequest().permitAll()
-                )
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder))) // Cấu hình JWT decoder
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(STATELESS)
-                );
 
-        return http.build();
-    }
-
-    @Bean
-    public ChannelInterceptor webSocketAuthInterceptor() {
-        return new ChannelInterceptor() {
-            @Override
-            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-
-                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    String authToken = accessor.getFirstNativeHeader("Authorization");
-                    if (authToken != null && authToken.startsWith("Bearer ")) {
-                        String jwtToken = authToken.substring(7);
-                        JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) jwtAuthenticationConverter.convert(jwtDecoder.decode(jwtToken));
-
-                        // Đặt user vào SecurityContext nếu xác thực JWT thành công
-                        if (authenticationToken != null && authenticationToken.isAuthenticated()) {
-                            SecurityContextHolder.getContext().setAuthentication(
-                                    new UsernamePasswordAuthenticationToken(
-                                            authenticationToken.getPrincipal(),
-                                            null,
-                                            authenticationToken.getAuthorities()
-                                    )
-                            );
-                        } else {
-                            throw new IllegalArgumentException("Invalid or expired token");
-                        }
-                    } else {
-                        throw new IllegalArgumentException("Authorization header is missing or invalid");
-                    }
-                }
-                return message;
-            }
-        };
-    }
 }
