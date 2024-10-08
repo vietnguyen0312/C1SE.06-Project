@@ -10,6 +10,7 @@ import ButtonCPN from '../components/Button/Button';
 import RoomCard from '../components/RoomCard';
 import { Navigate } from "react-router-dom";
 import { format } from 'date-fns';
+import moment from 'moment-timezone';
 const Overlay = styled.div`
   position: absolute;
   top: 0;
@@ -259,13 +260,27 @@ class BookingRoom extends Component {
         } else {
             alert('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!');
         }
+
     };
 
     BookingRoom = async () => {
         const response = await axios.get('/users/myInfo');
         const user = response.result.id;
-        const checkInDate = this.startDate instanceof Date ? this.startDate.toISOString() : new Date(this.startDate).toISOString();
-        const checkOutDate = this.endDate instanceof Date ? this.endDate.toISOString() : new Date(this.endDate).toISOString();
+        const now = moment.tz('Asia/Ho_Chi_Minh'); // Lấy thời gian hiện tại theo múi giờ 'Asia/Ho_Chi_Minh'
+
+        const checkInDate = moment(this.startDate).set({
+            hour: now.hours(),
+            minute: now.minutes(),
+            second: now.seconds()
+        }).add(1, 'seconds').tz('Asia/Ho_Chi_Minh').format();  // Thêm 1 giây và định dạng lại
+
+        // Tạo checkOutDate với giờ phút hiện tại + thêm 1 giờ
+        const checkOutDate = moment(this.endDate).set({
+            hour: now.hours(),
+            minute: now.minutes(),
+            second: now.seconds()
+        }).add(1, 'seconds').tz('Asia/Ho_Chi_Minh').format();  // Thêm 1 giây và định dạng lại
+
         const response1 = await axios.post('booking_room', {
             userId: user,
             checkInDate: checkInDate,
@@ -287,12 +302,9 @@ class BookingRoom extends Component {
 
 
     formatDate(date) {
-
-
         if (!(date instanceof Date)) {
             throw new Error("Invalid date object");
         }
-
         return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     }
 

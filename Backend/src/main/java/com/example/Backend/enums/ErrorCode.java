@@ -12,7 +12,7 @@ public enum ErrorCode {
     UNAUTHENTICATED(1004, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1005, "You do not have permission", HttpStatus.FORBIDDEN),
 
-    PASSWORD_INCORRECT(1999,"Password not correct", HttpStatus.BAD_REQUEST),
+    PASSWORD_INCORRECT(1999, "Password not correct", HttpStatus.BAD_REQUEST),
     NOT_BLANK(2001, "This field is mandatory", HttpStatus.BAD_REQUEST),
     USERNAME_SIZE(2002, "Username must be between {min} and {max} characters", HttpStatus.BAD_REQUEST),
     INVALID(2003, "This field is invalid", HttpStatus.BAD_REQUEST),
@@ -24,6 +24,7 @@ public enum ErrorCode {
     NOT_NULL(2009, "This field must not be null", HttpStatus.BAD_REQUEST),
     POSITIVE(2010, "This field must be greater than 0", HttpStatus.BAD_REQUEST),
     MAX_SIZE(2011, "This field must be at max {max} characters long", HttpStatus.BAD_REQUEST),
+    DATE_FUTURE_OR_PRESENT(2008, "Date must be a future date or today  ", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
