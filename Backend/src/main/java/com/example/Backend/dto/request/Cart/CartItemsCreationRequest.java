@@ -14,10 +14,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartItemsCreationRequest {
     @NotNull(message = "NOT_NULL")
-    Cart cart;
+    String IdTicket;
 
     @NotNull(message = "NOT_NULL")
-    Ticket ticket;
+    String IdTicketType;
 
     @Positive(message = "POSITIVE")
     int quantity;

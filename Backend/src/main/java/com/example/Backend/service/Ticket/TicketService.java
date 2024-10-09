@@ -16,7 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +25,7 @@ public class TicketService {
     TicketRepository ticketRepository;
     TicketMapper ticketMapper;
 
+    @PreAuthorize("hasRole('MANAGER')")
     public TicketResponse createTicket(TicketCreationRequest request) {
         Ticket ticket = ticketMapper.toEntity(request);
         Ticket savedTicket = ticketRepository.save(ticket);
@@ -33,7 +33,7 @@ public class TicketService {
     }
 
     public List<TicketResponse> getTickets(String search) {
-        return ticketRepository.findFirst5ByServiceEntity_NameContainingOrServiceEntity_DescriptionContaining(search,search)
+        return ticketRepository.findByServiceEntity_NameContainingOrServiceEntity_DescriptionContaining(search,search)
                 .stream().map(ticketMapper::toResponse)
                 .toList();
     }

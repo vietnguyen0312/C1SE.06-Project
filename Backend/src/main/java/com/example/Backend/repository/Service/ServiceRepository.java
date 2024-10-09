@@ -13,12 +13,12 @@ import java.util.List;
 public interface ServiceRepository extends JpaRepository<ServiceEntity, String> {
     Page<ServiceEntity> findByNameOrDescriptionContaining(String name, String description, Pageable pageable);
 
-    Page<ServiceEntity> findByServiceTypeIn(List<ServiceType> serviceType, Pageable pageable);
+    Page<ServiceEntity> findByServiceType_IdIn(List<String> serviceType, Pageable pageable);
 
-    Page<ServiceEntity> findByServiceTypeInAndNameContainingOrServiceTypeInAndDescriptionContaining(
-            List<ServiceType> serviceType1,
+    Page<ServiceEntity> findByServiceType_IdInAndNameContainingOrServiceType_IdInAndDescriptionContaining(
+            List<String> serviceType1,
             String name,
-            List<ServiceType> serviceType2,
+            List<String> serviceType2,
             String description,
             Pageable pageable);
 }

@@ -2,6 +2,7 @@ package com.example.Backend.dto.response.Cart;
 
 import com.example.Backend.entity.Cart.Cart;
 import com.example.Backend.entity.Ticket.Ticket;
+import com.example.Backend.entity.Ticket.TicketType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,6 +15,7 @@ public class CartItemsResponse {
     String id;
     Cart cart;
     Ticket ticket;
+    TicketType ticketType;
     int quantity;
     double total;
 }

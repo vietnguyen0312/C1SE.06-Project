@@ -50,7 +50,7 @@ public class DateTimeFormatter {
 
     private String formatInDate(Instant instant){
         LocalDateTime localDateTime = instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
-        java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ISO_DATE;
+        java.time.format.DateTimeFormatter dateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
         return localDateTime.format(dateTimeFormatter);
     }

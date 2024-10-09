@@ -4,7 +4,11 @@ import com.example.Backend.dto.request.Cart.CartItemsCreationRequest;
 import com.example.Backend.dto.request.Cart.CartItemsUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Cart.CartItemsResponse;
+import com.example.Backend.dto.response.User.UserResponse;
+import com.example.Backend.entity.Cart.CartItems;
+import com.example.Backend.entity.User.User;
 import com.example.Backend.service.Cart.CartItemsService;
+import com.example.Backend.service.User.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +17,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 @RestController
-@RequestMapping("/cartItems")
+@RequestMapping("/cart-items")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class CartItemController {
     CartItemsService cartItemsService;
+
     @PostMapping
     ApiResponse<CartItemsResponse> createCartItem(@RequestBody @Valid CartItemsCreationRequest request) {
         return ApiResponse.<CartItemsResponse>builder()
@@ -31,7 +36,7 @@ public class CartItemController {
                 .result(cartItemsService.getCartItemsById(id))
                 .build();
     }
-    @GetMapping("/myCartItems")
+    @GetMapping
     ApiResponse<List<CartItemsResponse>> getMyCartItems() {
         return ApiResponse.<List<CartItemsResponse>>builder()
                 .result(cartItemsService.getMyCartItems())
@@ -46,7 +51,8 @@ public class CartItemController {
     }
     @DeleteMapping("/{id}")
     ApiResponse<Void> deleteCartItems(@PathVariable("id")String id){
-        cartItemsService.deleteCartItems(id);
+        CartItemsResponse cartItemsResponse = cartItemsService.getCartItemsById(id);
+        cartItemsService.deleteCartItems(id, cartItemsResponse.getCart().getUser().getEmail());
         return ApiResponse.<Void>builder().build();
     }
 }
