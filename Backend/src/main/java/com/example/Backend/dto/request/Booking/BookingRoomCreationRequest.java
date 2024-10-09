@@ -28,6 +28,6 @@ public class BookingRoomCreationRequest {
     @Positive(message = "POSITIVE")
     double total;
 
-    @NotNull(message = "NOT_NULL")
+    @NotNull(message = "NOT_NULL") // đang text commit
     String status;
 }
