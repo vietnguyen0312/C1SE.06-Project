@@ -31,9 +31,9 @@ const StyledButton = styled.button`
   }
 `;
 
-const ButtonCPN = ({ text, onClick, type = "button", disabled = false }) => {
+const ButtonCPN = ({ text, onClick, type = "button", disabled = false,style }) => {
   return (
-    <StyledButton type={type} onClick={onClick} disabled={disabled}>
+    <StyledButton type={type} onClick={onClick} disabled={disabled} style={style}>
       {text}
     </StyledButton>
   );
