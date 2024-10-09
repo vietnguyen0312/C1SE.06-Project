@@ -32,7 +32,7 @@ public class BookingRoom {
     @Temporal(TemporalType.DATE)
     Date checkOutDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false) // test commit
     double total;
 
     @Column
