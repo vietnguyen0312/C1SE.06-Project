@@ -4,18 +4,18 @@ import com.example.Backend.dto.request.Cart.CartItemsCreationRequest;
 import com.example.Backend.dto.request.Cart.CartItemsUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Cart.CartItemsResponse;
-import com.example.Backend.dto.response.User.UserResponse;
-import com.example.Backend.entity.Cart.CartItems;
-import com.example.Backend.entity.User.User;
+import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.service.Cart.CartItemsService;
-import com.example.Backend.service.User.UserService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/cart-items")
 @RequiredArgsConstructor
@@ -30,15 +30,9 @@ public class CartItemController {
                 .result(cartItemsService.createCartItems(request))
                 .build();
     }
-    @GetMapping("/{id}")
-    ApiResponse<CartItemsResponse> getCartItemById(@PathVariable("id")String id) {
-        return ApiResponse.<CartItemsResponse>builder()
-                .result(cartItemsService.getCartItemsById(id))
-                .build();
-    }
     @GetMapping
-    ApiResponse<List<CartItemsResponse>> getMyCartItems() {
-        return ApiResponse.<List<CartItemsResponse>>builder()
+    ApiResponse<Map<ServiceResponse,List<CartItemsResponse>>> getMyCartItems() {
+        return ApiResponse.<Map<ServiceResponse,List<CartItemsResponse>>>builder()
                 .result(cartItemsService.getMyCartItems())
                 .build();
     }

@@ -32,8 +32,8 @@ public class Ticket {
     @Column(length = 50)
     String status;
 
-    @ManyToMany
-    Set<TicketType> ticketTypes;
+    @ManyToOne
+    TicketType ticketType;
 
     @PrePersist
     public void prePersist() {

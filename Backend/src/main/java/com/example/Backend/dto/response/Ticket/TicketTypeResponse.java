@@ -11,5 +11,5 @@ import lombok.experimental.FieldDefaults;
 public class TicketTypeResponse {
     String id;
     String name;
-    float discount;
+    String description;
 }

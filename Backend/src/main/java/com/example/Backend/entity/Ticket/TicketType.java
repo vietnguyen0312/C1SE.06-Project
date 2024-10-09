@@ -20,5 +20,5 @@ public class TicketType {
     String name;
 
     @Column(nullable = false)
-    float discount;
+    String description;
 }

@@ -15,7 +15,6 @@ public class CartItemsResponse {
     String id;
     Cart cart;
     Ticket ticket;
-    TicketType ticketType;
     int quantity;
     double total;
 }

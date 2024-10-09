@@ -26,10 +26,6 @@ public class CartItems {
     @JoinColumn(name = "ticket_id")
     Ticket ticket;
 
-    @ManyToOne
-    @JoinColumn(name = "ticket_type_id")
-    TicketType ticketType;
-
     @Column(nullable = false)
     int quantity;
 

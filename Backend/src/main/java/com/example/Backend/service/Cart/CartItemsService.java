@@ -3,14 +3,16 @@ package com.example.Backend.service.Cart;
 import com.example.Backend.dto.request.Cart.CartItemsCreationRequest;
 import com.example.Backend.dto.request.Cart.CartItemsUpdateRequest;
 import com.example.Backend.dto.response.Cart.CartItemsResponse;
+import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.entity.Cart.CartItems;
+import com.example.Backend.entity.Service.ServiceEntity;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Cart.CartItemsMapper;
+import com.example.Backend.mapper.Service.ServiceMapper;
 import com.example.Backend.repository.Cart.CartItemsRepository;
 import com.example.Backend.repository.Cart.CartRepository;
 import com.example.Backend.repository.Ticket.TicketRepository;
-import com.example.Backend.repository.Ticket.TicketTypeRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +22,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +34,7 @@ public class CartItemsService {
     CartItemsRepository cartItemsRepository;
     CartRepository cartRepository;
     TicketRepository ticketRepository;
-    TicketTypeRepository ticketTypeRepository;
+    ServiceMapper serviceMapper;
     CartItemsMapper cartItemsMapper;
 
     public CartItemsResponse createCartItems(CartItemsCreationRequest request) {
@@ -42,8 +46,6 @@ public class CartItemsService {
         cartItems.setCart(cartRepository.findByUser_Email(email));
 
         cartItems.setTicket(ticketRepository.findById(request.getIdTicket()).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
-
-        cartItems.setTicketType(ticketTypeRepository.findById(request.getIdTicketType()).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
 
         return cartItemsMapper.toCartItemsResponse(cartItemsRepository.save(cartItems));
     }
@@ -68,10 +70,24 @@ public class CartItemsService {
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    public List<CartItemsResponse> getMyCartItems() {
+    public Map<ServiceResponse,List<CartItemsResponse>> getMyCartItems() {
+        Map<ServiceResponse,List<CartItemsResponse>> entityListHashMap = new LinkedHashMap<>();
+
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();
-        return cartItemsRepository.findAllByCart(cartRepository.findByUser_Email(email))
-                .stream().map(cartItemsMapper::toCartItemsResponse).toList();
+
+        List<CartItems> cartItemsByUser = cartItemsRepository.findByCart_User_Email(email);
+
+        List<ServiceEntity> serviceEntities = cartItemsByUser.stream()
+                .map(cartItem -> cartItem.getTicket().getServiceEntity())
+                .distinct().toList();
+
+        serviceEntities.forEach(serviceEntity -> {
+            List<CartItems> cartItems = cartItemsRepository.findByCart_User_EmailAndTicket_ServiceEntity(email, serviceEntity);
+            if (!cartItems.isEmpty())
+                entityListHashMap.put(serviceMapper.toResponse(serviceEntity),cartItems.stream().map(cartItemsMapper::toCartItemsResponse).toList());
+        });
+
+        return entityListHashMap;
     }
 }

@@ -11,6 +11,8 @@ import java.util.List;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<ServiceEntity, String> {
+    List<ServiceEntity> findByNameOrDescriptionContaining(String name, String description);
+
     Page<ServiceEntity> findByNameOrDescriptionContaining(String name, String description, Pageable pageable);
 
     Page<ServiceEntity> findByServiceType_IdIn(List<String> serviceType, Pageable pageable);

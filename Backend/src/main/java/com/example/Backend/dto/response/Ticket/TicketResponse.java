@@ -22,5 +22,5 @@ public class TicketResponse {
     double price;
     int quantity;
     String status;
-    Set<TicketType> ticketTypes;
+    TicketType ticketType;
 }

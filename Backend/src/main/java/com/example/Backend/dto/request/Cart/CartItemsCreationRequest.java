@@ -16,9 +16,6 @@ public class CartItemsCreationRequest {
     @NotNull(message = "NOT_NULL")
     String IdTicket;
 
-    @NotNull(message = "NOT_NULL")
-    String IdTicketType;
-
     @Positive(message = "POSITIVE")
     int quantity;
 
