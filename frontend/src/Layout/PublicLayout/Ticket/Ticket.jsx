@@ -158,10 +158,10 @@ const ContentTicket1 = styled.div`
   gap: 10px;
   user-select: none;  
   outline: none;
-  background-image: url('../../img/ticket/chiTay.png');
+  background-image: url('../../img/ticket/Ogai.png');
   background-size: cover;
   background-position: center;
-  height: 271px;
+  height: auto;
   width: 300px;
 `;
 
@@ -287,7 +287,7 @@ const Ticket = () => {
     setTimeout(() => {
       setShowService(true);
       AOS.refresh();
-    }, 100);
+    }, 0);
   };
 
   const handleChildCheck = (e) => {
@@ -479,13 +479,10 @@ const Ticket = () => {
               </ServiceContainer>
             ) : (
               <div>
-                <ContentTicket1 style={{ textAlign: 'center', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '70px' }}>
-              </ContentTicket1>
-              <div>
-                  <p style={{fontSize:'20px',justifyContent:'center',alignItems:'center',display:'flex',color:'black'}}>Vui lòng tìm vé</p>
-                </div>
+                <ContentTicket1 style={{ textAlign: 'center', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                </ContentTicket1>
               </div>
-              
+
             )}
             <SelectTypeService>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
