@@ -26,6 +26,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import org.springframework.data.domain.Pageable;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,29 +47,19 @@ public class RoomService {
 
     @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse createRoom(RoomCreationRequest request) {
-        try {
-
-            Room room = roomMapper.toRoom(request);
-
-            RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
-                    .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-            room.setRoomType(roomType);
-
-            Room savedRoom = roomRepository.save(room);
-            return roomMapper.toRoomResponse(savedRoom);
-        } catch (Exception e) {
-
-            throw new AppException(ErrorCode.EXISTED);
-        }
+        Room room = roomMapper.toRoom(request);
+        RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        room.setRoomType(roomType);
+        Room savedRoom = roomRepository.save(room);
+        return roomMapper.toRoomResponse(savedRoom);
     }
 
     @PreAuthorize("hasRole('MANAGER')")
     public RoomResponse updateRoom(String id, RoomUpdateRequest request) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
         room.setStatus(request.getStatus());
-
         if (request.getRoomTypeId() != null && !request.getRoomTypeId().isEmpty()) {
             RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
                     .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -75,7 +70,7 @@ public class RoomService {
         return roomMapper.toRoomResponse(updatedRoom);
     }
 
-    @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
+
     public RoomResponse getRoomById(String id) {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -88,7 +83,7 @@ public class RoomService {
                 .collect(Collectors.toList());
     }
 
-    @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
+    @PreAuthorize("hasRole('MANAGER')")
     public void deleteRoom(String id) {
         roomRepository.deleteById(id);
     }
@@ -103,29 +98,36 @@ public class RoomService {
                 .filter(room -> {
                     List<BookingRoomDetails> bookingDetails = bookingRoomDetailsRepository.findByRoom(room);
                     return bookingDetails.stream()
-                            .noneMatch(details -> details.getBookingRoom().getCheckOutDate().after(new Date()));
+                            .noneMatch(details -> details.getBookingRoom().getCheckOutDate().isAfter(new Date().toInstant()));
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return availableRooms.stream()
                 .map(roomMapper::toRoomResponse)
                 .collect(Collectors.toList());
     }
 
-    public PageResponse<RoomResponse> getAvailableRoomsByRoomType(RoomType roomType, Date checkIn, int page, int size) {
+    public PageResponse<RoomResponse> getAvailableRoomsByRoomType(RoomType roomType, String checkIn, int page, int size) {
         Sort sort = Sort.by("roomNumber").descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<Room> roomPage = roomRepository.findAllByRoomType(roomType, pageable);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date = LocalDate.parse(checkIn, formatter);
+
         List<Room> availableRooms = roomPage.stream()
                 .filter(room -> {
                     List<BookingRoomDetails> bookingDetails = bookingRoomDetailsRepository.findByRoom(room);
                     if (bookingDetails.isEmpty()) {
                         return true;
                     }
+                    // Chuyển đổi LocalDate thành Instant
+                    Instant checkInInstant = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
+
                     return bookingDetails.stream()
-                            .noneMatch(details -> details.getBookingRoom().getCheckOutDate().compareTo(checkIn) >= 0);
+                            .noneMatch(details -> details.getBookingRoom().getCheckOutDate().compareTo(checkInInstant) >= 0);
                 })
-                .collect(Collectors.toList());
+                .toList();
         List<RoomResponse> roomResponses = availableRooms.stream()
                 .map(roomMapper::toRoomResponse)
                 .collect(Collectors.toList());
@@ -146,9 +148,9 @@ public class RoomService {
                 .filter(room -> {
                     List<BookingRoomDetails> bookingDetails = bookingRoomDetailsRepository.findByRoom(room);
                     return bookingDetails.stream()
-                            .noneMatch(details -> details.getBookingRoom().getCheckOutDate().after(new Date()));
+                            .noneMatch(details -> details.getBookingRoom().getCheckOutDate().isAfter(new Date().toInstant()));
                 })
-                .collect(Collectors.toList());
+                .toList();
         return availableRooms.stream()
                 .map(roomMapper::toRoomResponse)
                 .collect(Collectors.toList());

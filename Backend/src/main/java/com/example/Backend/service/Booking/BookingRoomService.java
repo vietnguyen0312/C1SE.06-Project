@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,8 +33,9 @@ public class BookingRoomService {
 
     public BookingRoomResponse createBookingRoom(BookingRoomCreationRequest request) {
         BookingRoom bookingRoom = bookingRoomMapper.toBookingRoom(request);
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         bookingRoom.setUser(user);
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
@@ -46,7 +49,7 @@ public class BookingRoomService {
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
+    @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
     public BookingRoomResponse updateBookingRoom(String id, BookingRoomUpdateRequest request) {
         BookingRoom bookingRoom = bookingRoomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -54,20 +57,15 @@ public class BookingRoomService {
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
 
-    @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
+    @PostAuthorize("hasAnyRole('EMPLOYEE','EMPLOYER' ,'MANAGER')")
     public void deleteBookingRoom(String id) {
         bookingRoomRepository.deleteById(id);
     }
 
     public List<BookingRoomResponse> getBookingRoomsByUser(String userId) {
-        // Kiểm tra xem User có tồn tại hay không
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
-        // Tìm tất cả các BookingRoom có liên kết với User đó
         List<BookingRoom> bookingRooms = bookingRoomRepository.findByUser(user);
-
-        // Chuyển đổi từ danh sách BookingRoom sang BookingRoomResponse
         return bookingRooms.stream()
                 .map(bookingRoomMapper::toBookingRoomResponse)
                 .toList();

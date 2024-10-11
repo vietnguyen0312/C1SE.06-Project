@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.Set;
 
@@ -24,13 +25,11 @@ public class BookingRoom {
     @JoinColumn(name = "user_id")
     User user;
 
-    @Column
-    @Temporal(TemporalType.DATE)
-    Date checkInDate;
+    @Column(nullable = false)
+    Instant checkInDate;
 
-    @Column
-    @Temporal(TemporalType.DATE)
-    Date checkOutDate;
+    @Column(nullable = false)
+    Instant checkOutDate;
 
     @Column(nullable = false) // test commit
     double total;

@@ -252,7 +252,7 @@ class BookingRoom extends Component {
                 return;
             }
             this.setState({ showRoomSelection: true });
-            const formattedDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-${startDate.getDate()}`;
+            const formattedDate = this.formatDate(startDate);
             const formattedDate1 = this.formatDate(endDate);
             this.startDate = formattedDate;
             this.endDate = formattedDate1;
@@ -281,6 +281,8 @@ class BookingRoom extends Component {
             second: now.seconds()
         }).add(1, 'seconds').tz('Asia/Ho_Chi_Minh').format();  // Thêm 1 giây và định dạng lại
 
+        console.log(checkInDate);
+        console.log(checkOutDate);
         const response1 = await axios.post('booking_room', {
             userId: user,
             checkInDate: checkInDate,
@@ -288,6 +290,7 @@ class BookingRoom extends Component {
             total: this.state.totalPrice,
             status: 'Đã xác nhận'
         });
+        console.log(response1.result);
         const gia = this.state.totalPrice / this.state.selectedRoomsDetails.length;
         console.log(gia);
         for (const room of this.state.selectedRoomsDetails) {
@@ -305,8 +308,14 @@ class BookingRoom extends Component {
         if (!(date instanceof Date)) {
             throw new Error("Invalid date object");
         }
-        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Đảm bảo tháng có 2 chữ số
+        const day = String(date.getDate()).padStart(2, '0'); // Đảm bảo ngày có 2 chữ số
+
+        return `${year}-${month}-${day}`;
     }
+
 
     handlePriceClick = (room) => {
         const { selectedRooms, selectedRoomsDetails, startDate, endDate, roomPrice } = this.state;

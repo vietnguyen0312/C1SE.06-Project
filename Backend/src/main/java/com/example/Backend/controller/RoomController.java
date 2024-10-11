@@ -72,7 +72,6 @@ public class RoomController {
         ApiResponse<List<RoomResponse>> getRoomByRoomType(@PathVariable("roomTypeId") String roomTypeId) {
                 RoomType roomType = roomTypeRepository.findById(roomTypeId)
                                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
                 List<RoomResponse> rooms = roomService.getRoomByRoomType(roomType);
                 return ApiResponse.<List<RoomResponse>>builder()
                                 .result(rooms)
@@ -95,7 +94,7 @@ public class RoomController {
         @GetMapping("/findByRoomType/{data_check_in}/{roomTypeId}")
         public ApiResponse<PageResponse<RoomResponse>> getRoomByRoomType(
                         @PathVariable("roomTypeId") String roomTypeId,
-                        @PathVariable("data_check_in") @DateTimeFormat(pattern = "yyyy-MM-dd") Date dataCheckIn,
+                        @PathVariable("data_check_in") String dataCheckIn,
                         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
                         @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
                 RoomType roomType = roomTypeRepository.findById(roomTypeId)
@@ -109,7 +108,6 @@ public class RoomController {
         @GetMapping("/findByRoomType/entity")
         public ApiResponse<List<RoomResponse>> getAvailableRooms() {
                 List<RoomResponse> availableRooms = roomService.getAvailableRooms();
-
                 return ApiResponse.<List<RoomResponse>>builder()
                                 .result(availableRooms)
                                 .build();

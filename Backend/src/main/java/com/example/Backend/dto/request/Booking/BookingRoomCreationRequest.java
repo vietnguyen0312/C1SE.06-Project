@@ -8,6 +8,7 @@ import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Data
@@ -16,14 +17,12 @@ import java.util.Date;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingRoomCreationRequest {
-    @NotNull(message = "NOT_NULL")
-    String userId;
 
     @FutureOrPresent(message = "DATE_FUTURE_OR_PRESENT")
-    Date checkInDate;
+    Instant checkInDate;
 
     @FutureOrPresent(message = "DATE_FUTURE_OR_PRESENT")
-    Date checkOutDate;
+    Instant checkOutDate;
 
     @Positive(message = "POSITIVE")
     double total;

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Data
@@ -18,10 +19,10 @@ public class BookingRoomUpdateRequest {
     String status;
 
     @Future(message = "DATE_FUTURE")
-    Date checkInDate;
+    Instant checkInDate;
 
     @Future(message = "DATE_FUTURE")
-    Date checkOutDate;
+    Instant checkOutDate;
 
     @Positive(message = "POSITIVE")
     double total;

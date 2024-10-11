@@ -33,19 +33,14 @@ public class BookingRoomDetailsService {
         BookingRoomRepository bookingRoomRepository;
 
         public BookingRoomDetailsResponse createBookingRoomDetails(BookingRoomDetailsRequest request) {
-
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsMapper.toBookingRoomDetails(request);
-
                 Room room = roomRepository.findById(request.getRoomId())
                                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
                 BookingRoom bookingRoom = bookingRoomRepository.findById(request.getBookingId())
                                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
                 bookingRoomDetails.setRoom(room);
                 bookingRoomDetails.setBookingRoom(bookingRoom);
                 bookingRoomDetails.setPrice(request.getPrice());
-
                 return bookingRoomDetailsMapper
                                 .toBookingRoomDetailsResponse(bookingRoomDetailsRepository.save(bookingRoomDetails));
         }
@@ -63,13 +58,14 @@ public class BookingRoomDetailsService {
                 return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(bookingRoomDetails);
         }
 
-        @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
+        @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE','EMPLOYER')")
         public void deleteBookingRoomDetails(String id) {
                 if (!bookingRoomDetailsRepository.existsById(id)) {
                         throw new AppException(ErrorCode.NOT_EXISTED);
                 }
                 bookingRoomDetailsRepository.deleteById(id);
         }
+
 
         public List<BookingRoomDetailsResponse> getBookingRoomDetailsByBookingRoom(String bookingRoomId) {
                 BookingRoom bookingRoom = bookingRoomRepository.findById(bookingRoomId)
@@ -79,7 +75,7 @@ public class BookingRoomDetailsService {
                                 .toList();
         }
 
-        @PreAuthorize("hasRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
+        @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
         public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDetailsRequest request) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
                                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));

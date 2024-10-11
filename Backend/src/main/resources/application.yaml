@@ -21,6 +21,8 @@ spring:
           auth: true
           starttls:
             enable: true
+  jackson:
+    time-zone: GMT+7
 
 outbound:
   identity:
