@@ -178,7 +178,7 @@ export const BlogInfoUser = styled.div`
 export const BlogButton = styled.button`
   width: 100%;
   padding: 5px;
-  background-color: #7084d2;
+  background-color: #333333;
   color: rgb(209, 245, 100);
   text-align: center;
   cursor: pointer;
@@ -457,7 +457,7 @@ export class BlogList extends Component {
               onChange={this.handleInputChange}
               placeholder="Nhập tại đây"
             />
-            <button onClick={this.handleSearch}>Tìm kiếm</button>
+            <button style={{backgroundColor: "#333333", color: "white"}} onClick={this.handleSearch}>Tìm kiếm</button>
           </SearchBar>
 
           {loading ? (
@@ -489,7 +489,7 @@ export class BlogList extends Component {
                     <BlogBody>{post.contentOpen}</BlogBody>
                     <BlogInfoDate>
                       <BlogIcon src="/img/time.png" alt="Blog Type Icon" />
-                      <span>{format(new Date(post.dateTimeEdit), 'dd/MM/yyyy')}</span>
+                      <span>{post.createdDate}</span>
                     </BlogInfoDate>
                     <BlogInfoBlogType>
                       <BlogIcon src="/img/tag.png" alt="Blog Type Icon" />

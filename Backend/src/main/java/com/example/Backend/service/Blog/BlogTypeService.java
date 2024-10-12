@@ -16,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,29 +30,37 @@ public class BlogTypeService {
     BlogTypeRepository blogTypeRepository;
     BlogTypeMapper blogTypeMapper;
 
+    @PreAuthorize("hasRole('MANAGER')")
     public BlogTypeResponse createBlogType(BlogTypeCreateRequest request) {
         BlogType blogType = blogTypeMapper.toBlogType(request);
+
         return blogTypeMapper.toBlogTypeResponse(blogTypeRepository.save(blogType));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public BlogTypeResponse updateBlogType(BlogTypeUpdateRequest request, String id) {
-        BlogType blogType = blogTypeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        BlogType blogType = blogTypeRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
         blogTypeMapper.updateBlogType(blogType, request);
+
         return blogTypeMapper.toBlogTypeResponse(blogTypeRepository.save(blogType));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     public void deleteBlogType(String id) {
         blogTypeRepository.deleteById(id);
     }
 
     public BlogTypeResponse getBlogTypeById(String id) {
-        return blogTypeMapper.toBlogTypeResponse(blogTypeRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+        return blogTypeMapper.toBlogTypeResponse(blogTypeRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
     public List<BlogTypeResponse> getAllBlogTypes() {
         return blogTypeRepository.findAll().stream()
-                .map(blogTypeMapper::toBlogTypeResponse)  // Chuyển đổi mỗi BlogType thành BlogTypeResponse
-                .collect(Collectors.toList());  // Thu thập tất cả vào một List
+                .map(blogTypeMapper::toBlogTypeResponse)
+                     .collect(Collectors.toList());
     }
 
 }

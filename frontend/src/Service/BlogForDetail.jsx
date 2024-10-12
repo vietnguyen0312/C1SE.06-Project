@@ -52,10 +52,11 @@ export const AboutContent = styled.div`
   margin-top: 79px;
 `;
 
-const Title1 = styled.h1`
+const Title1 = styled.h3`
   color: white;
   font-size: 48px;
   margin-bottom: 20px;
+  font-weight: bold;
 `;
 
 const LinkNav = styled.p`
@@ -169,7 +170,7 @@ const Card = styled.div`
 `;
 
 const CardHeader = styled.div`
-  background: linear-gradient(135deg, ${props => props.theme.colors.primary} 0%, ${props => props.theme.colors.secondary} 100%);
+  background: linear-gradient(135deg, #000000 0%, #555555 100%);
   color: ${props => props.theme.colors.white};
   padding: ${props => props.theme.space.medium};
 `;
@@ -324,15 +325,15 @@ const parseContent = (content, images) => {
     } else if (section.startsWith('*title1*')) {
       const title = section.replace('*title1*', '').trim();
       parsedContent.push(
-        <h3 key={`title-${index}`} style={{ margin: '1rem 0' }}>
-          {title}
-        </h3>
+        <Title1 key={`title-${index}`} style={{  margin: '1rem 0' }}>
+          <b>{title}</b>
+        </Title1>
       );
     } else if (section === '|||') {
       parsedContent.push(<br key={`break-${index}`} />);
     } else if (section) {
       parsedContent.push(
-        <p key={`paragraph-${index}`} style={{ margin: '1rem 0' }}>
+        <p key={`paragraph-${index}`} style={{ margin: '1rem 0', textAlign: 'justify' }}>
           {section}
         </p>
       );
@@ -437,7 +438,9 @@ const BlogDetail = () => {
   }, []);
   const getBlogWithImages = async (blogId) => {
     const blogResponse = await axios.get(`/blogs/${blogId}`);
+
     const imagesResponse = await axios.get(`/images/findImagesByBlog/${blogId}`);
+    
     return {
       blog: blogResponse.result,
       images: imagesResponse.result.map((img) => `/img/blog/${img.image}`),
@@ -449,9 +452,13 @@ const BlogDetail = () => {
           page: currentPage ,
           size: pageSize,
       };
+
       const commentsResponse = await axios.get(`/blogComments/byBlog/${postId}`, { params });
+
       setTotalElements(commentsResponse.result.totalElements);
+
       setTotalPages(commentsResponse.result.totalPages);
+
       return commentsResponse.result.data || [];
 
   };
@@ -490,6 +497,7 @@ const BlogDetail = () => {
 
         const comment = await submitComment(newComment); 
         setComments(prevComments => [comment, ...prevComments]); 
+        setCommentContent(''); 
 
 };
 
@@ -517,20 +525,20 @@ const BlogDetail = () => {
       <ThemeProvider theme={theme}>
         <GlobalStyle />
         <Container>
-          <HeroSection>
+          {/* <HeroSection>
             <HeroImage src={images[0]} alt={post.title} />
             <HeroOverlay />
             <HeroTitle initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
               {post.title}
             </HeroTitle>
-          </HeroSection>
+          </HeroSection> */}
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
             <Card>
               <CardHeader>
                 <CardTitle>{post.title}</CardTitle>
                 {post.user?.username && post.dateTimeEdit && (
-                  <p>Tác Giả: {post.user.username} | Ngày Đăng: {post.dateTimeEdit}</p>
+                  <p>Tác Giả: {post.user.username} | Ngày Đăng: {post.createdDate}</p>
                 )}
              
               </CardHeader>
@@ -570,7 +578,7 @@ const BlogDetail = () => {
         ) : (
             comments.map((comment, index) => (
                 <CommentWrapper key={`${comment.id}-${index}`}> {/* Kết hợp id với index để tạo key duy nhất */}
-                    <Avatar src="https://scontent.fdad1-4.fna.fbcdn.net/v/t39.30808-1/428604690_939439111067791_1227446939923103326_n.jpg?stp=dst-jpg_s200x200&_nc_cat=103&ccb=1-7&_nc_sid=50d2ac&_nc_ohc=c-_9xEv94csQ7kNvgEg6joX&_nc_ht=scontent.fdad1-4.fna&_nc_gid=AhXvmhMkpSclaa8MoFXimu8&oh=00_AYBEE-itfc7Bh_bysvs3MD55OKMVyQaGm-V0jBItF4zF5g&oe=6701C121" alt="Avatar" />
+                    <Avatar src="/img/user/{comment.user.avatar}" alt="Avatar" />
                     <CommentContent>
                         <CommentContainer>
                             <CommentBody>
@@ -583,7 +591,8 @@ const BlogDetail = () => {
                               ) : (
                                   <span style={{ marginRight: '20px' }}>{comment.createdDate}</span>
                               )}
-                                <ActionButton>{'Phản hồi'}</ActionButton>
+                                <ActionButton>{comment.user && comment.user.id === user?.id ? 'Sửa' : null}</ActionButton>
+                                <ActionButton>{comment.user && comment.user.id === user?.id ? 'Xóa' : null}</ActionButton>
                             </CommentFooter>
                         </CommentContainer>
                     </CommentContent>

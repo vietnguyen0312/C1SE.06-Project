@@ -3,6 +3,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,6 +17,8 @@ public class BlogCreateRequest {
 
     @NotBlank(message = "NOT_BLANK")
     String body;
+
+    Instant dateTimeEdit;
 
     String contentOpen;
 

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import  lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Data
@@ -18,5 +19,5 @@ public class BlogCommentUpdateRequest {
     String comment;
 
     @Future(message = "DATE_FUTURE")
-    Date dateUpdate;
+    Instant dateUpdate;
 }

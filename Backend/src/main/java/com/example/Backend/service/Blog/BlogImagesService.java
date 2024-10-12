@@ -29,26 +29,29 @@ public class BlogImagesService {
     BlogImagesMapper blogImagesMapper;
 
     public BlogImagesResponse createBlogImages(BlogImagesCreateRequest request) {
-       try {
            BlogImages blogImages = blogImagesMapper.toBlogImages(request);
+
            if(blogImagesRepository.existsByImage(blogImages.getImage())) {
                throw new AppException(ErrorCode.EXISTED);
            }
+
            return blogImagesMapper.toBlogImagesResponse(blogImagesRepository.save(blogImages));
-       } catch (Exception e) {
-           throw new AppException(ErrorCode.EXISTED);
-       }
     }
 
     public List<BlogImagesResponse> getBlogImagesByBlog(String blogId) {
-        return blogImagesRepository.findAllByBlog(blogRepository.findById(blogId)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)))
-                .stream().map(blogImagesMapper::toBlogImagesResponse).toList();
+        return blogImagesRepository.findAllByBlog(
+                        blogRepository.findById(blogId)
+                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED))
+                ).stream()
+                .map(blogImagesMapper::toBlogImagesResponse)
+                .toList();
     }
 
     public BlogImagesResponse getBlogImagesById(String id) {
-         return blogImagesMapper.toBlogImagesResponse(blogImagesRepository.findById(id)
-                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+        BlogImages blogImages = blogImagesRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
+        return blogImagesMapper.toBlogImagesResponse(blogImages);
     }
 
     public void deleteBlogImages(String blogID) {
