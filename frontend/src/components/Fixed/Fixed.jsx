@@ -242,8 +242,8 @@ const Fixed = () => {
     setMessages(initialMessages);
   }, []);
 
-  
-  
+
+
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
       event.preventDefault();
@@ -264,13 +264,13 @@ const Fixed = () => {
       message = input.value.trim();
       input.value = '';
     }
-  
+
     if (message) {
       setMessages((prevMessages) => [
         ...prevMessages,
         { text: message, isUser: true },
       ]);
-  
+
       try {
         const response = await axios.post('http://localhost:5005/webhooks/rest/webhook', {
           sender: '20240921-013310-antique-mole',
@@ -280,9 +280,9 @@ const Fixed = () => {
             'Content-Type': 'application/json',
           }
         });
-  
+
         const data = response;
-  
+
         if (data && data.length > 0) {
           const botMessage = data[0].text;
           setMessages((prevMessages) => [
@@ -295,7 +295,7 @@ const Fixed = () => {
       }
     }
   };
-  
+
 
   // Cuộn xuống cuối khi messages thay đổi
   const chatBodyRef = useRef(null);
@@ -303,7 +303,7 @@ const Fixed = () => {
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
-  }, [messages]); 
+  }, [messages]);
   return (
     <>
       <Container data-aos="fade-right">
