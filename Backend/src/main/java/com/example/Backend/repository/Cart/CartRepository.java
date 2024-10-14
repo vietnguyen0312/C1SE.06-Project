@@ -1,6 +1,7 @@
 package com.example.Backend.repository.Cart;
 
 import com.example.Backend.entity.Cart.Cart;
+import com.example.Backend.entity.Ticket.Ticket;
 import com.example.Backend.entity.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

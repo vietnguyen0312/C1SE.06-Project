@@ -4,6 +4,7 @@ import com.example.Backend.dto.request.Cart.CartItemsCreationRequest;
 import com.example.Backend.dto.request.Cart.CartItemsUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Cart.CartItemsResponse;
+import com.example.Backend.dto.response.MapEntryResponse;
 import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.service.Cart.CartItemsService;
 import jakarta.validation.Valid;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/cart-items")
@@ -31,8 +31,8 @@ public class CartItemController {
                 .build();
     }
     @GetMapping
-    ApiResponse<Map<ServiceResponse,List<CartItemsResponse>>> getMyCartItems() {
-        return ApiResponse.<Map<ServiceResponse,List<CartItemsResponse>>>builder()
+    ApiResponse<List<MapEntryResponse<ServiceResponse,List<CartItemsResponse>>>> getMyCartItems() {
+        return ApiResponse.<List<MapEntryResponse<ServiceResponse,List<CartItemsResponse>>>>builder()
                 .result(cartItemsService.getMyCartItems())
                 .build();
     }

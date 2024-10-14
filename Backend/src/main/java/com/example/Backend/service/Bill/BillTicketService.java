@@ -49,7 +49,7 @@ public class BillTicketService {
         return billTicketMapper.toBillTicketResponse(billTicketRepository.save(billTicket));
     }
 
-    @PostAuthorize("returnObject.user.email == authentication.name or hasRole('MANAGER')")
+    @PostAuthorize("#isCustomer or hasRole('MANAGER')")
     public PageResponse<BillTicketResponse> getBills(Boolean isCustomer, int page, int size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "datePay").ascending();
 

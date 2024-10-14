@@ -20,6 +20,7 @@ public class DateTimeFormatter {
         strategyMap.put(60L, this::formatInSeconds);
         strategyMap.put(3600L, this::formatInMinutes);
         strategyMap.put(86400L, this::formatInHours);
+        strategyMap.put(2592000L, this::formatInDays);
         strategyMap.put(Long.MAX_VALUE, this::formatInDate);
     }
 
@@ -46,6 +47,11 @@ public class DateTimeFormatter {
     private String formatInHours(Instant instant){
         long elapseHours = ChronoUnit.HOURS.between(instant, Instant.now());
         return String.format("%s giờ", elapseHours);
+    }
+
+    private String formatInDays(Instant instant){
+        long elapseDays = ChronoUnit.DAYS.between(instant, Instant.now());
+        return String.format("%s ngày", elapseDays);
     }
 
     private String formatInDate(Instant instant){

@@ -12,7 +12,7 @@ import BlogDetail from '../Service/BlogForDetail';
 import ServiceLayout from '../Layout/PublicLayout/ServiceLayout/ServiceLayout';
 import Hotel from '../components/Hotels';
 import Booking from '../components/Booking';
-import Ticket from '../Layout/PublicLayout/Ticket/Ticket';
+import TicketLayout from '../Layout/PublicLayout/Ticket/TicketLayout';
 
 const UnthorizedRoute = () => {
     const isAuthenticated = localStorage.getItem('token');
@@ -62,7 +62,7 @@ const PublicRouters = [
             },
             {
                 path: "ticket",
-                element: <Ticket />
+                element: <TicketLayout />
             },
 
         ],
