@@ -69,7 +69,7 @@ const ServiceName = styled.div`
 `;
 
 const ServiceType = styled.div`
-  color: #ccc;
+  color: #bebebe;
 `;
 
 const ServiceContainer = styled.div`
@@ -117,6 +117,7 @@ const SelectTypeService = styled.div`
 
 const CheckboxContainer = styled(Checkbox)`
   width: 165px;
+  white-space: nowrap;
 `;
 
 const SearchDropdown = styled.div`
@@ -127,6 +128,9 @@ const SearchDropdown = styled.div`
   z-index: 1;
   width: 200px;
   margin-left: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 4px;
 `;
 
 const DropdownItem = styled.div`
@@ -330,9 +334,19 @@ const Ticket = () => {
                                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccc', borderRadius: '10px', padding: '10px', }}>
                                             Giá vé
                                         </div>
-                                        {selectedTicket.value.map((ticketValue) => (
-                                            <div key={ticketValue.id}>{ticketValue.ticketType.name}: {ticketValue.price.toLocaleString()} VND</div>
-                                        ))}
+                                        <div style={{ display: 'table', width: '100%', borderCollapse: 'collapse' }}>
+                                            {selectedTicket.value.map((ticketValue) => (
+                                                <div key={ticketValue.id} style={{ display: 'table-row', borderBottom: '1px solid #ddd' }}>
+                                                    <div style={{ display: 'table-cell', width: '50%', textAlign: 'right', padding: '8px', whiteSpace: 'nowrap', borderRight: '1px solid #ddd' }}>
+                                                        {ticketValue.ticketType.name}
+                                                    </div>
+                                                    <div style={{ display: 'table-cell', width: '50%', textAlign: 'left', padding: '8px' }}>
+                                                        {ticketValue.price.toLocaleString()} VND
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
                                     </div>
                                 </ContentTicket>
                             </ServiceContainer>
@@ -395,7 +409,7 @@ const Ticket = () => {
                                                 style={{ width: '50px', height: '50px', borderRadius: '5px' }}
                                                 onClick={() => setSelectedService(cartItem.key)}
                                             />
-                                            <div>
+                                            <div style={{width: '100%'}}>
                                                 <div style={{ fontWeight: 'bold' }}>{cartItem.key.name}</div>
                                                 {cartItem.value.map((ticketBooking, idx) => (
                                                     <div key={idx} style={{ borderTop: '1px solid #ccc', paddingTop: '10px', position: 'relative', display: 'flex', justifyContent: 'space-between' }}>
