@@ -3,7 +3,10 @@ package com.example.Backend.controller;
 import com.example.Backend.dto.request.Bill.BillTicketDetailsRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Bill.BillTicketDetailsResponse;
+import com.example.Backend.dto.response.MapEntryResponse;
+import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.service.Bill.BillTicketDetailsService;
+import com.example.Backend.service.Bill.BillTicketService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ import java.util.List;
 @Slf4j
 public class BillTicketDetailController {
     BillTicketDetailsService billTicketDetailsService;
+    BillTicketService billTicketService;
 
     @PostMapping
     ApiResponse<BillTicketDetailsResponse> createBillTicketDetail(
@@ -29,17 +33,11 @@ public class BillTicketDetailController {
                 .build();
     }
 
-    @GetMapping("/{id}")
-    ApiResponse<BillTicketDetailsResponse> getBillTicketDetail(@PathVariable("id")String id) {
-        return ApiResponse.<BillTicketDetailsResponse>builder()
-                .result(billTicketDetailsService.getBillTicketDetailsById(id))
-                .build();
-    }
-
     @GetMapping("/get-by-bill/{id}")
-    ApiResponse<List<BillTicketDetailsResponse>> getBillTicketDetailsByBill(
+    ApiResponse<List<MapEntryResponse<ServiceResponse,List<BillTicketDetailsResponse>>>> getBillTicketDetailsByBill(
             @PathVariable("id")String id) {
-        return ApiResponse.<List<BillTicketDetailsResponse>>builder()
+        billTicketService.getBill(id);
+        return ApiResponse.<List<MapEntryResponse<ServiceResponse,List<BillTicketDetailsResponse>>>>builder()
                 .result(billTicketDetailsService.getBillTicketDetailsByBillTicket(id))
                 .build();
     }

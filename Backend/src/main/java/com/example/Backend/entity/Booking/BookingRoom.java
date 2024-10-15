@@ -4,6 +4,7 @@ import com.example.Backend.entity.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.Date;
@@ -36,5 +37,12 @@ public class BookingRoom {
 
     @Column
     String status;
+
+    @PrePersist
+    public void prePersist() {
+        if (!StringUtils.hasLength(status)) {
+            status = "Chưa thanh toán";
+        }
+    }
 
 }

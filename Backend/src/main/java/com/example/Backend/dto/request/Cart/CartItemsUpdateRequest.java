@@ -1,6 +1,7 @@
 package com.example.Backend.dto.request.Cart;
 
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,6 +14,6 @@ public class CartItemsUpdateRequest {
     @Positive(message = "POSITIVE")
     int quantity;
 
-    @Positive(message = "POSITIVE")
+    @PositiveOrZero(message = "POSITIVE_OR_ZERO")
     double total;
 }

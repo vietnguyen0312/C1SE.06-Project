@@ -2,19 +2,26 @@ package com.example.Backend.service.Bill;
 
 import com.example.Backend.dto.request.Bill.BillTicketDetailsRequest;
 import com.example.Backend.dto.response.Bill.BillTicketDetailsResponse;
-import com.example.Backend.entity.Bill.BillTicket;
+import com.example.Backend.dto.response.MapEntryResponse;
+import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.entity.Bill.BillTicketDetails;
-import com.example.Backend.exception.AppException;
+import com.example.Backend.entity.Service.ServiceEntity;
+import com.example.Backend.entity.Ticket.Ticket;
 import com.example.Backend.enums.ErrorCode;
+import com.example.Backend.exception.AppException;
 import com.example.Backend.mapper.Bill.BillTicketDetailsMapper;
+import com.example.Backend.mapper.Service.ServiceMapper;
 import com.example.Backend.repository.Bill.BillTicketDetailsRepository;
 import com.example.Backend.repository.Bill.BillTicketRepository;
+import com.example.Backend.repository.Ticket.TicketRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -24,23 +31,50 @@ import java.util.List;
 public class BillTicketDetailsService {
     BillTicketDetailsRepository billTicketDetailsRepository;
     BillTicketRepository billTicketRepository;
+    TicketRepository ticketRepository;
     BillTicketDetailsMapper billTicketDetailsMapper;
+    ServiceMapper serviceMapper;
 
     public BillTicketDetailsResponse createBillTicketDetails(BillTicketDetailsRequest request) {
         BillTicketDetails billTicketDetails = billTicketDetailsMapper.toBillTicketDetails(request);
 
+        billTicketDetails.setBillTicket(billTicketRepository.findById(request.getIdBillTicket())
+                .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
+
+        Ticket ticket = ticketRepository.findById(request.getIdTicket())
+                .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED));
+
+        ticket.setQuantity(ticket.getQuantity() - request.getQuantity());
+        ticketRepository.save(ticket);
+
+        billTicketDetails.setTicket(ticket);
+
         return billTicketDetailsMapper.toBillTicketDetailsResponse(billTicketDetailsRepository.save(billTicketDetails));
     }
 
-    public BillTicketDetailsResponse getBillTicketDetailsById(String id) {
-        return billTicketDetailsMapper.toBillTicketDetailsResponse(billTicketDetailsRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
-    }
+    public List<MapEntryResponse<ServiceResponse,List<BillTicketDetailsResponse>>> getBillTicketDetailsByBillTicket(String idBillTicket) {
+        List<MapEntryResponse<ServiceResponse,List<BillTicketDetailsResponse>>> billTicketDetailsMap = new LinkedList<>();
 
-    public List<BillTicketDetailsResponse> getBillTicketDetailsByBillTicket(String  idBillTicket) {
-        BillTicket billTicket = billTicketRepository.findById(idBillTicket)
-                .orElseThrow(()->new AppException(ErrorCode.NOT_EXISTED));
-        return billTicketDetailsRepository.findAllByBillTicket(billTicket)
-                .stream().map(billTicketDetailsMapper::toBillTicketDetailsResponse).toList();
+        List<BillTicketDetails> billTicketDetailsList = billTicketDetailsRepository.findByBillTicket_Id
+                (idBillTicket, Sort.by(Sort.Direction.ASC, "ticket_serviceEntity_name"));
+
+        List<ServiceEntity> serviceEntities = billTicketDetailsList.stream()
+                .map(billTicketDetails -> billTicketDetails.getTicket().getServiceEntity())
+                .distinct().toList();
+
+        serviceEntities.forEach(serviceEntity -> {
+            Sort sort = Sort.by(Sort.Direction.DESC, "ticket_price");
+
+            List<BillTicketDetails> billTicketDetails = billTicketDetailsRepository
+                    .findByBillTicket_IdAndTicket_ServiceEntity(idBillTicket, serviceEntity, sort);
+
+            if (!billTicketDetails.isEmpty())
+                billTicketDetailsMap.add(MapEntryResponse.<ServiceResponse, List<BillTicketDetailsResponse>>builder()
+                        .key(serviceMapper.toResponse(serviceEntity))
+                        .value(billTicketDetails.stream().map(billTicketDetailsMapper::toBillTicketDetailsResponse).toList())
+                        .build());
+        });
+
+        return billTicketDetailsMap;
     }
 }

@@ -35,3 +35,13 @@ jwt:
   valid-duration: 3600 # in second
   refreshable-duration: 360000 # in seconds
 
+payment:
+  vnPay:
+    url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    tmnCode: "JRDQJ0SP"
+    secretKey: "EMJLY4Q816EQDRCRVSZPGXGQKUEK1AS8"
+    returnUrl: "http://localhost:3000/checkout"
+    version: "2.1.0"
+    command: "pay"
+    orderType: "other"
+

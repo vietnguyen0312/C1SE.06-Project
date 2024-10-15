@@ -292,6 +292,37 @@ const Ticket = () => {
 
     };
 
+    const handlePayment = async () => {
+        const total = cartItems.reduce((acc, cartItem) => acc + cartItem.value.reduce((acc, ticketBooking) => acc + ticketBooking.total, 0), 0);
+        const bill = await axios.post('/bill-ticket', { total: total });
+
+        cartItems.forEach(cartItem => {
+            cartItem.value.forEach(ticketBooking => {
+                axios.post('/bill-ticket-detail', { 
+                    idBillTicket: bill.result.id,
+                    idTicket: ticketBooking.ticket.id,
+                    quantity: ticketBooking.quantity, 
+                    total: ticketBooking.total
+                });
+            });
+        });
+
+        cartItems.forEach(cartItem => {
+            cartItem.value.forEach(ticketBooking => {
+                axios.delete(`/cart-items/${ticketBooking.id}`);
+            });
+        });
+        setCartItems([]);
+
+       const paymentUrl = await axios.get('/payment/vn-pay', { 
+         params: { 
+           amount: total, 
+           orderInfo: `t${bill.result.id}`
+         } 
+       });
+       window.location.href = paymentUrl.result;
+    }
+
     return (
         <>
             <TicketContainer>
@@ -351,9 +382,10 @@ const Ticket = () => {
                                             <CheckboxContainer
                                                 checked={ticketStates[index]?.checked}
                                                 onChange={(e) => handleSelectedTicketType(index, e.target.checked)}
+                                                disabled={ticketValue.quantity === 0}
                                             >
                                                 {ticketValue.ticketType.name}
-                                            </CheckboxContainer>
+                                            </CheckboxContainer> {ticketValue.quantity === 0 ? <div style={{ color: 'red' }}>Hết vé</div> : null}
                                             <div>Số lượng vé: <Soluong
                                                 min={1}
                                                 max={ticketValue.quantity}
@@ -421,7 +453,11 @@ const Ticket = () => {
                             <div style={{ marginTop: '20px', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 Tổng giá: {cartItems.reduce((acc, cartItem) => acc + cartItem.value.reduce((acc, ticketBooking) => acc + ticketBooking.total, 0), 0).toLocaleString()} VND
                             </div>
-                            <ButtonCPN text='Thanh toán' style={{ width: '100%', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }} />
+                            <ButtonCPN
+                                text='Thanh toán'
+                                style={{ width: '100%', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}
+                                onClick={handlePayment}
+                            />
                         </div>
                     ) : (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>

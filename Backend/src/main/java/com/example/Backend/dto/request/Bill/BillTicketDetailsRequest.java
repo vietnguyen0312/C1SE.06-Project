@@ -1,9 +1,8 @@
 package com.example.Backend.dto.request.Bill;
 
-import com.example.Backend.entity.Bill.BillTicket;
-import com.example.Backend.entity.Ticket.Ticket;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,14 +13,14 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BillTicketDetailsRequest {
     @NotNull(message = "NOT_NULL")
-    private BillTicket billTicket;
+    private String idBillTicket;
 
     @NotNull(message = "NOT_NULL")
-    private Ticket ticket;
+    private String idTicket;
 
     @Positive(message = "POSITIVE")
     private int quantity;
 
-    @Positive(message = "POSITIVE")
+    @PositiveOrZero(message = "POSITIVE_OR_ZERO")
     private double total;
 }
