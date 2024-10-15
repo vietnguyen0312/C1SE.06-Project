@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import LoadingIcons from 'react-loading-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faStarHalf, faTimes } from '@fortawesome/free-solid-svg-icons'
 import axios from '../Configuration/AxiosConfig'
 import { Pagination } from '@mui/material';
 import styled from 'styled-components';
 import '../Style/Service.css';
-
+import { faStar } from '@fortawesome/free-solid-svg-icons';
+import ButtonCPN from '../components/Button/Button';
+import { LikeOutlined } from '@ant-design/icons';
 const ModalBackdrop = styled.div`
   position: fixed;
   top: 0;
@@ -91,6 +93,113 @@ const ServiceDescription = styled.p`
   margin-bottom: 0;
 `;
 
+const RatingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 20px;
+`;
+
+const RatingItem = styled.div`
+  display: flex;
+  width: 100%;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  
+`;
+
+const RatingImage = styled.img`
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const RatingContent = styled.div`
+  flex: 1;
+`;
+
+const RatingText = styled.p`
+  margin: 10px 0;
+  font-size: 15px;
+  color: #555;
+`;
+
+const RatingAuthor = styled.h4`
+  margin-bottom: 5px;
+  font-size: 18px;
+  color: #333;
+`;
+
+const StarRating = styled.div`
+  color: #ffc107;
+`;
+
+const TotalRating = styled.div`
+  font-size: 15px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap:5px;
+`;
+
+const Time = styled.div`
+    margin: 4px 0 0 10px;
+
+    font-size: 14px;
+`
+const ratings = [
+    {
+        image: "img/user.png",
+        text: "Do you want to be even more successful? Learn to love learning and growth.",
+        author: "Harriet Maxwell",
+        rating: 3
+    },
+    {
+        image: "img/user.png",
+        text: "A purpose is the eternal condition for success. Every former smoker can tell you how hard it is.",
+        author: "Carolyn Craig",
+        rating: 2
+    },
+    {
+        image: "img/user.png",
+        text: "The more effort you put into improving your skills, the bigger the payoff.",
+        author: "Dennis Williams",
+        rating: 5
+    },
+    {
+        image: "img/user.png",
+        text: "The more effort you put into improving your skills, the bigger the payoff.",
+        author: "Dennis Williams",
+        rating: 5
+    },
+    {
+        image: "img/user.png",
+        text: "A purpose is the eternal condition for success. Every former smoker can tell you how hard it is.",
+        author: "Carolyn Craig",
+        rating: 2
+    },
+    {
+        image: "img/user.png",
+        text: "The more effort you put into improving your skills, the bigger the payoff.",
+        author: "Dennis Williams",
+        rating: 5
+    },
+    {
+        image: "img/user.png",
+        text: "The more effort you put into improving your skills, the bigger the payoff.",
+        author: "Dennis Williams",
+        rating: 5
+    },
+]
+
+const totalStar = ratings.reduce((total, rating) => total + rating.rating, 0);
+const averageRating = ratings.length > 0 ? (totalStar / ratings.length).toFixed(1) : 0;
+
 
 export class ServiceList extends Component {
     constructor(props) {
@@ -106,7 +215,8 @@ export class ServiceList extends Component {
             totalElements: 0,
             filterBySearch: props.search || null,
             filterByServiceTypeId: props.serviceTypeId || null,
-            limit: props.limit || null
+            limit: props.limit || null,
+            showAll: false
         }
         this.serviceListRef = React.createRef();
     }
@@ -170,7 +280,13 @@ export class ServiceList extends Component {
         });
     }
 
+    toggleShowAll = () => {
+        this.setState(prevState => ({ showAll: !prevState.showAll }));
+    };
+
     render() {
+        const { showAll } = this.state;
+        const ratingToShow = showAll ? ratings : ratings.slice(0, 3);
         return (
             <div style={{ backgroundColor: '#f8f9fa' }}>
                 <div className='row' ref={this.serviceListRef}>
@@ -206,7 +322,6 @@ export class ServiceList extends Component {
                             </div>
                         </div>
                     ))}
-
                     {this.state.isModalOpen && this.state.selectedService && (
                         <ModalBackdrop onClick={this.closeModal}>
                             <ModalWrapper onClick={(e) => e.stopPropagation()}>
@@ -228,15 +343,91 @@ export class ServiceList extends Component {
                                                 className="img-fluid"
                                             />
                                         </div>
-                                        <div>
+                                        <div style={{ borderBottom: '2px solid #f8b600', paddingBottom: '15px' }}>
                                             <p><strong>Description:</strong></p>
                                             <ServiceDescription>{this.state.selectedService.description}</ServiceDescription>
+                                        </div>
+                                        <div>
+                                            <RatingContainer>
+                                                <h5>Đánh giá dịch vụ ({ratings.length})</h5>
+                                                <TotalRating>
+                                                    {averageRating} <div style={{ color: '#787878' }}>/ 5</div>
+                                                    <StarRating style={{ marginLeft: '5px' }}>
+                                                        {[...Array(5)].map((_, i) => {
+                                                            if (i < Math.floor(averageRating)) {
+                                                                return (
+                                                                    <FontAwesomeIcon key={i} icon={faStar} color="#ffc107" />
+                                                                );
+                                                            } else if (i === Math.floor(averageRating)) {
+                                                                const decimalPart = averageRating % 1;
+                                                                if (decimalPart <= 0.2) {
+                                                                    return (
+                                                                        <FontAwesomeIcon key={i} icon={faStar} color="#e4e5e9" />
+                                                                    );
+                                                                } else if (decimalPart >= 0.3 && decimalPart < 0.8) {
+                                                                    return (
+                                                                        <FontAwesomeIcon key={i} icon={faStarHalf} color="#ffc107" />
+                                                                    );
+                                                                } else {
+                                                                    return (
+                                                                        <FontAwesomeIcon key={i} icon={faStar} color="#ffc107" />
+                                                                    );
+                                                                }
+                                                            } else {
+                                                                return (
+                                                                    <FontAwesomeIcon key={i} icon={faStar} color="#e4e5e9" />
+                                                                );
+                                                            }
+                                                        })}
+                                                    </StarRating>
+                                                </TotalRating>
+                                                <div style={{ marginTop: '20px' }}>
+                                                    {ratingToShow.map((rating, index) => (
+                                                        <div key={index} style={{ marginBottom: '30px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+                                                            <RatingItem>
+                                                                <div>
+                                                                    <RatingImage src={rating.image} alt={rating.author} />
+                                                                </div>
+                                                                <RatingContent>
+                                                                    <RatingAuthor>{rating.author}</RatingAuthor>
+                                                                    <StarRating>
+                                                                        {[...Array(5)].map((_, i) => (
+                                                                            <FontAwesomeIcon
+                                                                                key={i}
+                                                                                icon={faStar}
+                                                                                color={i < rating.rating ? "#ffc107" : "#e4e5e9"}
+                                                                            />
+                                                                        ))}
+                                                                    </StarRating>
+                                                                    <RatingText>{rating.text}</RatingText>
+
+                                                                </RatingContent>
+                                                            </RatingItem>
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', color: '#9a9a9a' }}>
+                                                                <Time>?? Time</Time>
+                                                                <LikeOutlined style={{ cursor: 'pointer' }} />
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                                                    {ratings.length > 3 && (
+                                                        <ButtonCPN
+                                                            onClick={this.toggleShowAll}
+                                                            style={{ height: '40px', width: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '15px', fontWeight: 'bold' }}
+                                                            text={this.state.showAll ? 'Thu gọn' : 'Xem thêm'}
+                                                        />
+                                                    )}
+                                                </div>
+                                            </RatingContainer>
                                         </div>
                                     </ModalBody>
                                 </ModalContent>
                             </ModalWrapper>
                         </ModalBackdrop>
                     )}
+
+
                 </div>
 
                 {this.state.totalPages > 1 && (
@@ -248,7 +439,22 @@ export class ServiceList extends Component {
                         size="large"
                         showFirstButton
                         showLastButton
-                        sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            marginTop: '20px',
+                            "& .MuiPaginationItem-root": {
+                                color: 'black',
+                                border: '1px solid #dee2e6',
+                            },
+                            "& .Mui-selected": {
+                                backgroundColor: '#ffc107',
+                                color: 'white',
+                            },
+                            "& .MuiPaginationItem-ellipsis": {
+                                color: 'black',
+                            }
+                        }}
                     />
                 )}
             </div>
