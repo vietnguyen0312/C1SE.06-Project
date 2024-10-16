@@ -1,5 +1,5 @@
 import React from 'react';
-  import {
+import {
   GlobalStyle,
   Wrapper,
   Pedastal,
@@ -18,9 +18,9 @@ import React from 'react';
   Copy,
   Headline
 } from './style';
+import Button from '../../../components/Button/Button';
 
 const Error403 = () => {
-
   return (
     <>
       <GlobalStyle />
@@ -103,6 +103,11 @@ const Error403 = () => {
               <div />
             </Ornaments>
             <div className="lower-support-pillar" />
+            <Ornaments>
+              <div />
+              <div />
+            </Ornaments>
+            <div className="lower-support-pillar" />
           </LowerSupport>
           <LowerRoof>
             <div />
@@ -131,6 +136,10 @@ const Error403 = () => {
             <svg width="520px" height="90px">
               <path d="M495.689265,72.9065145 L520,90 L0,90 L24.3069308,72.9091893 L45.9698498,74.0444947 C88.9890231,76.2990341 125.690619,43.2527689 127.945158,0.233595624 L127.687016,0.220066965 L128,0 L392,0 L392.30918,0.217392187 L392,0.233595624 C394.254539,43.2527689 430.956135,76.2990341 473.975308,74.0444947 L495.689265,72.9065145 Z" id="Combined-Shape" fill="#FDBB3B" />
             </svg>
+            <Button style={{ backgroundColor: 'white', color: 'black', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',width: '200px', height: '50px', fontSize: '15px', }}
+              text="Quay lại ngay ‼️ 😠"
+              onClick={() => window.location.href = "/"} />
+
             <div />
           </UpperRoof>
           <RoofTop>
@@ -144,7 +153,7 @@ const Error403 = () => {
             <Copy>403</Copy>
           </Sun>
           <Headline>
-            <h1>Forbidden City</h1>
+            <div className='Allison' style={{ fontSize: '200px', fontWeight: 'bold'}}>Forbidden City</div>
             <h2>🙅‍♂️ Bạn không có quyền truy cập vào vùng này ❌</h2>
           </Headline>
         </Wrapper>
