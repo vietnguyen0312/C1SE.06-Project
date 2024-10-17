@@ -8,7 +8,6 @@ import styled from 'styled-components';
 import '../Style/Service.css';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import ButtonCPN from '../components/Button/Button';
-import { LikeOutlined } from '@ant-design/icons';
 const ModalBackdrop = styled.div`
   position: fixed;
   top: 0;
@@ -147,11 +146,22 @@ const TotalRating = styled.div`
   gap:5px;
 `;
 
-const Time = styled.div`
-    margin: 4px 0 0 10px;
-
+const Bottom = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: #9a9a9a;
     font-size: 14px;
-`
+
+    div {
+        cursor: pointer;
+
+        &:hover {
+            color: #ffc107;
+        }
+    }
+`;
+
 const ratings = [
     {
         image: "img/user.png",
@@ -403,10 +413,11 @@ export class ServiceList extends Component {
 
                                                                 </RatingContent>
                                                             </RatingItem>
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', color: '#9a9a9a' }}>
-                                                                <Time>?? Time</Time>
-                                                                <LikeOutlined style={{ cursor: 'pointer' }} />
-                                                            </div>
+                                                            <Bottom >
+                                                                <div>?? Time</div>
+                                                                <div>Sửa</div>
+                                                                <div>Xóa</div>
+                                                            </Bottom>
                                                         </div>
                                                     ))}
                                                 </div>
