@@ -32,7 +32,6 @@ public class SecurityConfig {
             "/ratingServices", "/ratingServices/**", "/services/**",
             "/blogTypes", "/blogTypes/**", "/blogs", "/blogs/**", "/images", "/images/**",
             "/blogComments", "/blogComments/**", "/room_type", "/room_type/**", "/room", "/room/**",
-            "/booking_room", "/booking_room/**", "/booking_room_details", "/booking_room_details/**",
             "/swagger-ui/**", "/v3/api-docs/**", "/mails/send/*", "/ws", "/faq", "/faq/**",
             "/tickets","/tickets/**","/ticket-types","/ticket-types/**","/rate-services","/rate-services/**"
     };

@@ -20,6 +20,14 @@ const Checkout = () => {
                     billDetails: detailsRes.result
                 });
             }
+            if (checkCategory === 'r') {
+                const res = await axios.put(`/booking_room/${id}`, { status: 'Đã thanh toán' });
+                const detailsRes = await axios.get(`/booking_room_details/byBookingRoom/${id}`);
+                setBillData({
+                    billInfo: res.result,
+                    billDetails: detailsRes.result
+                });
+            }
         };
         fetchBillData();
     }, [orderInfo]);
@@ -30,7 +38,7 @@ const Checkout = () => {
             <div>
                 <h2>Thông tin đơn hàng</h2>
                 <p>Mã đơn hàng: {billData.billInfo?.id}</p>
-                <p>Ngày đặt: {billData.billInfo?.datePay}</p>
+                <p>Ngày đặt: {billData.billInfo?.datePay || billData.billInfo?.checkInDate}</p>
                 <p>Tổng tiền: {billData.billInfo?.total}</p>
                 <p>Trạng thái: {billData.billInfo?.status}</p>
             </div>
