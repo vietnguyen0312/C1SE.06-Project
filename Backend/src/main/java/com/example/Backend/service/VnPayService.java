@@ -1,7 +1,7 @@
 package com.example.Backend.service;
 
 import com.example.Backend.configuration.VNPAYConfig;
-import com.example.Backend.repository.VNPayUtil;
+import com.example.Backend.repository.VnPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,11 +27,11 @@ public class VnPayService {
         if (bankCode != null && !bankCode.isEmpty()) {
             vnpParamsMap.put("vnp_BankCode", bankCode);
         }
-        vnpParamsMap.put("vnp_IpAddr", VNPayUtil.getIpAddress(request));
+        vnpParamsMap.put("vnp_IpAddr", VnPayUtil.getIpAddress(request));
 
-        String queryUrl = VNPayUtil.getPaymentURL(vnpParamsMap, true);
-        String hashData = VNPayUtil.getPaymentURL(vnpParamsMap, false);
-        String vnpSecureHash = VNPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
+        String queryUrl = VnPayUtil.getPaymentURL(vnpParamsMap, true);
+        String hashData = VnPayUtil.getPaymentURL(vnpParamsMap, false);
+        String vnpSecureHash = VnPayUtil.hmacSHA512(vnPayConfig.getSecretKey(), hashData);
         queryUrl += "&vnp_SecureHash=" + vnpSecureHash;
 
         return vnPayConfig.getVnp_PayUrl() + "?" + queryUrl;

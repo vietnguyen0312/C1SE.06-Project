@@ -14,7 +14,7 @@ public enum ErrorCode {
 
     PASSWORD_INCORRECT(1999, "Password not correct", HttpStatus.BAD_REQUEST),
     NOT_BLANK(2001, "This field is mandatory", HttpStatus.BAD_REQUEST),
-    USERNAME_SIZE(2002, "Username must be between {min} and {max} characters", HttpStatus.BAD_REQUEST),
+    BETWEEN_SIZE(2002, "This field must be between {min} and {max} characters", HttpStatus.BAD_REQUEST),
     INVALID(2003, "This field is invalid", HttpStatus.BAD_REQUEST),
     MIN_SIZE(2004, "This field must be at least {min} characters long", HttpStatus.BAD_REQUEST),
     PHONE_NUMBER_INVALID(2005, "Phone number is invalid", HttpStatus.BAD_REQUEST),

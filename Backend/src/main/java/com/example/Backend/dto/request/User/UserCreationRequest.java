@@ -18,7 +18,7 @@ import java.util.Date;
 public class UserCreationRequest {
 
     @NotBlank(message = "NOT_BLANK")
-    @Size(min = 3, max = 50, message = "USERNAME_SIZE")
+    @Size(min = 3, max = 50, message = "BETWEEN_SIZE")
     String username;
 
     @Email(message = "INVALID")

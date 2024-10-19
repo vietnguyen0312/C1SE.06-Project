@@ -6,19 +6,22 @@ const Checkout = () => {
     const location = useLocation();
     const params = new URLSearchParams(location.search);
     const orderInfo = params.get('vnp_OrderInfo');
+    const vnp_ResponseCode = params.get('vnp_ResponseCode');
     const [billData, setBillData] = useState({});
 
     useEffect(() => {
         const fetchBillData = async () => {
             const checkCategory = orderInfo.charAt(0);
             const id = orderInfo.slice(1);
-            if (checkCategory === 't') {
-                const res = await axios.put(`/bill-ticket/${id}`, { status: 'Đã thanh toán' });
+            if (vnp_ResponseCode === '00') {
+                if (checkCategory === 't') {
+                    const res = await axios.put(`/bill-ticket/${id}`, { status: 'Đã thanh toán' });
                 const detailsRes = await axios.get(`/bill-ticket-detail/get-by-bill/${id}`);
                 setBillData({
                     billInfo: res.result,
                     billDetails: detailsRes.result
-                });
+                    });
+                }
             }
         };
         fetchBillData();

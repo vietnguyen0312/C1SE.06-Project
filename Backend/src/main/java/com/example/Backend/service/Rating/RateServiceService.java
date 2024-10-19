@@ -2,6 +2,7 @@ package com.example.Backend.service.Rating;
 
 import com.example.Backend.dto.request.Rating.RateServiceCreationRequest;
 import com.example.Backend.dto.request.Rating.RateServiceUpdateRequest;
+import com.example.Backend.dto.response.MapEntryResponse;
 import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.Rating.RateServiceResponse;
 import com.example.Backend.entity.Rating.RateService;
@@ -56,7 +57,7 @@ public class RateServiceService {
         return rateServiceMapper.toResponse(rateServiceRepository.save(rateService));
     }
 
-    public PageResponse<RateServiceResponse> getRateServices(String idService, int page, int size) {
+    public  PageResponse<RateServiceResponse> getRateServices(String idService, int page, int size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "dateUpdate").ascending();
 
         Pageable pageable = PageRequest.of(page-1,size,sort);
@@ -70,12 +71,16 @@ public class RateServiceService {
         }).toList();
 
         return PageResponse.<RateServiceResponse>builder()
-                .totalPages(pageData.getTotalPages())
-                .pageSize(size)
-                .currentPage(page)
-                .totalElements(pageData.getTotalElements())
-                .data(dataMapper)
-                .build();
+                        .totalPages(pageData.getTotalPages())
+                        .pageSize(size)
+                        .currentPage(page)
+                        .totalElements(pageData.getTotalElements())
+                        .data(dataMapper)
+                        .build();
+    }
+
+    public Double getAVGScoreByServiceEntity(String idService){
+        return rateServiceRepository.findAverageScoreByServiceEntity_Id(idService);
     }
 
     public RateServiceResponse getRateServiceById(String id) {
@@ -84,7 +89,6 @@ public class RateServiceService {
         return rateServiceMapper.toResponse(rateService);
     }
 
-    @PostAuthorize("returnObject.user.email == authentication.name or hasRole('MANAGER')")
     public void deleteRateService(String id) {
         RateService rateService = rateServiceRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));

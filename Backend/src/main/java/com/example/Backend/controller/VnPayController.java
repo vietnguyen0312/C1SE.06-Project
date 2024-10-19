@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+
 @RestController
 @RequestMapping("/payment")
 @RequiredArgsConstructor
@@ -18,26 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class VnPayController {
     VnPayService vnPayService;
+    ArrayList<String> v = new ArrayList<>();
 
     @GetMapping("/vn-pay")
     public ApiResponse<String> pay(HttpServletRequest request) {
         return ApiResponse.<String>builder()
                 .result(vnPayService.createVnPayPayment(request))
                 .build();
-    }
-
-    @GetMapping("/vn-pay-callback")
-    public ApiResponse<String> payCallbackHandler(HttpServletRequest request) {
-        String status = request.getParameter("vnp_ResponseCode");
-
-        if (status.equals("00")) {
-            return ApiResponse.<String>builder()
-                    .result("Success")
-                    .build();
-        } else {
-            return ApiResponse.<String>builder()
-                    .result("Fail")
-                    .build();
-        }
     }
 }
