@@ -4,6 +4,7 @@ import com.example.Backend.dto.request.Booking.BookingRoomCreationRequest;
 import com.example.Backend.dto.request.Booking.BookingRoomUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Booking.BookingRoomResponse;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.entity.Booking.BookingRoom;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.exception.AppException;
@@ -25,34 +26,35 @@ public class BookingRoomController {
 
     @PostMapping
     public ApiResponse<BookingRoomResponse> createBookingRoom(@RequestBody @Valid BookingRoomCreationRequest request) {
-        BookingRoomResponse bookingRoomResponse = bookingRoomService.createBookingRoom(request);
         return ApiResponse.<BookingRoomResponse>builder()
-                .result(bookingRoomResponse)
+                .result(bookingRoomService.createBookingRoom(request))
                 .build();
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<BookingRoomResponse> updateBookingRoom(@PathVariable String id,
+    public ApiResponse<BookingRoomResponse> updateBookingRoom(
+            @PathVariable String id,
             @RequestBody @Valid BookingRoomUpdateRequest request) {
-        BookingRoomResponse bookingRoomResponse = bookingRoomService.updateBookingRoom(id, request);
         return ApiResponse.<BookingRoomResponse>builder()
-                .result(bookingRoomResponse)
+                .result(bookingRoomService.updateBookingRoom(id, request))
                 .build();
     }
 
     @GetMapping("/{id}")
     public ApiResponse<BookingRoomResponse> getBookingRoomById(@PathVariable String id) {
-        BookingRoomResponse bookingRoomResponse = bookingRoomService.getBookingRoomById(id);
         return ApiResponse.<BookingRoomResponse>builder()
-                .result(bookingRoomResponse)
+                .result(bookingRoomService.getBookingRoomById(id))
                 .build();
     }
 
     @GetMapping
-    public ApiResponse<List<BookingRoomResponse>> getAllBookingRooms() {
-        List<BookingRoomResponse> bookingRooms = bookingRoomService.getBookingRooms();
-        return ApiResponse.<List<BookingRoomResponse>>builder()
-                .result(bookingRooms)
+    public ApiResponse<PageResponse<BookingRoomResponse>> getAllBookingRooms(
+            @RequestParam(value = "isCustomer",required = false, defaultValue = "false")Boolean isCustomer,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+
+        return ApiResponse.<PageResponse<BookingRoomResponse>>builder()
+                .result(bookingRoomService.getBookingRooms(isCustomer, page, size))
                 .build();
     }
 
@@ -64,9 +66,8 @@ public class BookingRoomController {
 
     @GetMapping("/findByUser/{userId}")
     public ApiResponse<List<BookingRoomResponse>> getBookingRoomsByUser(@PathVariable("userId") String userId) {
-        List<BookingRoomResponse> bookingRooms = bookingRoomService.getBookingRoomsByUser(userId);
         return ApiResponse.<List<BookingRoomResponse>>builder()
-                .result(bookingRooms)
+                .result(bookingRoomService.getBookingRoomsByUser(userId))
                 .build();
     }
 }

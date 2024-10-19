@@ -11,6 +11,8 @@ import RoomCard from '../components/RoomCard';
 import { Navigate } from "react-router-dom";
 import { format } from 'date-fns';
 import moment from 'moment-timezone';
+
+
 const Overlay = styled.div`
   position: absolute;
   top: 0;
@@ -155,7 +157,17 @@ const Payment = styled.div`
         color: #f8b600; 
     }
   }
+  
 `;
+
+const RoomImage = ({ imageUrl, name, onClick, isSelected }) => {
+    return (
+        <div style={{ margin: '10px', textAlign: 'center', cursor: 'pointer', boxShadow: isSelected ? '0px 0px 10px #888888' : 'none' }} onClick={onClick}>
+            <img src={imageUrl} alt={name} style={{ width: '100px', height: '100px' }} />
+            <p>{name}</p>
+        </div>
+    );
+};
 
 class BookingRoom extends Component {
     constructor(props) {
@@ -166,13 +178,23 @@ class BookingRoom extends Component {
             showRoomSelection: false,
             totalPrice: 0,
             page: 1,  // Thêm trang để phân trang khi lấy phòng
+            pageRoomType: {},
             rooms_type: [],
             selectedRooms: [],
             rooms: [],
             roomPrice: 0,
+            roomPiceList: {},
             roomId: props.roomTypeId,  // Lấy roomTypeId từ props
             hasMore: true,
             selectedRoomsDetails: [], // Kiểm soát việc tải thêm
+            currentRoomDetails: [], // Thêm trường này để lưu thông tin phòng hiện tại được chọn
+            selectedImage: null,
+            sampleImages: [], // Khởi tạo mảng ảnh là rỗng
+            selectedRoomsInfo: [],
+            roomTypes: [],
+            roomsByType: {},
+            selectedRoomDetails: [],
+            activeRoomIndex: 0
         };
         this.lastPostElementRef = createRef(); // Tạo ref cho phần tử cuối cùng
     }
@@ -180,12 +202,19 @@ class BookingRoom extends Component {
     componentDidMount() {
         AOS.init({ duration: 2000 });
         this.fetchRoomType();
+        this.fetchRoomTypes();
+        const selectedImage = this.state.sampleImages.find(img => img.id === this.state.roomId);
+        if (selectedImage) {
+            this.setState({ selectedImage: selectedImage.url });
+        }
     }
+
 
     setupObserver = () => {
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && this.state.hasMore) {
-                this.fetchRoom(this.startDate);
+                // this.fetchRoom(this.startDate, this.state.roomId);
+                this.handleRoomTypeSelect(this.state.activeRoomIndex);
                 // console.log("Phần tử cuối đã xuất hiện, tải thêm dữ liệu..."); // Kiểm tra log khi phần tử cuối cùng xuất hiện
             }
         });
@@ -197,34 +226,98 @@ class BookingRoom extends Component {
     };
 
     fetchRoomType = async () => {
-        try {
-            const response = await axios.get(`/room_type/${this.state.roomId}`);
-            this.setState({
-                rooms_type: response.result,
-                roomPrice: response.result.price,
+        const response = await axios.get(`/room_type/${this.state.roomId}`);
+        const roomTypeName = response.result.name;
+        this.setState({
+            rooms_type: response.result,
+            roomPrice: response.result.price,
+        }, () => {
+            console.log("đầy là cảnh báo  " + this.state.rooms_type.name + " dsadsads");
+            const index = this.state.roomTypes.findIndex(roomType => roomType.name === roomTypeName);
+            if (index !== -1) {
+                console.log(`Room type "${roomTypeName}" là phần tử số ${index} của roomTypes.`);
+                this.setState({ activeRoomIndex: index });
+            } else {
+                console.log(`Room type "${roomTypeName}" không có trong roomTypes.`);
+                this.setState({ activeRoomIndex: 0 });
+            }
+        });
+
+    };
+
+    fetchRoomTypes = async () => {
+
+        const response = await axios.get("/room_type");
+        this.setState({ roomTypes: response.result });
+
+
+        console.log(this.state.roomTypes);
+        if (Array.isArray(response.result)) {
+
+            this.dynamicVariables = {};
+
+            this.state.roomTypes.forEach((roomType) => {
+                // Tạo biến động với tên "roomType_" và id của roomType
+                this.dynamicVariables[`${roomType.id}`] = roomType;
             });
-        } catch (error) {
-            console.error('Error fetching room types:', error);
+
+            response.result.forEach((roomType) => {
+                this.setState(prevState => ({
+                    roomPiceList: {
+                        ...prevState.roomPiceList,
+                        [roomType.name]: roomType.price
+                    },
+                    pageRoomType: {
+                        ...prevState.pageRoomType,
+                        [roomType.name]: 1
+                    }
+                }));
+            });
+
+
+
+
+            this.setState({ sampleImages: response.result }, () => {
+                const selectedImage = this.state.sampleImages.find(img => img.id === this.state.roomId);
+                if (selectedImage) {
+                    this.setState({ selectedImage: selectedImage.id });
+                }
+            });
+
+        } else {
+            console.error("Expected an array but got:", response.result);
+            this.setState({ sampleImages: [] });
         }
-    };
 
+    }
 
-    fetchRoom = async (date) => {
+    fetchRoom = async (date, roomId) => {
         const size = 7; // Số lượng phòng mỗi lần tải
-        try {
-            const response = await axios.get(`/room/findByRoomType/${date}/${this.state.roomId}?page=${this.state.page}&size=${size}`);
-            const newRooms = response.result.data;
-            console.log(response.result.data);
-            this.setState((prevState) => ({
-                rooms: [...prevState.rooms, ...newRooms],
-                hasMore: response.result.totalPages !== 0, // Kiểm tra xem còn phòng để tải hay không
-                page: prevState.page + 1,
+        const response = await axios.get(`/room/findByRoomType/${date}/${roomId}?page=${this.state.page}&size=${size}`);
+        const newRooms = response.result.data;
+        console.log(response.result.data);
+        const roomTypeName = this.state.rooms_type?.name;
 
-            }));
-        } catch (error) {
-            console.error('Error fetching rooms:', error);
-        }
+        this.setState((prevState) => ({
+            rooms: [...prevState.rooms, ...newRooms],
+            hasMore: response.result.totalPages !== 0, // Kiểm tra xem còn phòng để tải hay không
+            pageRoomType: {
+                ...prevState.pageRoomType,
+                [roomTypeName]: prevState.pageRoomType[roomTypeName] + 1
+            },
+            roomsByType: {
+                ...prevState.roomsByType,
+                [roomTypeName]: [ // Sử dụng roomTypeName làm key
+                    ...(prevState.roomsByType[roomTypeName] || []), // Kiểm tra và khởi tạo mảng nếu chưa tồn tại
+                    ...newRooms
+                ]
+            }
+        }), () => { // Callback sau khi state được cập nhật
+            console.log("roomsByType sau khi cập nhật:", this.state.roomsByType);
+            console.log("pageRoomType sau khi cập nhật:", this.state.pageRoomType);
+        });
     };
+
 
     calculateDays = (start, end) => {
         if (!start || !end) return 0;
@@ -256,11 +349,10 @@ class BookingRoom extends Component {
             const formattedDate1 = this.formatDate(endDate);
             this.startDate = formattedDate;
             this.endDate = formattedDate1;
-            this.fetchRoom(formattedDate); // Gọi fetchRoom với ngày đã định dạng
+            this.handleRoomTypeSelect(this.state.activeRoomIndex); // Gọi fetchRoom với ngày đã định dạng
         } else {
             alert('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!');
         }
-
     };
 
     BookingRoom = async () => {
@@ -288,7 +380,7 @@ class BookingRoom extends Component {
             checkInDate: checkInDate,
             checkOutDate: checkOutDate,
             total: this.state.totalPrice,
-            status: 'Đã xác nhận'
+            status: 'chưa thanh toán'
         });
         console.log(response1.result);
         const gia = this.state.totalPrice / this.state.selectedRoomsDetails.length;
@@ -297,11 +389,65 @@ class BookingRoom extends Component {
             const response2 = await axios.post('booking_room_details', {
                 roomId: room.id,
                 bookingId: response1.result.id,
-                price: gia
+                price: room.roomType.price * this.calculateDays(this.state.startDate, this.state.endDate)
             });
             console.log(response2.result);
         }
+        const paymentUrl = await axios.get('/payment/vn-pay', {
+            params: {
+                amount: this.state.totalPrice,
+                orderInfo: `r${response1.result.id}`
+            }
+        });
+        window.location.href = paymentUrl.result;
     };
+
+    handleRoomTypeSelect = async (index) => {
+
+        const selectedRoomType = this.state.roomTypes[index];
+        console.log("RoomType được chọn:", selectedRoomType);
+        console.log(index);
+
+        const formattedDate = this.formatDate(this.state.startDate);
+        console.log(formattedDate);
+        console.log(selectedRoomType.id);
+
+        // Gọi API để lấy dữ liệu phòng
+        const page = this.state.pageRoomType[selectedRoomType.name];
+        console.log("page:", page);
+        const response = await axios.get(`/room/findByRoomType/${formattedDate}/${selectedRoomType.id}?page=${page}&size=${7}`);
+        console.log("Response từ API:", response.result.data);
+        const rooms = response.result.data;
+
+        // Cập nhật state và sử dụng callback để đảm bảo state đã được cập nhật
+        this.setState((prevState) => {
+
+            const existingRooms = prevState.roomsByType[selectedRoomType.name] || [];
+            const hasMore = response.result.totalPages !== 0; // Điều kiện kiểm tra trang
+            const nextPage = hasMore ? prevState.page + 1 : prevState.page;
+            return {
+                roomsByType: {
+                    ...prevState.roomsByType, // Giữ lại dữ liệu cũ
+                    [selectedRoomType.name]: [
+                        ...existingRooms, // Thêm phòng cũ
+                        ...rooms // Thêm phòng mới
+                    ]
+                },
+                pageRoomType: {
+                    ...prevState.pageRoomType,
+                    [selectedRoomType.name]: prevState.pageRoomType[selectedRoomType.name] + 1
+                },
+                page: nextPage,
+                hasMore: hasMore
+            };
+
+        }, () => {
+            console.log("roomsByType sau khi setState:", this.state.roomsByType);
+
+        });
+    }
+
+
 
 
     formatDate(date) {
@@ -318,15 +464,16 @@ class BookingRoom extends Component {
 
 
     handlePriceClick = (room) => {
-        const { selectedRooms, selectedRoomsDetails, startDate, endDate, roomPrice } = this.state;
+        const { selectedRooms, selectedRoomsDetails, startDate, endDate, roomPrice, roomPiceList } = this.state;
         const isSelected = selectedRooms.includes(room.roomNumber);
         const days = this.calculateDays(startDate, endDate);
-        const priceForRoom = roomPrice * days;
+        const priceForRoom = roomPiceList[room.roomType.name] * days;
 
         if (isSelected) {
             // Nếu phòng đã được chọn, bỏ chọn
             this.setState((prevState) => ({
                 selectedRooms: prevState.selectedRooms.filter((item) => item !== room.roomNumber),
+                currentRoomDetails: prevState.currentRoomDetails.filter((item) => item.id !== room.id),
                 selectedRoomsDetails: prevState.selectedRoomsDetails.filter((item) => item.id !== room.id), // Cập nhật chi tiết phòng bằng ID
                 totalPrice: prevState.totalPrice - priceForRoom,
             }));
@@ -335,6 +482,7 @@ class BookingRoom extends Component {
             this.setState((prevState) => ({
                 selectedRooms: [...prevState.selectedRooms, room.roomNumber],
                 selectedRoomsDetails: [...prevState.selectedRoomsDetails, room], // Thêm thông tin chi tiết phòng
+                currentRoomDetails: [...prevState.currentRoomDetails, room], // Thêm thông tin chi tiết phòng
                 totalPrice: prevState.totalPrice + priceForRoom,
             }));
         }
@@ -348,6 +496,8 @@ class BookingRoom extends Component {
         }).format(value);
     };
 
+
+
     componentDidUpdate() {
         if (this.lastPostElementRef.current) {
             // console.log("Phần tử cuối cùng sau khi render:", this.lastPostElementRef.current);
@@ -358,8 +508,20 @@ class BookingRoom extends Component {
         }
     }
 
+    handleImageSelect = (imageId, index) => {
+        console.log("Selected image ID:", imageId); // Thêm dòng này để kiểm tra giá trị truyền vào
+        this.setState({ selectedImage: imageId, activeRoomIndex: index });
+        console.log(this.state.activeRoomIndex);
+        if (this.state.startDate !== null) {
+            this.handleRoomTypeSelect(index);
+        }
+
+    }
+
+
+
     render() {
-        const { startDate, endDate, showRoomSelection, rooms, totalPrice, rooms_type, roomPrice, selectedRooms } = this.state;
+        const { startDate, endDate, showRoomSelection, totalPrice, rooms_type, roomPrice, selectedRooms, currentRoomDetails, selectedImage, sampleImages, roomTypes, activeRoomIndex } = this.state;
 
         return (
             <>
@@ -405,52 +567,81 @@ class BookingRoom extends Component {
                         </DatePickerContainer>
                     </Row>
                     <Row>
+                        {Array.isArray(this.state.sampleImages) && this.state.sampleImages.length > 0 ? (
+                            this.state.sampleImages.map((image, index) => (
+                                <RoomImage
+                                    key={image.id}
+                                    imageUrl={"/img/hotels/room_type/" + image.image}
+                                    name={image.name}
+                                    onClick={() => this.handleImageSelect(image.id, index)}
+                                    isSelected={this.state.selectedImage === image.id}
+                                />
+                            ))
+                        ) : (
+                            <p>No images to display</p>
+                        )}
+                    </Row>
+                    <Row>
                         <ButtonCPN text="Đặt phòng" onClick={this.handleBookingClick} />
                     </Row>
                 </ContainerDate>
-                {showRoomSelection && (
-                    <RoomSelection>
-                        <h2>Thông tin phòng đã chọn: {rooms_type.name}</h2>
-                        {startDate && endDate && (
-                            <DateInfo>
-                                <p>Ngày bắt đầu: {startDate.toLocaleDateString()}</p>
-                                <p>Ngày kết thúc: {endDate.toLocaleDateString()}</p>
-                                <p>Số ngày lưu trú: {this.calculateDays(startDate, endDate)}</p>
-                            </DateInfo>
+
+                {roomTypes.map((roomType, index) => (
+                    <div key={index}>
+                        {showRoomSelection && index === activeRoomIndex && (  // Thêm điều kiện kiểm tra index
+                            <RoomSelection>
+                                <h2>Thông tin phòng đã chọn: {roomType.name}</h2>
+                                {startDate && endDate && (
+                                    <DateInfo>
+                                        <p>Ngày bắt đầu: {startDate.toLocaleDateString()}</p>
+                                        <p>Ngày kết thúc: {endDate.toLocaleDateString()}</p>
+                                        <p>Số ngày lưu trú: {this.calculateDays(startDate, endDate)}</p>
+                                    </DateInfo>
+                                )}
+                                <p>Giá phòng một đêm: {this.formatCurrency(this.state.roomPiceList[roomType.name])}</p>
+
+                                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', borderBottom: '1px solid #f8b600' }}>
+
+                                    {this.state.roomsByType[roomType.name]?.map((room, roomIndex) => {
+                                        const isLastRoom = roomIndex === this.state.roomsByType[roomType.name].length - 1;
+
+                                        return (
+                                            <RoomCard
+                                                ref={(el) => {
+                                                    if (isLastRoom) {
+                                                        this.lastPostElementRef.current = el;  // Gán ref cho phần tử cuối cùng
+                                                    }
+                                                }}
+                                                key={room.roomNumber}
+                                                room={room}
+                                                isSelected={selectedRooms.includes(room.roomNumber)}
+                                                onPriceClick={() => this.handlePriceClick(room)}  // Gọi hàm khi nhấp vào
+                                                index={index}
+                                            />
+                                        );
+                                    })}
+
+                                </div>
+                                {currentRoomDetails.length > 0 && (
+                                    <div>
+                                        <h3>Thông tin các phòng đã chọn:</h3>
+                                        {currentRoomDetails.map((roomDetail, index) => {
+                                            const formattedPrice = this.formatCurrency(roomDetail.roomType.price); // Sửa đây để truy cập đúng thuộc tính price
+                                            return (
+                                                <p key={index}>Số phòng: {roomDetail.roomNumber}, Giá: {formattedPrice}</p>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                                <Payment>
+                                    <p>Tổng giá trị:</p>
+                                    <p>{this.formatCurrency(totalPrice)}</p>
+                                    <ButtonCPN text="Đặt phòng" onClick={this.BookingRoom} />
+                                </Payment>
+                            </RoomSelection>
                         )}
-                        <p>Giá phòng một đêm: {this.formatCurrency(roomPrice)}</p>
-
-                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', borderBottom: '1px solid #f8b600' }}>
-
-                            {rooms.map((room, index) => {
-                                const isLastRoom = rooms.length === index + 1;
-
-                                return (
-                                    <RoomCard
-                                        ref={(el) => {
-                                            if (isLastRoom) {
-                                                this.lastPostElementRef.current = el;  // Gán ref cho phần tử cuối cùng
-                                            }
-                                        }}
-                                        key={room.roomNumber}
-                                        room={room}
-                                        isSelected={selectedRooms.includes(room.roomNumber)}
-                                        onPriceClick={() => this.handlePriceClick(room)}  // Gọi hàm khi nhấp vào
-                                        index={index}
-                                    />
-                                );
-                            })}
-
-
-
-                        </div>
-                        <Payment>
-                            <p>Tổng giá trị:</p>
-                            <p>{this.formatCurrency(totalPrice)}</p>
-                            <ButtonCPN text="Đặt phòng" onClick={this.BookingRoom} />
-                        </Payment>
-                    </RoomSelection>
-                )}
+                    </div>
+                ))}
             </>
         );
     }

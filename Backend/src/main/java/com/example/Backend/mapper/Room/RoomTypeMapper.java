@@ -10,4 +10,5 @@ public interface RoomTypeMapper {
     RoomTypeResponse toRoomTypeResponse(RoomType roomType);
 
     RoomType toRoomType(RoomTypeRequest roomTypeRequest);
+
 }
