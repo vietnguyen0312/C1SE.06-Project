@@ -7,7 +7,8 @@ import { Pagination } from '@mui/material';
 import styled from 'styled-components';
 import '../Style/Service.css';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
-import ButtonCPN from '../components/Button/Button';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 const ModalBackdrop = styled.div`
   position: fixed;
   top: 0;
@@ -162,55 +163,6 @@ const Bottom = styled.div`
     }
 `;
 
-const ratings = [
-    {
-        image: "img/user.png",
-        text: "Do you want to be even more successful? Learn to love learning and growth.",
-        author: "Harriet Maxwell",
-        rating: 3
-    },
-    {
-        image: "img/user.png",
-        text: "A purpose is the eternal condition for success. Every former smoker can tell you how hard it is.",
-        author: "Carolyn Craig",
-        rating: 2
-    },
-    {
-        image: "img/user.png",
-        text: "The more effort you put into improving your skills, the bigger the payoff.",
-        author: "Dennis Williams",
-        rating: 5
-    },
-    {
-        image: "img/user.png",
-        text: "The more effort you put into improving your skills, the bigger the payoff.",
-        author: "Dennis Williams",
-        rating: 5
-    },
-    {
-        image: "img/user.png",
-        text: "A purpose is the eternal condition for success. Every former smoker can tell you how hard it is.",
-        author: "Carolyn Craig",
-        rating: 2
-    },
-    {
-        image: "img/user.png",
-        text: "The more effort you put into improving your skills, the bigger the payoff.",
-        author: "Dennis Williams",
-        rating: 5
-    },
-    {
-        image: "img/user.png",
-        text: "The more effort you put into improving your skills, the bigger the payoff.",
-        author: "Dennis Williams",
-        rating: 5
-    },
-]
-
-const totalStar = ratings.reduce((total, rating) => total + rating.rating, 0);
-const averageRating = ratings.length > 0 ? (totalStar / ratings.length).toFixed(1) : 0;
-
-
 export class ServiceList extends Component {
     constructor(props) {
         super(props)
@@ -223,10 +175,13 @@ export class ServiceList extends Component {
             totalPages: 0,
             pageSize: 6,
             totalElements: 0,
+            ratingsOfSelectedService: [],
             filterBySearch: props.search || null,
             filterByServiceTypeId: props.serviceTypeId || null,
             limit: props.limit || null,
-            showAll: false
+            hasMoreRatings: true,
+            ratingsPage: 2,
+            totalRatings: 0
         }
         this.serviceListRef = React.createRef();
     }
@@ -255,8 +210,8 @@ export class ServiceList extends Component {
         });
     }
 
-    componentDidMount = () => {
-        this.getServices()
+    componentDidMount() {
+        this.getServices();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -275,12 +230,57 @@ export class ServiceList extends Component {
 
     }
 
-    setSelectedService = (service) => {
-        this.setState({ selectedService: service, isModalOpen: true })
-    }
+    setSelectedService = async (service) => {
+        const AVG_RATING = await axios.get(`/rate-services/get-AVG-Score/${service.id}`);
+        const RATINGS = await axios.get('/rate-services', {
+            params: {
+                serviceId: service.id,
+                page: 1,
+                size: 5
+            }
+        });
+
+        this.setState({
+            selectedService: { service, averageRating: AVG_RATING.result },
+            isModalOpen: true,
+            totalRatings: RATINGS.result.totalElements
+        });
+
+        if (RATINGS.result.data && RATINGS.result.data.length > 0) {
+            this.setState({
+                ratingsOfSelectedService: RATINGS.result.data
+            });
+        } else {
+            this.setState({
+                hasMoreRatings: false
+            });
+        }
+    };
+
+    loadMoreRatings = () => {
+        setTimeout(async () => {
+            const { selectedService, ratingsPage } = this.state;
+            const RATINGS = await axios.get('/rate-services', {
+                params: {
+                    serviceId: selectedService.service.id,
+                    page: ratingsPage,
+                    size: 5
+                }
+            });
+
+            if (RATINGS.result.data && RATINGS.result.data.length > 0) {
+                this.setState(prevState => ({
+                    ratingsOfSelectedService: [...prevState.ratingsOfSelectedService, ...RATINGS.result.data],
+                    ratingsPage: prevState.ratingsPage + 1
+                }));
+            } else {
+                this.setState({ hasMoreRatings: false });
+            }
+        }, 1000);
+    };
 
     closeModal = () => {
-        this.setState({ isModalOpen: false })
+        this.setState({ isModalOpen: false, hasMoreRatings: true })
     }
 
     paginate = (pageNumber) => {
@@ -295,8 +295,6 @@ export class ServiceList extends Component {
     };
 
     render() {
-        const { showAll } = this.state;
-        const ratingToShow = showAll ? ratings : ratings.slice(0, 3);
         return (
             <div style={{ backgroundColor: '#f8f9fa' }}>
                 <div className='row' ref={this.serviceListRef}>
@@ -337,39 +335,39 @@ export class ServiceList extends Component {
                             <ModalWrapper onClick={(e) => e.stopPropagation()}>
                                 <ModalContent>
                                     <ModalHeader>
-                                        <ModalTitle>{this.state.selectedService.serviceType.name}</ModalTitle>
+                                        <ModalTitle>{this.state.selectedService.service.serviceType.name}</ModalTitle>
                                         <CloseButton onClick={this.closeModal} aria-label="Close">
                                             <FontAwesomeIcon icon={faTimes} />
                                         </CloseButton>
                                     </ModalHeader>
                                     <ModalBody>
                                         <div className="mb-3">
-                                            <ServiceTitle>{this.state.selectedService.name}</ServiceTitle>
+                                            <ServiceTitle>{this.state.selectedService.service.name}</ServiceTitle>
                                         </div>
                                         <div className="mb-3 text-center">
                                             <ServiceImage
-                                                src={`/img/service/${this.state.selectedService.image}`}
+                                                src={`/img/service/${this.state.selectedService.service.image}`}
                                                 alt="Service Image"
                                                 className="img-fluid"
                                             />
                                         </div>
                                         <div style={{ borderBottom: '2px solid #f8b600', paddingBottom: '15px' }}>
                                             <p><strong>Description:</strong></p>
-                                            <ServiceDescription>{this.state.selectedService.description}</ServiceDescription>
+                                            <ServiceDescription>{this.state.selectedService.service.description}</ServiceDescription>
                                         </div>
                                         <div>
                                             <RatingContainer>
-                                                <h5>Đánh giá dịch vụ ({ratings.length})</h5>
+                                                <h5>Đánh giá dịch vụ ({this.state.totalRatings})</h5>
                                                 <TotalRating>
-                                                    {averageRating} <div style={{ color: '#787878' }}>/ 5</div>
+                                                    {this.state.selectedService.averageRating} <div style={{ color: '#787878' }}>/ 5</div>
                                                     <StarRating style={{ marginLeft: '5px' }}>
                                                         {[...Array(5)].map((_, i) => {
-                                                            if (i < Math.floor(averageRating)) {
+                                                            if (i < Math.floor(this.state.selectedService.averageRating)) {
                                                                 return (
                                                                     <FontAwesomeIcon key={i} icon={faStar} color="#ffc107" />
                                                                 );
-                                                            } else if (i === Math.floor(averageRating)) {
-                                                                const decimalPart = averageRating % 1;
+                                                            } else if (i === Math.floor(this.state.selectedService.averageRating)) {
+                                                                const decimalPart = this.state.selectedService.averageRating % 1;
                                                                 if (decimalPart <= 0.2) {
                                                                     return (
                                                                         <FontAwesomeIcon key={i} icon={faStar} color="#e4e5e9" />
@@ -392,43 +390,49 @@ export class ServiceList extends Component {
                                                     </StarRating>
                                                 </TotalRating>
                                                 <div style={{ marginTop: '20px' }}>
-                                                    {ratingToShow.map((rating, index) => (
-                                                        <div key={index} style={{ marginBottom: '30px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
-                                                            <RatingItem>
-                                                                <div>
-                                                                    <RatingImage src={rating.image} alt={rating.author} />
+                                                    <InfiniteScroll
+                                                        key={this.state.selectedService.service.id}
+                                                        dataLength={this.state.ratingsOfSelectedService.length}
+                                                        next={this.loadMoreRatings}
+                                                        hasMore={this.state.hasMoreRatings}
+                                                        loader={<div className="loading-container">
+                                                            <LoadingIcons.TailSpin stroke="#000" />
+                                                        </div>}
+                                                    >
+                                                        {this.state.ratingsOfSelectedService.length > 0 ? (
+                                                            this.state.ratingsOfSelectedService.map((rating, index) => (
+                                                                <div key={index} style={{ marginBottom: '30px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+                                                                    <RatingItem>
+                                                                        <div>
+                                                                            <RatingImage src={`/img/user/${rating.user.avatar}`} />
+                                                                        </div>
+                                                                        <RatingContent>
+                                                                            <RatingAuthor>{rating.user.username}</RatingAuthor>
+                                                                            <StarRating>
+                                                                                {[...Array(5)].map((_, i) => (
+                                                                                    <FontAwesomeIcon
+                                                                                        key={i}
+                                                                                        icon={faStar}
+                                                                                        color={i < rating.score ? "#ffc107" : "#e4e5e9"}
+                                                                                    />
+                                                                                ))}
+                                                                            </StarRating>
+                                                                            <RatingText>{rating.comment}</RatingText>
+                                                                        </RatingContent>
+                                                                    </RatingItem>
+                                                                    <Bottom>
+                                                                        <div>{rating.formatDate}</div>
+                                                                        <div>Sửa</div>
+                                                                        <div>Xóa</div>
+                                                                    </Bottom>
                                                                 </div>
-                                                                <RatingContent>
-                                                                    <RatingAuthor>{rating.author}</RatingAuthor>
-                                                                    <StarRating>
-                                                                        {[...Array(5)].map((_, i) => (
-                                                                            <FontAwesomeIcon
-                                                                                key={i}
-                                                                                icon={faStar}
-                                                                                color={i < rating.rating ? "#ffc107" : "#e4e5e9"}
-                                                                            />
-                                                                        ))}
-                                                                    </StarRating>
-                                                                    <RatingText>{rating.text}</RatingText>
-
-                                                                </RatingContent>
-                                                            </RatingItem>
-                                                            <Bottom >
-                                                                <div>?? Time</div>
-                                                                <div>Sửa</div>
-                                                                <div>Xóa</div>
-                                                            </Bottom>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                                                    {ratings.length > 3 && (
-                                                        <ButtonCPN
-                                                            onClick={this.toggleShowAll}
-                                                            style={{ height: '40px', width: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '15px', fontWeight: 'bold' }}
-                                                            text={this.state.showAll ? 'Thu gọn' : 'Xem thêm'}
-                                                        />
-                                                    )}
+                                                            ))
+                                                        ) : (
+                                                            <div className="no-ratings" style={{ textAlign: 'center', marginTop: '20px' }}>
+                                                                Không có bình luận nào.
+                                                            </div>
+                                                        )}
+                                                    </InfiniteScroll>
                                                 </div>
                                             </RatingContainer>
                                         </div>
