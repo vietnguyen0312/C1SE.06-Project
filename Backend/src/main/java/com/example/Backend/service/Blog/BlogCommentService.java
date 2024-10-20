@@ -54,17 +54,18 @@ public class BlogCommentService {
         return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.save(blogComment));
     }
 
-
-    public BlogCommentResponse updateBlogComment(BlogCommentUpdateRequest request, String id) {
+    @PostAuthorize("returnObject.user.email == authentication.name")
+    public BlogCommentResponse updateBlogComment( BlogCommentUpdateRequest request, String id) {
         BlogComment blogComment = blogCommentRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
+        blogComment.setDateUpdate(Instant.now());
         blogCommentMapper.updateBlogComment(blogComment, request);
 
         return blogCommentMapper.toBlogCommentResponse(blogCommentRepository.save(blogComment));
     }
 
-    public void deleteBlogComment(String id) {
+    @PreAuthorize("#email == authentication.name or hasRole('MANAGER')" )
+    public void deleteBlogComment(String id, String email) {
         blogCommentRepository.deleteById(id);
     }
 
@@ -92,6 +93,13 @@ public class BlogCommentService {
                 .totalElements(pageData.getTotalElements())
                 .data(listData)
                 .build();
+    }
+
+    public BlogCommentResponse getBlogCommentByIdComment(String idComment) {
+        BlogComment blogComment = blogCommentRepository.findById(idComment)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
+        return blogCommentMapper.toBlogCommentResponse(blogComment);
     }
 
     public PageResponse<BlogCommentResponse> getBlogCommentByIdBlog(String idBlog, int page, int size) {

@@ -11,9 +11,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.access.prepost.PreAuthorize;
+import com.example.Backend.dto.response.Blog.CommentMessageResponse;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -30,23 +29,29 @@ public class BlogCommentController {
     @PostMapping
     ApiResponse<BlogCommentResponse> createBlogComment(@RequestBody @Valid BlogCommentCreateRequest request) {
         BlogCommentResponse response = blogCommentService.createBlogComment(request);
-        simpMessagingTemplate.convertAndSend("/topic/comments", response);
-        System.out.println("Sent comment to WebSocket: " + response);
+
+        simpMessagingTemplate.convertAndSend("/topic/comments",
+                new CommentMessageResponse("CREATE", response));
+
         return ApiResponse.<BlogCommentResponse>builder()
                 .result(response)
                 .build();
     }
 
     @PutMapping("/{id}")
-    ApiResponse<BlogCommentResponse> updateBlogComment(@PathVariable String id,
-            @RequestBody @Valid BlogCommentUpdateRequest request) {
+    ApiResponse<BlogCommentResponse> updateBlogComment(@PathVariable("id") String id,
+                                                       @RequestBody @Valid BlogCommentUpdateRequest request) {
+        BlogCommentResponse response = blogCommentService.updateBlogComment(request, id);
+
+        simpMessagingTemplate.convertAndSend("/topic/comments",
+                new CommentMessageResponse("UPDATE", response));
         return ApiResponse.<BlogCommentResponse>builder()
-                .result(blogCommentService.updateBlogComment(request, id))
+                .result(response)
                 .build();
     }
 
     @GetMapping("/{id}")
-    ApiResponse<BlogCommentResponse> getBlogCommentById(@PathVariable String id) {
+    ApiResponse<BlogCommentResponse> getBlogCommentById(@PathVariable("id")String id) {
         return ApiResponse.<BlogCommentResponse>builder()
                 .result(blogCommentService.getBlogComment(id))
                 .build();
@@ -73,10 +78,15 @@ public class BlogCommentController {
     }
 
     @DeleteMapping("/{id}")
-    ApiResponse<String> deleteBlogComment(@PathVariable String id) {
-        blogCommentService.deleteBlogComment(id);
+    ApiResponse<String> deleteBlogComment(@PathVariable("id") String id) {
+        BlogCommentResponse blogCommentResponse = blogCommentService.getBlogCommentByIdComment(id);
+        blogCommentService.deleteBlogComment(id, blogCommentResponse.getUser().getEmail());
+
+        simpMessagingTemplate.convertAndSend("/topic/comments",
+                new CommentMessageResponse("DELETE", blogCommentResponse));
+
         return ApiResponse.<String>builder()
-                .result("Blog has been deleted")
+                .result("Blog comment has been deleted")
                 .build();
     }
 }
