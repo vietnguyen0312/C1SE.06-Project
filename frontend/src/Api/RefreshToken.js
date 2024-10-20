@@ -1,5 +1,6 @@
-import axios from '../Configuration/AxiosConfig';
+import axios from 'axios';
+import { API_URL } from '../Configuration/ClientConfig';
 
 export const refreshToken = async (token) => {
-    return await axios.post('/auth/refresh', { token });
+    return (await axios.post(`${API_URL}/auth/refresh`, { token })).data;
 };

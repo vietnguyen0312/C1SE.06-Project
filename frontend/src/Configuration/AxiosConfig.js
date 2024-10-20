@@ -27,15 +27,12 @@ instance.interceptors.response.use((response) => {
 }, async (error) => {
   const originalRequest = error.config;
   if (error.response?.status === 401 && originalRequest) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      window.location.href = '/authentication';
-    }
-
     if (!refreshTokenPromise) {
       const token = localStorage.getItem('token');
-      localStorage.removeItem('token');
-
+      console.log(token);
+      if (token === null) {
+        window.location.href = '/authentication';
+      }
       refreshTokenPromise = refreshToken(token).then((response) => {
         localStorage.setItem('token', response.result.token);
         instance.defaults.headers.Authorization = `Bearer ${response.result.token}`;
