@@ -270,8 +270,6 @@ const Fixed = () => {
         ...prevMessages,
         { text: message, isUser: true },
       ]);
-
-      try {
         const response = await axios.post('http://localhost:5005/webhooks/rest/webhook', {
           sender: '20240921-013310-antique-mole',
           message: message,
@@ -290,9 +288,7 @@ const Fixed = () => {
             { text: botMessage, isUser: false },
           ]);
         }
-      } catch (error) {
-        console.error('Error connecting to Rasa:', error);
-      }
+
     }
   };
 

@@ -18,6 +18,4 @@ public class BlogCommentUpdateRequest {
     @Size(max = 255,message = "COMMENT_SIZE")
     String comment;
 
-    @Future(message = "DATE_FUTURE")
-    Instant dateUpdate;
 }
