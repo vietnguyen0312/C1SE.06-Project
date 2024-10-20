@@ -48,6 +48,11 @@ const UserInfo = () => {
                             </NavMenuLink>
                         </li>
                         <li>
+                            <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/customer/historyTicketBill">
+                                Lịch sử giao dịch
+                            </NavMenuLink>
+                        </li>
+                        <li>
                             <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="" onClick={handleLogout}>
                                 Đăng xuất
                             </NavMenuLink>

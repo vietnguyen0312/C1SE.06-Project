@@ -1,10 +1,12 @@
 package com.example.Backend.dto.response.Bill;
 
 import com.example.Backend.entity.User.User;
+import jakarta.persistence.PrePersist;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.util.StringUtils;
 
-import java.util.Date;
+import java.time.Instant;
 
 @Data
 @NoArgsConstructor
@@ -14,8 +16,14 @@ import java.util.Date;
 public class BillTicketResponse {
     String id;
     User user;
-    Date datePay;
-    Date dateUse;
+    Instant datePay;
     double total;
     String status;
+
+    @PrePersist
+    public void prePersist() {
+        if (!StringUtils.hasLength(status)) {
+            status = "Đã thanh toán";
+        }
+    }
 }

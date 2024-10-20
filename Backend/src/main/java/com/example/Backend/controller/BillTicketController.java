@@ -38,7 +38,7 @@ public class BillTicketController {
             @RequestParam(value = "size", required = false, defaultValue = "6") int size
     ) {
         return ApiResponse.<PageResponse<BillTicketResponse>>builder()
-                .result(billTicketService.getBills(isCustomer, page, size))
+                .result(billTicketService.getBills(page, size))
                 .build();
     }
 

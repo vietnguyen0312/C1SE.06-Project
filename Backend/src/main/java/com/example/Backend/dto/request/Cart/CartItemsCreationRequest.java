@@ -1,9 +1,8 @@
 package com.example.Backend.dto.request.Cart;
 
-import com.example.Backend.entity.Cart.Cart;
-import com.example.Backend.entity.Ticket.Ticket;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,11 +13,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CartItemsCreationRequest {
     @NotNull(message = "NOT_NULL")
-    String IdTicket;
+    String idTicket;
 
     @Positive(message = "POSITIVE")
     int quantity;
 
-    @Positive(message = "POSITIVE")
+    @PositiveOrZero(message = "POSITIVE_OR_ZERO")
     double total;
 }

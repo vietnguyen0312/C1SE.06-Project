@@ -2,6 +2,7 @@ package com.example.Backend.service.Ticket;
 
 import com.example.Backend.dto.request.Ticket.TicketCreationRequest;
 import com.example.Backend.dto.request.Ticket.TicketUpdateRequest;
+import com.example.Backend.dto.response.MapEntryResponse;
 import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.dto.response.Ticket.TicketResponse;
 import com.example.Backend.entity.Service.ServiceEntity;
@@ -16,13 +17,11 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -41,27 +40,38 @@ public class TicketService {
         return ticketMapper.toResponse(savedTicket);
     }
 
-    public Map<ServiceResponse,List<TicketResponse>> getTickets(String search) {
-        Map<ServiceResponse,List<TicketResponse>> entityListHashMap = new LinkedHashMap<>();
+    public List<MapEntryResponse<ServiceResponse,List<TicketResponse>>> getTickets(String search) {
+        List<MapEntryResponse<ServiceResponse,List<TicketResponse>>> ticketMap = new ArrayList<>();
 
-        List<ServiceEntity> serviceEntities = serviceRepository.findByNameOrDescriptionContaining(search, search);
+        List<ServiceEntity> serviceEntities = serviceRepository
+                .findByNameOrDescriptionContaining(search, search, Sort.by(Sort.Direction.ASC, "name"));
 
         serviceEntities.forEach(serviceEntity -> {
+            Sort sort = Sort.by(Sort.Direction.DESC, "price");
             List<Ticket> tickets = ticketRepository
                     .findByServiceEntity_NameContainingAndServiceEntityIsOrServiceEntity_DescriptionContainingAndServiceEntityIs
-                            (search, serviceEntity, search, serviceEntity);
+                            (search, serviceEntity, search, serviceEntity, sort);
 
             if (!tickets.isEmpty())
-                entityListHashMap.put(serviceMapper.toResponse(serviceEntity),tickets.stream().map(ticketMapper::toResponse).toList());
+                ticketMap.add(MapEntryResponse.<ServiceResponse, List<TicketResponse>>builder()
+                                .key(serviceMapper.toResponse(serviceEntity))
+                                .value(tickets.stream().map(ticketMapper::toResponse).toList())
+                                .build());
         });
 
-        return entityListHashMap;
+        return ticketMap;
     }
 
-    public TicketResponse getTicketById(String id) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-        return ticketMapper.toResponse(ticket);
+    public MapEntryResponse<ServiceResponse,List<TicketResponse>> getTicketByIdService(String id) {
+        ServiceEntity serviceEntity = serviceRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED));
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "price");
+        List<Ticket> tickets = ticketRepository
+                .findByServiceEntityIs(serviceEntity, sort);
+        return MapEntryResponse.<ServiceResponse, List<TicketResponse>>builder()
+                .key(serviceMapper.toResponse(serviceEntity))
+                .value(tickets.stream().map(ticketMapper::toResponse).toList())
+                .build();
     }
 
     @PreAuthorize("hasRole('MANAGER')")

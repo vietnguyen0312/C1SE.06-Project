@@ -12,17 +12,17 @@ const StyledButton = styled.button`
   font-weight: bold;
   transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
   cursor: pointer;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background-color: black; /* Màu đậm hơn khi hover */
-    transform: translateY(-2px); /* Hiệu ứng nổi khi hover */
-    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15); /* Tăng độ đổ bóng khi hover */
+    background-color: black; 
+    transform: translateY(-2px); 
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15); 
   }
 
   &:active {
-    transform: translateY(0); /* Không hiệu ứng khi click */
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Đổ bóng bình thường */
+    transform: translateY(0); 
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
   }
     
   &:disabled {
@@ -33,10 +33,12 @@ const StyledButton = styled.button`
 
 const ButtonCPN = ({ text, onClick, type = "button", disabled = false,style }) => {
   return (
-    <StyledButton type={type} onClick={onClick} disabled={disabled} style={style}>
+    <StyledButton type={type} onClick={onClick} disabled={disabled} style={style} >
       {text}
+
     </StyledButton>
   );
 };
+
 
 export default ButtonCPN;

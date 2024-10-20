@@ -6,6 +6,7 @@ import com.example.Backend.dto.response.Bill.BillTicketResponse;
 import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.entity.Bill.BillTicket;
 import com.example.Backend.entity.User.User;
+import com.example.Backend.enums.RoleEnum;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Bill.BillTicketMapper;
@@ -24,6 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -32,15 +34,25 @@ import java.util.List;
 @Slf4j
 public class BillTicketService {
     BillTicketRepository billTicketRepository;
+    UserRepository userRepository;
     BillTicketMapper billTicketMapper;
 
     public BillTicketResponse createBillTicket(BillTicketCreationRequest request) {
         BillTicket billTicket = billTicketMapper.toBillTicket(request);
 
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new AppException(ErrorCode.NOT_EXISTED));
+
+        billTicket.setUser(user);
+
+        billTicket.setDatePay(Instant.now());
+
         return billTicketMapper.toBillTicketResponse(billTicketRepository.save(billTicket));
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
     public BillTicketResponse updateBillTicket(BillTicketUpdateRequest request, String id) {
         BillTicket billTicket = billTicketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
@@ -49,22 +61,24 @@ public class BillTicketService {
         return billTicketMapper.toBillTicketResponse(billTicketRepository.save(billTicket));
     }
 
-    @PostAuthorize("returnObject.user.email == authentication.name or hasRole('MANAGER')")
-    public PageResponse<BillTicketResponse> getBills(Boolean isCustomer, int page, int size) {
+    public PageResponse<BillTicketResponse> getBills(int page, int size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "datePay").ascending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Page<BillTicket> pageData;
 
-        if (isCustomer)
+        var context = SecurityContextHolder.getContext();
+        var isManager = context.getAuthentication().getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(RoleEnum.ROLE_MANAGER.name()));
+
+        if (isManager)
         {
-            var context = SecurityContextHolder.getContext();
+            pageData = billTicketRepository.findAll(pageable);
+        } else {
             String email = context.getAuthentication().getName();
 
             pageData = billTicketRepository.findByUser_Email(email, pageable);
-        } else {
-            pageData = billTicketRepository.findAll(pageable);
         }
 
         return PageResponse.<BillTicketResponse>builder()
@@ -76,7 +90,7 @@ public class BillTicketService {
                 .build();
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PostAuthorize("returnObject.user.email == authentication.name or hasRole('MANAGER')")
     public BillTicketResponse getBill(String id) {
         return billTicketMapper.toBillTicketResponse(billTicketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }

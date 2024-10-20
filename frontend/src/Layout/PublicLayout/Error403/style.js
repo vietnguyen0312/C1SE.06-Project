@@ -652,13 +652,6 @@ const Headline = styled.div`
   z-index: 4;   
   top: -140px;
 
-  h1 {
-    font-family: 'Permanent Marker', cursive;
-    color: #2b2b2b;
-    font-size: 8em;
-    margin: 0;
-  }
-
   h2 {
     font-family: 'Roboto Mono', monospace;
     font-size: 1.25em;

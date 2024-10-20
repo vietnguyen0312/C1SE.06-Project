@@ -22,7 +22,4 @@ public class Cart {
     @ManyToOne
     @JoinColumn(name = "user_id", unique = true)
     User user;
-
-    @Column(nullable = false)
-    double total;
 }

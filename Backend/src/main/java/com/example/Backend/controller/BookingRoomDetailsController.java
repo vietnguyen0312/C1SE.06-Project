@@ -3,6 +3,10 @@ package com.example.Backend.controller;
 import com.example.Backend.dto.request.Booking.BookingRoomDetailsRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Booking.BookingRoomDetailsResponse;
+import com.example.Backend.dto.response.MapEntryResponse;
+import com.example.Backend.dto.response.PageResponse;
+import com.example.Backend.dto.response.Room.RoomTypeResponse;
+import com.example.Backend.entity.Booking.BookingRoomDetails;
 import com.example.Backend.service.Booking.BookingRoomDetailsService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -52,11 +56,13 @@ public class BookingRoomDetailsController {
 
     // Lấy tất cả BookingRoomDetails
     @GetMapping
-    public ApiResponse<List<BookingRoomDetailsResponse>> getAllBookingRoomDetails() {
-        List<BookingRoomDetailsResponse> bookingRoomDetailsResponses = bookingRoomDetailsService
-                .getAllBookingRoomDetails();
-        return ApiResponse.<List<BookingRoomDetailsResponse>>builder()
-                .result(bookingRoomDetailsResponses)
+    public ApiResponse<PageResponse<BookingRoomDetailsResponse>> getAllBookingRoomDetails(
+            @RequestParam(value = "isCustomer",required = false, defaultValue = "false")Boolean isCustomer,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size
+    ) {
+        return ApiResponse.<PageResponse<BookingRoomDetailsResponse>>builder()
+                .result(bookingRoomDetailsService.getAllBookingRoomDetails(isCustomer, page, size))
                 .build();
     }
 
@@ -69,12 +75,10 @@ public class BookingRoomDetailsController {
 
     // Lấy danh sách BookingRoomDetails theo BookingRoom (tìm theo bookingRoomId)
     @GetMapping("/byBookingRoom/{bookingRoomId}")
-    public ApiResponse<List<BookingRoomDetailsResponse>> getBookingRoomDetailsByBookingRoom(
+    public ApiResponse<List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>>>getBookingRoomDetailsByBookingRoom(
             @PathVariable("bookingRoomId") String bookingRoomId) {
-        List<BookingRoomDetailsResponse> bookingRoomDetailsResponses = bookingRoomDetailsService
-                .getBookingRoomDetailsByBookingRoom(bookingRoomId);
-        return ApiResponse.<List<BookingRoomDetailsResponse>>builder()
-                .result(bookingRoomDetailsResponses)
+        return ApiResponse.<List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>>>builder()
+                .result(bookingRoomDetailsService.getBookingRoomDetailsByBookingRoom(bookingRoomId))
                 .build();
     }
 }

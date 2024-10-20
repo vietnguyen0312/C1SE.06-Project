@@ -4,6 +4,7 @@ import com.example.Backend.entity.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 
@@ -27,13 +28,16 @@ public class BillTicket {
     @Temporal(TemporalType.TIMESTAMP)
     Instant datePay;
 
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    Instant dateUse;
-
     @Column(nullable = false)
     double total;
 
     @Column(length = 50)
     String status;
+
+    @PrePersist
+    public void prePersist() {
+        if (!StringUtils.hasLength(status)) {
+            status = "Chưa thanh toán";
+        }
+    }
 }

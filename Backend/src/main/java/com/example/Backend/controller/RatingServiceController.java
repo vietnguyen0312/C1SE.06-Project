@@ -3,6 +3,7 @@ package com.example.Backend.controller;
 import com.example.Backend.dto.request.Rating.RateServiceCreationRequest;
 import com.example.Backend.dto.request.Rating.RateServiceUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
+import com.example.Backend.dto.response.MapEntryResponse;
 import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.Rating.RateServiceResponse;
 import com.example.Backend.service.Rating.RateServiceService;
@@ -13,7 +14,11 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.*;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Executor;
 
 @RestController
 @RequestMapping("/rate-services")
@@ -22,7 +27,6 @@ import java.util.List;
 @Slf4j
 public class RatingServiceController {
     RateServiceService rateServiceService;
-
     @PostMapping
     ApiResponse<RateServiceResponse> createRateService(@RequestBody @Valid RateServiceCreationRequest request){
         return ApiResponse.<RateServiceResponse>builder()
@@ -38,6 +42,13 @@ public class RatingServiceController {
     ){
         return ApiResponse.<PageResponse<RateServiceResponse>>builder()
                 .result(rateServiceService.getRateServices(idService,page,size))
+                .build();
+    }
+
+    @GetMapping("/get-AVG-Score/{serviceId}")
+    ApiResponse<Double> getAVGScoreByServiceEntity(@PathVariable(value = "serviceId") String idService) {
+        return ApiResponse.<Double>builder()
+                .result(rateServiceService.getAVGScoreByServiceEntity(idService))
                 .build();
     }
 

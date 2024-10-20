@@ -2,7 +2,13 @@ package com.example.Backend.service.Booking;
 
 import com.example.Backend.dto.request.Booking.BookingRoomCreationRequest;
 import com.example.Backend.dto.request.Booking.BookingRoomUpdateRequest;
+import com.example.Backend.dto.response.Bill.BillTicketResponse;
 import com.example.Backend.dto.response.Booking.BookingRoomResponse;
+import com.example.Backend.dto.response.MapEntryResponse;
+import com.example.Backend.dto.response.PageResponse;
+import com.example.Backend.dto.response.Room.RoomResponse;
+import com.example.Backend.dto.response.Room.RoomTypeResponse;
+import com.example.Backend.entity.Bill.BillTicket;
 import com.example.Backend.entity.Booking.BookingRoom;
 import com.example.Backend.entity.User.User;
 import com.example.Backend.exception.AppException;
@@ -15,6 +21,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,8 +50,30 @@ public class BookingRoomService {
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
 
-    public List<BookingRoomResponse> getBookingRooms() {
-        return bookingRoomRepository.findAll().stream().map(bookingRoomMapper::toBookingRoomResponse).toList();
+
+    @PostAuthorize("#isCustomer or hasRole('MANAGER')")
+    public PageResponse<BookingRoomResponse> getBookingRooms(Boolean isCustomer, int page, int size) {
+        Sort sort = Sort.by(Sort.Direction.DESC, "checkInDate").ascending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+        Page<BookingRoom> pageData;
+
+        if (isCustomer)
+        {
+            var context = SecurityContextHolder.getContext();
+            String email = context.getAuthentication().getName();
+
+            pageData = bookingRoomRepository.findByUser_Email(email, pageable);
+        } else {
+            pageData = bookingRoomRepository.findAll(pageable);
+        }
+
+        return PageResponse.<BookingRoomResponse>builder()
+                .totalPages(pageData.getTotalPages())
+                .pageSize(size)
+                .currentPage(page)
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.stream().map(bookingRoomMapper::toBookingRoomResponse).toList())
+                .build();
     }
 
     public BookingRoomResponse getBookingRoomById(String id) {
@@ -49,7 +81,7 @@ public class BookingRoomService {
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
+//    @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
     public BookingRoomResponse updateBookingRoom(String id, BookingRoomUpdateRequest request) {
         BookingRoom bookingRoom = bookingRoomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -70,4 +102,6 @@ public class BookingRoomService {
                 .map(bookingRoomMapper::toBookingRoomResponse)
                 .toList();
     }
+
+
 }
