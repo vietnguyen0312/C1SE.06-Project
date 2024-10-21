@@ -34,6 +34,7 @@ const Row = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
 `;
 
 export const AboutContent = styled.div`
@@ -44,7 +45,7 @@ export const AboutContent = styled.div`
 
 const Title = styled.h1`
   color: white;
-  font-size: 90px;
+  font-size: 50px;
   margin-bottom: 20px;
 `;
 
@@ -89,12 +90,13 @@ const ContainerDate = styled.div`
   justify-content: center;
   align-items: center;
   background-color: #f0f0f0;
-  width: 50%;
+  width: 90%;
   margin: auto;
   margin-top: 30px;
   margin-bottom: 30px;
   border-radius: 10px;
   user-select: none;
+  padding: 20px;
 `;
 
 const StyledDatePicker = styled(DatePicker)`
@@ -160,12 +162,44 @@ const Payment = styled.div`
   
 `;
 
+const RoomImageContainer = styled.div`
+  margin: 20px;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 10px;
+  background-color: ${props => props.isSelected ? '#fcfaf1' : '#fff'};
+  box-shadow: ${props => props.isSelected ? '0px 4px 12px rgba(0, 0, 0, 0.1)' : '0px 2px 6px rgba(0, 0, 0, 0.05)'};
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+  border: ${props => props.isSelected ? '2px solid #f8b600' : '1px solid #ddd'};
+`;
+
+const ImageRoom = styled.img`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  transition: transform 0.3s ease;
+  &:hover{
+    transform: scale(1.05);
+  }
+`;
+
+const RoomName = styled.p`
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 5px 0;
+  white-space: nowrap;
+`;
+
 const RoomImage = ({ imageUrl, name, onClick, isSelected }) => {
     return (
-        <div style={{ margin: '10px', textAlign: 'center', cursor: 'pointer', boxShadow: isSelected ? '0px 0px 10px #888888' : 'none' }} onClick={onClick}>
-            <img src={imageUrl} alt={name} style={{ width: '100px', height: '100px' }} />
-            <p>{name}</p>
-        </div>
+        <RoomImageContainer onClick={onClick} isSelected={isSelected}>
+            <ImageRoom src={imageUrl} alt={name} />
+            <RoomName>{name}</RoomName>
+        </RoomImageContainer>
     );
 };
 
