@@ -8,10 +8,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import axios from "../Configuration/AxiosConfig";
 import ButtonCPN from '../components/Button/Button';
 import RoomCard from '../components/RoomCard';
-import { Navigate } from "react-router-dom";
-import { format } from 'date-fns';
 import moment from 'moment-timezone';
-
+import { toast } from 'react-toastify';
 
 const Overlay = styled.div`
   position: absolute;
@@ -34,7 +32,6 @@ const Row = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-
 `;
 
 export const AboutContent = styled.div`
@@ -161,7 +158,6 @@ const Payment = styled.div`
   }
   
 `;
-
 const RoomImageContainer = styled.div`
   margin: 20px;
   padding: 15px;
@@ -173,7 +169,6 @@ const RoomImageContainer = styled.div`
   transition: box-shadow 0.3s ease, background-color 0.3s ease;
   border: ${props => props.isSelected ? '2px solid #f8b600' : '1px solid #ddd'};
 `;
-
 const ImageRoom = styled.img`
   width: 120px;
   height: 120px;
@@ -185,7 +180,6 @@ const ImageRoom = styled.img`
     transform: scale(1.05);
   }
 `;
-
 const RoomName = styled.p`
   font-size: 16px;
   font-weight: bold;
@@ -266,35 +260,20 @@ class BookingRoom extends Component {
             rooms_type: response.result,
             roomPrice: response.result.price,
         }, () => {
-            console.log("đầy là cảnh báo  " + this.state.rooms_type.name + " dsadsads");
             const index = this.state.roomTypes.findIndex(roomType => roomType.name === roomTypeName);
             if (index !== -1) {
-                console.log(`Room type "${roomTypeName}" là phần tử số ${index} của roomTypes.`);
                 this.setState({ activeRoomIndex: index });
             } else {
-                console.log(`Room type "${roomTypeName}" không có trong roomTypes.`);
                 this.setState({ activeRoomIndex: 0 });
             }
         });
-
     };
 
     fetchRoomTypes = async () => {
 
         const response = await axios.get("/room_type");
         this.setState({ roomTypes: response.result });
-
-
-        console.log(this.state.roomTypes);
         if (Array.isArray(response.result)) {
-
-            this.dynamicVariables = {};
-
-            this.state.roomTypes.forEach((roomType) => {
-                // Tạo biến động với tên "roomType_" và id của roomType
-                this.dynamicVariables[`${roomType.id}`] = roomType;
-            });
-
             response.result.forEach((roomType) => {
                 this.setState(prevState => ({
                     roomPiceList: {
@@ -307,10 +286,6 @@ class BookingRoom extends Component {
                     }
                 }));
             });
-
-
-
-
             this.setState({ sampleImages: response.result }, () => {
                 const selectedImage = this.state.sampleImages.find(img => img.id === this.state.roomId);
                 if (selectedImage) {
@@ -319,17 +294,17 @@ class BookingRoom extends Component {
             });
 
         } else {
-            console.error("Expected an array but got:", response.result);
+
             this.setState({ sampleImages: [] });
         }
 
     }
 
     fetchRoom = async (date, roomId) => {
-        const size = 7; // Số lượng phòng mỗi lần tải
+        const size = 7;
         const response = await axios.get(`/room/findByRoomType/${date}/${roomId}?page=${this.state.page}&size=${size}`);
         const newRooms = response.result.data;
-        console.log(response.result.data);
+
         const roomTypeName = this.state.rooms_type?.name;
 
         this.setState((prevState) => ({
@@ -346,18 +321,18 @@ class BookingRoom extends Component {
                     ...newRooms
                 ]
             }
-        }), () => { // Callback sau khi state được cập nhật
-            console.log("roomsByType sau khi cập nhật:", this.state.roomsByType);
-            console.log("pageRoomType sau khi cập nhật:", this.state.pageRoomType);
-        });
+        }));
     };
 
 
     calculateDays = (start, end) => {
         if (!start || !end) return 0;
         const diffInTime = end.getTime() - start.getTime();
-        const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
-        return diffInDays + 1;
+        let diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24));
+        if (diffInDays === 0) {
+            diffInDays = 1;
+        }
+        return diffInDays;
     };
 
     handleBookingClick = () => {
@@ -371,12 +346,18 @@ class BookingRoom extends Component {
             start.setHours(0, 0, 0, 0);
             end.setHours(0, 0, 0, 0);
             if (start < currentDate) {
-                alert('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại!');
+                toast.error('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại!');
+                // alert('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại!');
                 return;
             }
             if (end < start) {
-                alert('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu!');
+                toast.error('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu!');
+                // alert('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu!');
                 return;
+            }
+            if (start.getTime() === end.getTime()) {
+                toast.info('Khách sạn chúng tôi check-in: 14:00 check-out: 12:00 hôm sau');
+                toast.info('Hiện tại bạn đang chọn chỉ ở lại trong ngày');
             }
             this.setState({ showRoomSelection: true });
             const formattedDate = this.formatDate(startDate);
@@ -385,30 +366,61 @@ class BookingRoom extends Component {
             this.endDate = formattedDate1;
             this.handleRoomTypeSelect(this.state.activeRoomIndex); // Gọi fetchRoom với ngày đã định dạng
         } else {
-            alert('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!');
+            toast.error('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!');
+            // alert('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!');
         }
     };
 
     BookingRoom = async () => {
         const response = await axios.get('/users/myInfo');
         const user = response.result.id;
-        const now = moment.tz('Asia/Ho_Chi_Minh'); // Lấy thời gian hiện tại theo múi giờ 'Asia/Ho_Chi_Minh'
+        const now = moment.tz('Asia/Ho_Chi_Minh');
+        const checkInDate = moment(this.startDate).tz('Asia/Ho_Chi_Minh');
+        const checkOutDate = moment(this.endDate).tz('Asia/Ho_Chi_Minh');
 
-        const checkInDate = moment(this.startDate).set({
-            hour: now.hours(),
-            minute: now.minutes(),
-            second: now.seconds()
-        }).add(1, 'seconds').tz('Asia/Ho_Chi_Minh').format();  // Thêm 1 giây và định dạng lại
+        if (checkInDate.isSame(checkOutDate, 'day')) {
+            if (checkInDate.isSame(now, 'day')) {
+                checkInDate.set({
+                    hour: now.hour(),
+                    minute: now.minute(),
+                    second: now.second()
+                }).add(1, 'seconds');
+            } else {
+                checkInDate.set({
+                    hour: 5,
+                    minute: 0,
+                    second: 0
+                });
+            }
+            checkOutDate.set({
+                hour: 23,
+                minute: 59,
+                second: 59
+            }).tz('Asia/Ho_Chi_Minh').format();
+        }
+        else {
+            if (now.hour() < 14) {
+                checkInDate.set({
+                    hour: 14,
+                    minute: 0,
+                    second: 0
+                });
+            } else {
+                checkInDate.set({
+                    hour: now.hour(),
+                    minute: now.minute(),
+                    second: now.second()
+                }).add(1, 'seconds');
+            }
 
-        // Tạo checkOutDate với giờ phút hiện tại + thêm 1 giờ
-        const checkOutDate = moment(this.endDate).set({
-            hour: now.hours(),
-            minute: now.minutes(),
-            second: now.seconds()
-        }).add(1, 'seconds').tz('Asia/Ho_Chi_Minh').format();  // Thêm 1 giây và định dạng lại
+            checkOutDate.set({
+                hour: 12,
+                minute: 0,
+                second: 0
+            }).tz('Asia/Ho_Chi_Minh').format();
 
-        console.log(checkInDate);
-        console.log(checkOutDate);
+        }
+
         const response1 = await axios.post('booking_room', {
             userId: user,
             checkInDate: checkInDate,
@@ -416,16 +428,15 @@ class BookingRoom extends Component {
             total: this.state.totalPrice,
             status: 'chưa thanh toán'
         });
-        console.log(response1.result);
-        const gia = this.state.totalPrice / this.state.selectedRoomsDetails.length;
-        console.log(gia);
+
+
         for (const room of this.state.selectedRoomsDetails) {
-            const response2 = await axios.post('booking_room_details', {
+            await axios.post('booking_room_details', {
                 roomId: room.id,
                 bookingId: response1.result.id,
                 price: room.roomType.price * this.calculateDays(this.state.startDate, this.state.endDate)
             });
-            console.log(response2.result);
+
         }
         const paymentUrl = await axios.get('/payment/vn-pay', {
             params: {
@@ -439,18 +450,13 @@ class BookingRoom extends Component {
     handleRoomTypeSelect = async (index) => {
 
         const selectedRoomType = this.state.roomTypes[index];
-        console.log("RoomType được chọn:", selectedRoomType);
-        console.log(index);
 
         const formattedDate = this.formatDate(this.state.startDate);
-        console.log(formattedDate);
-        console.log(selectedRoomType.id);
 
-        // Gọi API để lấy dữ liệu phòng
         const page = this.state.pageRoomType[selectedRoomType.name];
-        console.log("page:", page);
+
         const response = await axios.get(`/room/findByRoomType/${formattedDate}/${selectedRoomType.id}?page=${page}&size=${7}`);
-        console.log("Response từ API:", response.result.data);
+
         const rooms = response.result.data;
 
         // Cập nhật state và sử dụng callback để đảm bảo state đã được cập nhật
@@ -474,9 +480,6 @@ class BookingRoom extends Component {
                 page: nextPage,
                 hasMore: hasMore
             };
-
-        }, () => {
-            console.log("roomsByType sau khi setState:", this.state.roomsByType);
 
         });
     }
@@ -538,14 +541,14 @@ class BookingRoom extends Component {
             // console.log(this.startDate);
             this.setupObserver()
         } else {
-            console.log("Phần tử cuối cùng hiện không tồn tại hoặc chưa được gán ref!");
+            // console.log("Phần tử cuối cùng hiện không tồn tại hoặc chưa được gán ref!");
         }
     }
 
     handleImageSelect = (imageId, index) => {
-        console.log("Selected image ID:", imageId); // Thêm dòng này để kiểm tra giá trị truyền vào
+
         this.setState({ selectedImage: imageId, activeRoomIndex: index });
-        console.log(this.state.activeRoomIndex);
+
         if (this.state.startDate !== null) {
             this.handleRoomTypeSelect(index);
         }
