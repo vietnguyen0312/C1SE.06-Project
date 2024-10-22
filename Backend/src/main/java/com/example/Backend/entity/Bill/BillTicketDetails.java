@@ -4,6 +4,7 @@ import com.example.Backend.entity.Ticket.Ticket;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.util.StringUtils;
 
 @Entity
 @Table(name = "bill_ticket_details")
@@ -30,4 +31,13 @@ public class BillTicketDetails {
 
     @Column(nullable = false)
     double total;
+
+    String status;
+
+    @PrePersist
+    public void prePersist() {
+        if (!StringUtils.hasLength(status)) {
+            status = "Chưa đánh giá";
+        }
+    }
 }

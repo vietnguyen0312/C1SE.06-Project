@@ -21,8 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -52,8 +54,8 @@ public class BillTicketDetailsService {
         return billTicketDetailsMapper.toBillTicketDetailsResponse(billTicketDetailsRepository.save(billTicketDetails));
     }
 
-    public List<MapEntryResponse<ServiceResponse,List<BillTicketDetailsResponse>>> getBillTicketDetailsByBillTicket(String idBillTicket) {
-        List<MapEntryResponse<ServiceResponse,List<BillTicketDetailsResponse>>> billTicketDetailsMap = new LinkedList<>();
+    public List<MapEntryResponse<ServiceResponse,MapEntryResponse<String, List<BillTicketDetailsResponse>>>> getBillTicketDetailsByBillTicket(String idBillTicket) {
+        List<MapEntryResponse<ServiceResponse,MapEntryResponse<String, List<BillTicketDetailsResponse>>>> billTicketDetailsMap = new LinkedList<>();
 
         List<BillTicketDetails> billTicketDetailsList = billTicketDetailsRepository.findByBillTicket_Id
                 (idBillTicket, Sort.by(Sort.Direction.ASC, "ticket_serviceEntity_name"));
@@ -68,11 +70,15 @@ public class BillTicketDetailsService {
             List<BillTicketDetails> billTicketDetails = billTicketDetailsRepository
                     .findByBillTicket_IdAndTicket_ServiceEntity(idBillTicket, serviceEntity, sort);
 
-            if (!billTicketDetails.isEmpty())
-                billTicketDetailsMap.add(MapEntryResponse.<ServiceResponse, List<BillTicketDetailsResponse>>builder()
+            if (!billTicketDetails.isEmpty()) {
+                billTicketDetailsMap.add(MapEntryResponse.<ServiceResponse, MapEntryResponse<String, List<BillTicketDetailsResponse>>>builder()
                         .key(serviceMapper.toResponse(serviceEntity))
-                        .value(billTicketDetails.stream().map(billTicketDetailsMapper::toBillTicketDetailsResponse).toList())
+                        .value(MapEntryResponse.<String, List<BillTicketDetailsResponse>>builder()
+                                .key(billTicketDetails.getFirst().getStatus())
+                                .value(billTicketDetails.stream().map(billTicketDetailsMapper::toBillTicketDetailsResponse).toList())
+                                .build())
                         .build());
+            }
         });
 
         return billTicketDetailsMap;

@@ -16,4 +16,5 @@ public class BillTicketDetailsResponse {
     Ticket ticket;
     int quantity;
     double total;
+    String status;
 }

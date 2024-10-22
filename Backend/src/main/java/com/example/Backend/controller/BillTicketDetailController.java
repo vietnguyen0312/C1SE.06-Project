@@ -34,10 +34,10 @@ public class BillTicketDetailController {
     }
 
     @GetMapping("/get-by-bill/{id}")
-    ApiResponse<List<MapEntryResponse<ServiceResponse,List<BillTicketDetailsResponse>>>> getBillTicketDetailsByBill(
+    ApiResponse<List<MapEntryResponse<ServiceResponse,MapEntryResponse<String, List<BillTicketDetailsResponse>>>>> getBillTicketDetailsByBill(
             @PathVariable("id")String id) {
         billTicketService.getBill(id);
-        return ApiResponse.<List<MapEntryResponse<ServiceResponse,List<BillTicketDetailsResponse>>>>builder()
+        return ApiResponse.<List<MapEntryResponse<ServiceResponse,MapEntryResponse<String, List<BillTicketDetailsResponse>>>>>builder()
                 .result(billTicketDetailsService.getBillTicketDetailsByBillTicket(id))
                 .build();
     }
