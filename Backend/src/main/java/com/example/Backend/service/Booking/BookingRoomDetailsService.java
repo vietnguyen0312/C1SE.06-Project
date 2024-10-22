@@ -49,14 +49,14 @@ public class BookingRoomDetailsService {
         public BookingRoomDetailsResponse createBookingRoomDetails(BookingRoomDetailsRequest request) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsMapper.toBookingRoomDetails(request);
                 Room room = roomRepository.findById(request.getRoomId())
-                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
                 BookingRoom bookingRoom = bookingRoomRepository.findById(request.getBookingId())
-                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
                 bookingRoomDetails.setRoom(room);
                 bookingRoomDetails.setBookingRoom(bookingRoom);
                 bookingRoomDetails.setPrice(request.getPrice());
                 return bookingRoomDetailsMapper
-                                .toBookingRoomDetailsResponse(bookingRoomDetailsRepository.save(bookingRoomDetails));
+                        .toBookingRoomDetailsResponse(bookingRoomDetailsRepository.save(bookingRoomDetails));
         }
 
         @PostAuthorize("#isCustomer or hasRole('MANAGER')")
@@ -86,11 +86,11 @@ public class BookingRoomDetailsService {
 
         public BookingRoomDetailsResponse getBookingRoomDetailsById(String id) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
-                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
                 return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(bookingRoomDetails);
         }
 
-        @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE','EMPLOYER')")
+        @PreAuthorize("hasRole('MANAGER')")
         public void deleteBookingRoomDetails(String id) {
                 if (!bookingRoomDetailsRepository.existsById(id)) {
                         throw new AppException(ErrorCode.NOT_EXISTED);
@@ -101,21 +101,21 @@ public class BookingRoomDetailsService {
 
         public List<BookingRoomDetailsResponse> getBookingRoomDetailsByBookingRoom1(String bookingRoomId) {
                 BookingRoom bookingRoom = bookingRoomRepository.findById(bookingRoomId)
-                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
                 return bookingRoomDetailsRepository.findAllByBookingRoom(bookingRoom).stream()
-                                .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
-                                .toList();
+                        .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
+                        .toList();
         }
 
-        @PreAuthorize("hasAnyRole('MANAGER','EMPLOYEE' ,'EMPLOYER')")
+        @PreAuthorize("hasRole('EMPLOYEE')")
         public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDetailsRequest request) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
-                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
                 Room room = roomRepository.findById(request.getRoomId())
-                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
                 BookingRoom bookingRoom = bookingRoomRepository.findById(request.getBookingId())
-                                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
                 bookingRoomDetails.setRoom(room);
                 bookingRoomDetails.setBookingRoom(bookingRoom);
                 bookingRoomDetails.setPrice(request.getPrice());
@@ -126,27 +126,22 @@ public class BookingRoomDetailsService {
         public List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> getBookingRoomDetailsByBookingRoom(String bookingRoomId) {
                 List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> bookingRoomDetailsMap = new LinkedList<>();
 
-                // Lấy danh sách chi tiết phòng đã đặt
                 List<BookingRoomDetails> bookingRoomDetailsList = bookingRoomDetailsRepository.findByBookingRoom_Id(
                         bookingRoomId, Sort.by(Sort.Direction.DESC, "room_roomType_name"));
 
-                // Sử dụng một Map để nhóm BookingRoomDetails theo RoomType
                 Map<RoomType, List<BookingRoomDetails>> roomTypeMap = new HashMap<>();
 
                 for (BookingRoomDetails bookingDetail : bookingRoomDetailsList) {
                         Room room = bookingDetail.getRoom();
                         RoomType roomType = room.getRoomType();
 
-                        // Nếu RoomType chưa có trong Map, thêm vào
                         if (!roomTypeMap.containsKey(roomType)) {
                                 roomTypeMap.put(roomType, new ArrayList<>());
                         }
 
-                        // Thêm BookingRoomDetails vào danh sách tương ứng với RoomType
                         roomTypeMap.get(roomType).add(bookingDetail);
                 }
 
-                // Chuyển đổi Map thành danh sách kết quả
                 roomTypeMap.forEach((roomType, details) -> {
                         bookingRoomDetailsMap.add(
                                 MapEntryResponse.<RoomTypeResponse, List<BookingRoomDetails>>builder()
