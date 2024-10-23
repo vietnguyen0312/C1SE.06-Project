@@ -8,7 +8,7 @@ import { Client } from "@stomp/stompjs";
 import { Link } from "react-router-dom";
 import SockJS from "sockjs-client/dist/sockjs";
 import { Heart, Share2, ArrowRight } from "lucide-react";
-import { toast } from 'react-toastify'; // Import thư viện thông báo
+import { toast } from "react-toastify"; // Import thư viện thông báo
 
 const BannerSection = styled.section`
   background-image: url("/img/blog/tintuc.jpg");
@@ -322,7 +322,7 @@ const CollapseLink = styled.a`
   cursor: pointer;
   font-size: ${(props) => props.theme.fontSizes.small};
   margin-top: 10px;
-  margin-left: 50px; 
+  margin-left: 50px;
 
   &:hover {
     text-decoration: underline;
@@ -389,101 +389,100 @@ const BlogDetail = () => {
   const stompClient = useRef(null);
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedCommentContent, setEditedCommentContent] = useState("");
-  const client = useRef(null); 
+  const client = useRef(null);
 
-  
   const fetchUser = async () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
-        const response = await axios.get('/users/myInfo');
-        setUser(response.result); 
-
+      const response = await axios.get("/users/myInfo");
+      setUser(response.result);
     }
   };
-   
-   
+
   const loadMoreComments = async () => {
-    setCurrentPage(currentPage + 1); 
-    const newComments = await fetchComments(id); 
-    setComments(prevComments => [...prevComments, ...newComments]); 
+    setCurrentPage(currentPage + 1);
+    const newComments = await fetchComments(id);
+    setComments((prevComments) => [...prevComments, ...newComments]);
   };
 
- 
   const resetComments = async () => {
-    setComments([]); 
-    setCurrentPage(2); 
-    setTotalElements(0); 
+    setComments([]);
+    setCurrentPage(2);
+    setTotalElements(0);
     setTotalPages(0);
 
-    const newComments = await firtcomment(id); 
-    setComments(newComments); 
-};
-
+    const newComments = await firtcomment(id);
+    setComments(newComments);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
-      fetchUser(); 
+      fetchUser();
       const { blog, images } = await getBlogWithImages(id);
       loadMoreComments();
       setPost(blog);
-      setImages(images);     
+      setImages(images);
     };
 
     fetchData();
   }, [id]);
-  
+
   useEffect(() => {
-  
-    const socket = new SockJS('http://localhost:8080/ws');
+    const socket = new SockJS("http://localhost:8080/ws");
     stompClient.current = new Client({
       webSocketFactory: () => socket,
-      reconnectDelay: 5000, 
+      reconnectDelay: 5000,
       debug: (str) => console.log(str),
-    })
-    
+    });
+
     stompClient.current.onConnect = () => {
-      console.log('Connected to WebSocket server');
-  
-      stompClient.current.subscribe('/topic/comments', (message) => {
-        console.log('Received comment:', message.body);
+      console.log("Connected to WebSocket server");
+
+      stompClient.current.subscribe("/topic/comments", (message) => {
+        console.log("Received comment:", message.body);
         const newCommentData = JSON.parse(message.body);
-  
-        if (newCommentData.type === 'CREATE') {
-          const newComment = newCommentData.comment; 
-          setComments(prevComments => [newComment, ...prevComments]); 
-        }
-        else if (newCommentData.type === 'DELETE') {
+
+        if (newCommentData.type === "CREATE") {
+          const newComment = newCommentData.comment;
+          setComments((prevComments) => [newComment, ...prevComments]);
+        } else if (newCommentData.type === "DELETE") {
           const deletedCommentId = newCommentData.comment.id;
-          setComments(prevComments => prevComments.filter(comment => comment.id !== deletedCommentId));
-          toast.success('Bình luận đã được xóa thành công');
-        }
-        else if (newCommentData.type === 'UPDATE') {
+          setComments((prevComments) =>
+            prevComments.filter((comment) => comment.id !== deletedCommentId)
+          );
+          toast.success("Bình luận đã được xóa thành công");
+        } else if (newCommentData.type === "UPDATE") {
           const updatedComment = newCommentData.comment;
-          setComments(prevComments => prevComments.map(comment => comment.id === updatedComment.id ? updatedComment : comment));
-          toast.success('Bình luận đã được cập nhật thành công');
-        }else {
-          toast.error('Lỗi bình luận');
+          setComments((prevComments) =>
+            prevComments.map((comment) =>
+              comment.id === updatedComment.id ? updatedComment : comment
+            )
+          );
+          toast.success("Bình luận đã được cập nhật thành công");
+        } else {
+          toast.error("Lỗi bình luận");
         }
       });
     };
     stompClient.current.onStompError = (frame) => {
-      console.error(`Broker reported error: ${frame.headers['message']}`);
+      console.error(`Broker reported error: ${frame.headers["message"]}`);
       console.error(`Additional details: ${frame.body}`);
-     
     };
 
-    stompClient.current.activate(); 
+    stompClient.current.activate();
     return () => {
       if (stompClient.current) {
-        stompClient.current.deactivate(); 
+        stompClient.current.deactivate();
       }
     };
   }, []);
   const getBlogWithImages = async (blogId) => {
     const blogResponse = await axios.get(`/blogs/${blogId}`);
 
-    const imagesResponse = await axios.get(`/images/findImagesByBlog/${blogId}`);
-    
+    const imagesResponse = await axios.get(
+      `/images/findImagesByBlog/${blogId}`
+    );
+
     return {
       blog: blogResponse.result,
       images: imagesResponse.result.map((img) => `/img/blog/${img.image}`),
@@ -491,64 +490,62 @@ const BlogDetail = () => {
   };
 
   const fetchComments = async (postId) => {
-        const params = {
-          page: currentPage ,
-          size: pageSize,
-      };
+    const params = {
+      page: currentPage,
+      size: pageSize,
+    };
 
-      const commentsResponse = await axios.get(`/blogComments/byBlog/${postId}`, { params });
+    const commentsResponse = await axios.get(`/blogComments/byBlog/${postId}`, {
+      params,
+    });
 
-      setTotalElements(commentsResponse.result.totalElements);
+    setTotalElements(commentsResponse.result.totalElements);
 
-      setTotalPages(commentsResponse.result.totalPages);
+    setTotalPages(commentsResponse.result.totalPages);
 
-      return commentsResponse.result.data || [];
-
+    return commentsResponse.result.data || [];
   };
-
 
   const firtcomment = async (postId) => {
     const params = {
-      page: 1 ,
+      page: 1,
       size: pageSize,
-  };
-  const commentsResponse = await axios.get(`/blogComments/byBlog/${postId}`, { params });
-  setTotalElements(commentsResponse.result.totalElements);
-  setTotalPages(commentsResponse.result.totalPages);
-  return commentsResponse.result.data || [];
-
+    };
+    const commentsResponse = await axios.get(`/blogComments/byBlog/${postId}`, {
+      params,
+    });
+    setTotalElements(commentsResponse.result.totalElements);
+    setTotalPages(commentsResponse.result.totalPages);
+    return commentsResponse.result.data || [];
   };
   const submitComment = async (commentData) => {
-        
-        const response = await axios.post('/blogComments', commentData);
-        return response.result;
+    const response = await axios.post("/blogComments", commentData);
+    return response.result;
   };
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    
-    if (commentContent.trim() === '' || !user) {
-        console.warn("User hoặc commentContent null");
-        return; 
+
+    if (commentContent.trim() === "" || !user) {
+      console.warn("User hoặc commentContent null");
+      return;
     }
 
     const newComment = {
-        userId: user.id,
-        blogId: id,
-        comment: commentContent,
+      userId: user.id,
+      blogId: id,
+      comment: commentContent,
     };
 
-        const comment = await submitComment(newComment); 
-        setComments(prevComments => [comment, ...prevComments]); 
-        setCommentContent(''); 
-
-};
+    const comment = await submitComment(newComment);
+    setComments((prevComments) => [comment, ...prevComments]);
+    setCommentContent("");
+  };
   const handleDeleteComment = async (commentId) => {
     await axios.delete(`/blogComments/${commentId}`);
     setComments((prevComments) =>
       prevComments.filter((comment) => comment.id !== commentId)
     );
-
   };
 
   const handleEditComment = (comment) => {
@@ -707,14 +704,18 @@ const BlogDetail = () => {
                                 <ActionButton
                                   onClick={() => handleEditComment(comment)}
                                 >
-                                  {comment.user && comment.user.id === user?.id ? 'Sửa' : null}
+                                  {comment.user && comment.user.id === user?.id
+                                    ? "Sửa"
+                                    : null}
                                 </ActionButton>
                                 <ActionButton
                                   onClick={() =>
                                     handleDeleteComment(comment.id)
                                   }
                                 >
-                                  {comment.user && comment.user.id === user?.id ? 'Xóa' : null}
+                                  {comment.user && comment.user.id === user?.id
+                                    ? "Xóa"
+                                    : null}
                                 </ActionButton>
                               </CommentFooter>
                             </CommentContainer>

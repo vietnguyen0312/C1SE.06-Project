@@ -30,6 +30,9 @@ public class RateServiceCreationRequest {
 
     String comment;
 
+    @NotNull
+    String billTicketDetailId;
+
     @Builder.Default
     Instant dateUpdate = Instant.now();
 }

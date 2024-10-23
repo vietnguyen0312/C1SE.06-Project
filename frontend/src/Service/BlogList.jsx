@@ -339,14 +339,12 @@ export class BlogList extends Component {
     let responseBlogs;
     let blogsWithImages = [];
 
-    // Xây dựng URL API theo các tham số
     const params = {
       page: currentPage,
       size: pageSize,
       search: searchTerm || null,
     };
 
-    // Gọi API theo `blogTypeId` nếu có, nếu không gọi API toàn bộ blogs
     if (filterByBlogTypeId) {
       responseBlogs = await axios.get(`/blogs/findByBlogType/${filterByBlogTypeId}`, { params });
     } else {
@@ -357,7 +355,6 @@ export class BlogList extends Component {
       responseBlogs.result.data = responseBlogs.result.data.slice(0, limit);
     }
 
-    // Lấy hình ảnh cho mỗi blog
     blogsWithImages = await Promise.all(
       responseBlogs.result.data.map(async (blog) => {
         const imageResponse = await axios.get(`/images/findImagesByBlog/${blog.id}`);
@@ -366,7 +363,7 @@ export class BlogList extends Component {
           : [];
         return {
           ...blog,
-          images: images || [], // Đảm bảo `images` luôn là một mảng
+          images: images || [], 
         };
       })
     );
@@ -387,7 +384,6 @@ export class BlogList extends Component {
   };
 
   handleSearch = () => {
-    // Gọi lại API để tìm kiếm
     this.setState({ currentPage: 1 }, this.getBlogs);
   };
 
