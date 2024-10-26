@@ -11,7 +11,7 @@ import com.example.Backend.mapper.Blog.BlogMapper;
 import com.example.Backend.repository.Blog.BlogRepository;
 import com.example.Backend.repository.Blog.BlogTypeRepository;
 import com.example.Backend.repository.User.UserRepository;
-import com.example.Backend.service.DateTimeFormatter;
+import com.example.Backend.components.DateTimeFormatter;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

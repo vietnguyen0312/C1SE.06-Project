@@ -16,14 +16,7 @@ import java.time.Instant;
 public class BillTicketResponse {
     String id;
     User user;
-    Instant datePay;
+    Instant dateCreated;
     double total;
     String status;
-
-    @PrePersist
-    public void prePersist() {
-        if (!StringUtils.hasLength(status)) {
-            status = "Đã thanh toán";
-        }
-    }
 }

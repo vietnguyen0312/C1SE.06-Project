@@ -26,7 +26,7 @@ public class BillTicket {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    Instant datePay;
+    Instant dateCreated;
 
     @Column(nullable = false)
     double total;

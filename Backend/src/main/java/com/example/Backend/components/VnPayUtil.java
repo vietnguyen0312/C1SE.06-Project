@@ -1,6 +1,7 @@
-package com.example.Backend.repository;
+package com.example.Backend.components;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

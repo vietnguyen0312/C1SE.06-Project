@@ -33,11 +33,6 @@ public class CustomerTypeService {
         return customerTypeMapper.toCustomerTypeResponse(customerTypeRepository.save(customerType));
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
-    public void deleteCustomerType(String id) {
-        customerTypeRepository.deleteById(id);
-    }
-
     @PreAuthorize("hasRole('EMPLOYEE')")
     public List<CustomerType> getAllCustomerTypes() {
         return customerTypeRepository.findAll();

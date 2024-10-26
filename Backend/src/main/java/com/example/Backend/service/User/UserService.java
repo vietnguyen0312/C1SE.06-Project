@@ -4,7 +4,6 @@ import com.example.Backend.dto.request.User.UserChangePasswordRequest;
 import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.User.UserResponse;
-import com.example.Backend.entity.Cart.Cart;
 import com.example.Backend.entity.User.Role;
 import com.example.Backend.entity.User.User;
 import com.example.Backend.enums.CustomerTypeEnum;
@@ -12,9 +11,7 @@ import com.example.Backend.enums.RoleEnum;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.User.UserMapper;
-import com.example.Backend.repository.Cart.CartRepository;
 import com.example.Backend.repository.User.CustomerTypeRepository;
-import com.example.Backend.repository.User.RoleRepository;
 import com.example.Backend.repository.User.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +23,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -37,11 +33,9 @@ import java.util.List;
 @Slf4j
 public class UserService {
     UserRepository userRepository;
-    CartRepository cartRepository;
     CustomerTypeRepository customerTypeRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
-
 
     public UserResponse createUser(UserCreationRequest request) {
 
@@ -60,10 +54,6 @@ public class UserService {
 
         try {
             user = userRepository.save(user);
-            cartRepository.save(Cart.builder()
-                    .user(user)
-                    .build());
-
         } catch (DataIntegrityViolationException exception) {
             throw new AppException(ErrorCode.EXISTED);
         }
@@ -109,10 +99,6 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
         return userMapper.toUserResponse(userRepository.save(user));
-    }
-
-    public void deleteUser(String id) {
-        userRepository.deleteById(id);
     }
 
 }

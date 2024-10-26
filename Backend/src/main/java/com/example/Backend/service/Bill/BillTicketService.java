@@ -21,12 +21,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +46,7 @@ public class BillTicketService {
 
         billTicket.setUser(user);
 
-        billTicket.setDatePay(Instant.now());
+        billTicket.setDateCreated(Instant.now());
 
         return billTicketMapper.toBillTicketResponse(billTicketRepository.save(billTicket));
     }
@@ -62,7 +60,7 @@ public class BillTicketService {
     }
 
     public PageResponse<BillTicketResponse> getBills(int page, int size) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "datePay").ascending();
+        Sort sort = Sort.by(Sort.Direction.DESC, "dateCreated").ascending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 

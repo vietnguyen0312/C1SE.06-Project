@@ -21,10 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -43,13 +41,8 @@ public class BillTicketDetailsService {
         billTicketDetails.setBillTicket(billTicketRepository.findById(request.getIdBillTicket())
                 .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
 
-        Ticket ticket = ticketRepository.findById(request.getIdTicket())
-                .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED));
-
-        ticket.setQuantity(ticket.getQuantity() - request.getQuantity());
-        ticketRepository.save(ticket);
-
-        billTicketDetails.setTicket(ticket);
+        billTicketDetails.setTicket(ticketRepository.findById(request.getIdTicket())
+                .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
 
         return billTicketDetailsMapper.toBillTicketDetailsResponse(billTicketDetailsRepository.save(billTicketDetails));
     }

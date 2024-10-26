@@ -1,4 +1,4 @@
-package com.example.Backend.service;
+package com.example.Backend.components;
 
 import org.springframework.stereotype.Component;
 
@@ -9,7 +9,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
-
 
 @Component
 public class DateTimeFormatter {

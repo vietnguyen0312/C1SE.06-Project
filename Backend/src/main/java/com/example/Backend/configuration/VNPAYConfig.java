@@ -1,6 +1,6 @@
 package com.example.Backend.configuration;
 
-import com.example.Backend.repository.VnPayUtil;
+import com.example.Backend.components.VnPayUtil;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

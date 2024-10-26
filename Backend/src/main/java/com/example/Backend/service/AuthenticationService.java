@@ -114,15 +114,15 @@ public class AuthenticationService {
                             .description(RoleEnum.ROLE_CUSTOMER.getDescription())
                             .build());
                     CustomerType customerType = customerTypeRepository.findByName(CustomerTypeEnum.BRONZE.getName());
-                    User newUser = userRepository.save(User.builder()
+                    var newUser = userRepository.save(User.builder()
                             .email(userInfo.getEmail())
                             .username(userInfo.getName())
                             .customerType(customerType)
                             .roles(roles)
                             .build());
                     cartRepository.save(Cart.builder()
-                            .user(newUser)
-                            .build());
+                                .user(newUser)
+                                .build());
                     return newUser;
                 });
 

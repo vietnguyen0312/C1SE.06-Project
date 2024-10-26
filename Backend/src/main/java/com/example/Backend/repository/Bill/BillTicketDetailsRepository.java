@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface BillTicketDetailsRepository extends JpaRepository<BillTicketDetails, String> {
+    List<BillTicketDetails> findByBillTicket_Id(String id);
+
     List<BillTicketDetails> findByBillTicket_Id(String id, Sort sort);
 
     List<BillTicketDetails> findByBillTicket_IdAndTicket_ServiceEntity(String idBillTicket, ServiceEntity serviceEntity, Sort sort);

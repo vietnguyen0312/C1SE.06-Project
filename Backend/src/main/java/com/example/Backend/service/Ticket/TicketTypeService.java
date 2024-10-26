@@ -56,11 +56,4 @@ public class TicketTypeService {
         TicketType updatedTicketType = ticketTypeRepository.save(ticketType);
         return ticketTypeMapper.toResponse(updatedTicketType);
     }
-
-    @PreAuthorize("hasRole('MANAGER')")
-    public void deleteTicketType(String id) {
-        TicketType ticketType = ticketTypeRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-        ticketTypeRepository.delete(ticketType);
-    }
 }

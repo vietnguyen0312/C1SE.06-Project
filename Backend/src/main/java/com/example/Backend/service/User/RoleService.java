@@ -40,9 +40,4 @@ public class RoleService {
                 .map(roleMapper::toRoleResponse)
                 .toList();
     }
-
-    @PreAuthorize("hasRole('MANAGER')")
-    public void delete(String role) {
-        roleRepository.deleteById(role);
-    }
 }

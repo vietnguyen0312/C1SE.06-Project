@@ -75,13 +75,6 @@ public class TicketService {
     }
 
     @PreAuthorize("hasRole('MANAGER')")
-    public void deleteTicket(String id) {
-        Ticket ticket = ticketRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-        ticketRepository.delete(ticket);
-    }
-
-    @PreAuthorize("hasRole('MANAGER')")
     public TicketResponse updateTicket(TicketUpdateRequest request, String id) {
         Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         ticketMapper.updateTicket(ticket, request);

@@ -1,7 +1,7 @@
 package com.example.Backend.service;
 
 import com.example.Backend.configuration.VNPAYConfig;
-import com.example.Backend.repository.VnPayUtil;
+import com.example.Backend.components.VnPayUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
