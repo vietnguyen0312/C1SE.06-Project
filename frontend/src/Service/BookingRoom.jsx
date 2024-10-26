@@ -10,7 +10,7 @@ import ButtonCPN from '../components/Button/Button';
 import RoomCard from '../components/RoomCard';
 import moment from 'moment-timezone';
 import { toast } from 'react-toastify';
-
+import { ClipLoader } from 'react-spinners';
 const Overlay = styled.div`
   position: absolute;
   top: 0;
@@ -186,6 +186,43 @@ const RoomName = styled.p`
   color: #333;
   margin: 5px 0;
   white-space: nowrap;
+`;
+
+const RoomDetailContainer = styled.div`
+    background-color: #f9f9f9;
+    padding: 20px;
+    padding-top: 30px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    width: 270px;
+    margin: 10px;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.6;
+    position: relative;
+`;
+
+const RoomDetailItem = styled.div`
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+`;
+
+const NoteText = styled.span`
+    font-weight: bold;
+    color: ${props => (props.isSameDayStay ? 'green' : '#555')};
+`;
+
+const DeleteIcon = styled.span`
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    cursor: pointer;
+    color: red;
+    font-size: 18px;
+    &:hover {
+        color: black;
+    }
 `;
 
 const RoomImage = ({ imageUrl, name, onClick, isSelected }) => {
@@ -777,8 +814,8 @@ class BookingRoom extends Component {
     }
 
     render() {
-        const { startDate, endDate, showRoomSelection, totalPrice, rooms_type, roomPrice, selectedRooms, currentRoomDetails, selectedImage, sampleImages, roomTypes, activeRoomIndex } = this.state;
-
+        const { startDate, endDate, showRoomSelection, totalPrice, rooms_type, roomPrice, selectedRooms, currentRoomDetails, selectedImage, sampleImages, roomTypes, activeRoomIndex, isLoading } = this.state;
+        
         return (
             <>
                 <BannerSectionHotels>
@@ -884,25 +921,28 @@ class BookingRoom extends Component {
                                 </div>
                                 {currentRoomDetails.length > 0 && (
                                     <div>
-                                        <h3>Thông tin các phòng đã chọn:</h3>
-                                        {currentRoomDetails.map((roomDetail, index) => {
-                                            const formattedPrice = this.formatCurrency(roomDetail.roomType.price);
-                                            const checkInDate = this.formatDateUI(roomDetail.checkIn);
-                                            const checkOutDate = this.formatDateUI(roomDetail.checkOut);
-                                            const isSameDayStay = checkInDate === checkOutDate; // Kiểm tra ngày check-in và check-out có giống nhau không
+                                        <h3 style={{display: 'flex', justifyContent: 'center',alignItems: 'center', margin: '10px 0'}}>Thông tin các phòng đã chọn</h3>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', margin: '0 10px' }}>
+                                            {currentRoomDetails.map((roomDetail, index) => {
+                                                const formattedPrice = this.formatCurrency(roomDetail.roomType.price);
+                                                const checkInDate = this.formatDateUI(roomDetail.checkIn);
+                                                const checkOutDate = this.formatDateUI(roomDetail.checkOut);
+                                                const isSameDayStay = checkInDate === checkOutDate; // Kiểm tra ngày check-in và check-out có giống nhau không
 
-                                            return (
-                                                <p key={index}>
-                                                    Số phòng: {roomDetail.roomNumber},
-                                                    Giá: {formattedPrice},
-                                                    Check-in: {checkInDate},
-                                                    Check-out: {checkOutDate},
-                                                    Ghi chú: {isSameDayStay ? "Ở lại trong ngày" : "không có"}
-                                                    <span style={{ cursor: 'pointer', color: 'red', marginLeft: '10px' }}
-                                                        onClick={() => this.handlePriceClick(roomDetail)}>X</span>
-                                                </p>
-                                            );
-                                        })}
+                                                return (
+                                                    <RoomDetailContainer key={index}>
+                                                        <DeleteIcon onClick={() => this.handlePriceClick(roomDetail)}>X</DeleteIcon>
+                                                        <RoomDetailItem>Số phòng: <span>{roomDetail.roomNumber}</span></RoomDetailItem>
+                                                        <RoomDetailItem>Giá: <span>{formattedPrice}</span></RoomDetailItem>
+                                                        <RoomDetailItem>Check-in: <span>{checkInDate}</span></RoomDetailItem>
+                                                        <RoomDetailItem>Check-out: <span>{checkOutDate}</span></RoomDetailItem>
+                                                        <RoomDetailItem>
+                                                            Ghi chú: <NoteText isSameDayStay={isSameDayStay}>{isSameDayStay ? "Ở lại trong ngày" : "không có"}</NoteText>
+                                                        </RoomDetailItem>
+                                                    </RoomDetailContainer>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 )}
                                 <Payment>
