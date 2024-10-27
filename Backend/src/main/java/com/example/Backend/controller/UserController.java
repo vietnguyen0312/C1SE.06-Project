@@ -71,13 +71,4 @@ public class UserController {
                 .result(userService.changePassword(id, request))
                 .build();
     }
-
-    @DeleteMapping("/{id}")
-    ApiResponse<String> deleteUser(@PathVariable("id") String id) {
-        userService.deleteUser(id);
-        return ApiResponse
-                .<String>builder()
-                .result("User has been deleted")
-                .build();
-    }
 }

@@ -211,28 +211,34 @@ public class AuthenticationService {
                 .build();
     }
 
-    private String generateToken(User user) {
-        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+    public String generateToken(User user) {
+        if ("Bị khoá".equals(user.getStatus())){
+            throw new AppException(ErrorCode.LOCKED);
+        }
+        else
+        {
+            JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(user.getEmail())
-                .issuer("HE.com")
-                .issueTime(new Date())
-                .expirationTime(new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
-                .jwtID(UUID.randomUUID().toString())
-                .claim("scope", buildScope(user))
-                .build();
+            JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                    .subject(user.getEmail())
+                    .issuer("HE.com")
+                    .issueTime(new Date())
+                    .expirationTime(new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
+                    .jwtID(UUID.randomUUID().toString())
+                    .claim("scope", buildScope(user))
+                    .build();
 
-        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+            Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
-        JWSObject jwsObject = new JWSObject(header, payload);
+            JWSObject jwsObject = new JWSObject(header, payload);
 
-        try {
-            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
-            return jwsObject.serialize();
-        } catch (JOSEException e) {
-            log.error("Cannot create Token", e);
-            throw new RuntimeException(e);
+            try {
+                jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+                return jwsObject.serialize();
+            } catch (JOSEException e) {
+                log.error("Cannot create Token", e);
+                throw new RuntimeException(e);
+            }
         }
     }
 

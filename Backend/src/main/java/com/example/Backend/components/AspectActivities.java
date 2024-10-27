@@ -1,7 +1,6 @@
 package com.example.Backend.components;
 
 import com.example.Backend.dto.response.Bill.BillTicketDetailsResponse;
-import com.example.Backend.dto.response.User.UserResponse;
 import com.example.Backend.entity.Bill.BillTicket;
 import com.example.Backend.entity.Bill.BillTicketDetails;
 import com.example.Backend.entity.Cart.Cart;
@@ -40,15 +39,16 @@ public class AspectActivities {
     UserRepository userRepository;
     CustomerTypeRepository customerTypeRepository;
 
-    @AfterReturning(value = "execution(* com.example.Backend.service.User.UserService.createUser(..))", returning = "userResponse")
-    public void afterUserCreated(UserResponse userResponse) {
-        try {
-            cartRepository.save(Cart.builder()
-                    .user(userRepository.findById(userResponse.getId())
-                            .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)))
-                    .build());
-        } catch (DataIntegrityViolationException exception) {
-            throw new AppException(ErrorCode.EXISTED);
+    @AfterReturning(value = "execution(* com.example.Backend.repository.User.UserRepository.save(..))", returning = "user")
+    public void afterUserCreated(User user) {
+        if (!cartRepository.existsByUser(user)) {
+            try {
+                cartRepository.save(Cart.builder()
+                        .user(user)
+                        .build());
+            } catch (DataIntegrityViolationException exception) {
+                throw new AppException(ErrorCode.EXISTED);
+            }
         }
     }
 

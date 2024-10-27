@@ -11,6 +11,7 @@ public enum ErrorCode {
     NOT_EXISTED(1003, "Not existed", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1004, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1005, "You do not have permission", HttpStatus.FORBIDDEN),
+    LOCKED(1006, "This account was locked", HttpStatus.BAD_REQUEST),
 
     PASSWORD_INCORRECT(1999, "Password not correct", HttpStatus.BAD_REQUEST),
     NOT_BLANK(2001, "This field is mandatory", HttpStatus.BAD_REQUEST),

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CustomerTypeRepository extends JpaRepository<CustomerType, String> {
     boolean existsByName(String name);
-    CustomerType findByName(String name); // Corrected method name
+    CustomerType findByName(String name);
 }

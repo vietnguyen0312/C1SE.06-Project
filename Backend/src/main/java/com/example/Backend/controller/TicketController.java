@@ -53,12 +53,4 @@ public class TicketController {
                 .result(ticketService.updateTicket(request,id))
                 .build();
     }
-
-    @DeleteMapping("/{id}")
-    ApiResponse<String> deleteTicket(@PathVariable("id")String id) {
-        ticketService.deleteTicket(id);
-        return ApiResponse.<String>builder()
-                .result("Delete ticket success")
-                .build();
-    }
 }
