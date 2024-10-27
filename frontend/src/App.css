@@ -2,10 +2,23 @@
     font-family: Allison;
     src: url('./assets/Allison-Regular.ttf');
   }
+@font-face {
+    font-family: LibreBaskerville;
+    src: url('./assets/LibreBaskerville-Regular.ttf');
+}
+@font-face {
+    font-family: PTSerif;
+    src: url('./assets/PTSerif-Regular.ttf');
+}
 .Allison{
     font-family: Allison;
 }
-
+.LibreBaskerville{
+    font-family: LibreBaskerville;
+}
+.PTSerif{
+    font-family: PTSerif;
+}
 .loading-container {
   display: flex;
   justify-content: center;

@@ -7,7 +7,7 @@ import {
 
 } from './style';
 import PopularDestinations from '../../../components/PopularDestinations/PopularDestinations';
-import PriceArea from '../../../components/PriceArea/PriceArea';
+import BookNow from '../../../components/BookNow/BookNow';
 import OtherIssues from '../../../components/OtherIssues/OtherIssues';
 import TestimonialArea from '../../../components/TestimonialArea/TestimonialArea';
 import HomeAbout from '../../../components/HomeAbout/HomeAbout';
@@ -40,10 +40,9 @@ function Home() {
         </Container>
       </BannerSection>
       <PopularDestinations />
-      <PriceArea />
+      <BookNow />
       <OtherIssues />
       <TestimonialArea />
-      <HomeAbout />
       <BlogArea />
     </>
   );

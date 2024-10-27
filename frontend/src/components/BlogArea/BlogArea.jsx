@@ -1,97 +1,89 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-
+import ButtonCPN from '../../components/Button/Button';
+import { Title, Subtitle } from '../TestimonialArea/TestimonialArea';
+import { motion } from 'framer-motion';
+import { UserOutlined, CommentOutlined } from '@ant-design/icons';
+import Aos from 'aos';
+import 'aos/dist/aos.css';
 const Section = styled.section`
   padding: 80px 0;
-  background-color: #f9f9ff;
   user-select: none;
   outline: none;
+  position: relative;
+  overflow: hidden;
+  background-color: #fff;
+`;
+
+const HalfBackground = styled.div`
+  position: absolute;
+  top: 0; 
+  right: 0;
+  width: 50%; 
+  height: 50%; 
+  background-color: #fff5da; 
+  z-index: 0; 
 `;
 
 const Container = styled.div`
   max-width: 1140px;
   margin: 0 auto;
   padding: 0 15px;
+  position: relative;
+  z-index: 1;
 `;
 
-const Title = styled.h2`
-  text-align: center;
-  margin-bottom: 10px;
-  font-size: 36px;
-  color: #222;
-`;
-
-const Subtitle = styled.p`
-  text-align: center;
-  margin-bottom: 50px;
-  color: #777;
-  font-size: 16px;
-`;
 
 const BlogGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 30px;
+  font-family: 'PTSerif';
 `;
 
 const BlogPost = styled.div`
-  background: white;
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-  &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-  }
+ 
 `;
 
 const BlogImage = styled.img`
   width: 100%;
-  height: 200px;
-  object-fit: cover;
-`;
-
-const BlogContent = styled.div`
-  padding: 20px;
-`;
-
-const BlogTags = styled.div`
-  margin-bottom: 10px;
-`;
-
-const Tag = styled.a`
-  background: #f1f1f1;
-  padding: 5px 10px;
-  margin-right: 5px;
-  border-radius: 20px;
-  color: #333;
-  text-decoration: none;
-  font-size: 12px;
-  transition: background 0.3s ease;
-
+  height: 350px;
+  object-fit: fill;
+  cursor: pointer;  
+  transition: transform 0.3s ease;
   &:hover {
-    background: #e1e1e1;
+    transform: scale(1.05);
   }
 `;
 
+
+const BlogContent = styled.div`
+  padding: 20px 0;
+  background-color: #fff;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+`;
+
+
 const BlogTitle = styled.h3`
-  margin-bottom: 10px;
+  margin: 10px 20px;
   font-size: 20px;
   color: #222;
 `;
 
-const BlogExcerpt = styled.p`
-  font-size: 14px;
-  margin-bottom: 15px;
-  color: #666;
-  line-height: 1.6;
-`;
-
 const BlogDate = styled.span`
-  color: #999;
-  font-size: 12px;
+  color: white;
+  font-size: 20px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 55px;
+  background-color: #f8b600;
+  padding: 5px 10px;
+  border-radius: 10px 0 0 0;
+  text-align: center;
+  font-weight: bold;
 `;
 
 const Pagination = styled.nav`
@@ -100,20 +92,14 @@ const Pagination = styled.nav`
   margin-top: 40px;
 `;
 
-const PageButton = styled.button`
-  padding: 10px 15px;
-  margin: 0 5px;
-  background: ${({ isActive }) => (isActive ? '#007bff' : 'white')};
-  color: ${({ isActive }) => (isActive ? 'white' : '#333')};
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
-  &:hover {
-    background: #007bff;
-    color: white;
-  }
+const Content1 = styled.div`
+  cursor: pointer;
 `;
 
 const BlogArea = () => {
@@ -121,54 +107,76 @@ const BlogArea = () => {
   const postsPerPage = 3;
 
   const blogPosts = [
-    { image: '/image/b1.jpg', tags: ['Travel', 'Life Style'], title: 'Low Cost Advertising', excerpt: 'Acres of Diamonds…', date: '31st January, 2018' },
-    { image: '/image/b2.jpg', tags: ['Travel', 'Life Style'], title: 'Creative Outdoor Ads', excerpt: 'Acres of Diamonds…', date: '31st January, 2018' },
-    { image: '/image/b3.jpg', tags: ['Travel', 'Life Style'], title: 'It is Classified', excerpt: 'Acres of Diamonds…', date: '31st January, 2018' },
-    { image: '/image/b4.jpg', tags: ['Tech', 'Innovation'], title: 'Tech Revolution', excerpt: 'Embrace the change…', date: '15th February, 2018' },
-    { image: '/image/b5.jpg', tags: ['Health', 'Life Style'], title: 'Healthy Living Tips', excerpt: 'Staying fit…', date: '22nd March, 2018' },
-    { image: '/image/b6.jpg', tags: ['Food', 'Life Style'], title: 'Top 10 Restaurants', excerpt: 'Explore the best…', date: '30th April, 2018' },
+    { image: '/img/User/userProfile.jpg', title: 'Low Cost Advertising', excerpt: 'Acres of Diamonds…', date: '31 JAN' },
+    { image: '/img/User/userProfile.jpg', title: 'Creative Outdoor Ads', excerpt: 'Acres of Diamonds…', date: '31 JAN' },
+    { image: '/img/User/userProfile.jpg', title: 'It is Classified', excerpt: 'Acres of Diamonds…', date: '31 JAN' },
+    { image: '/img/User/userProfile.jpg', title: 'Tech Revolution', excerpt: 'Embrace the change…', date: '15 FEB' },
+    { image: '/img/User/userProfile.jpg', title: 'Healthy Living Tips', excerpt: 'Staying fit…', date: '22 MAR' },
+    { image: '/img/User/userProfile.jpg', title: 'Top 10 Restaurants', excerpt: 'Explore the best…', date: '30 APR' },
   ];
-
+  useEffect(() => {
+    Aos.init({ duration: 1000 });
+  }, []);
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = blogPosts.slice(indexOfFirstPost, indexOfLastPost);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
   const totalPages = Math.ceil(blogPosts.length / postsPerPage);
-
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
   return (
-    <Section>
+    <Section data-aos="fade-up">
+      <HalfBackground />
       <Container>
-        <Title>Latest from Our Blog</Title>
-        <Subtitle>Discover our most recent articles and stay updated with the latest trends and insights.</Subtitle>
+        <Header>
+          <div>
+            <Title>From the blog post</Title>
+            <Subtitle>Tin tức & Bài viết</Subtitle>
+          </div>
+          <ButtonCPN text='View All Posts' style={{width: '160px'}} />
+        </Header>
         <BlogGrid>
           {currentPosts.map((post, index) => (
             <BlogPost key={index}>
-              <BlogImage src={post.image} alt={post.title} />
-              <BlogContent>
-                <BlogTags>
-                  {post.tags.map((tag, tagIndex) => (
-                    <Tag key={tagIndex} href="#">{tag}</Tag>
-                  ))}
-                </BlogTags>
-                <BlogTitle>{post.title}</BlogTitle>
-                <BlogExcerpt>{post.excerpt}</BlogExcerpt>
+              <div style={{position: 'relative'}}>
+                <BlogImage src={post.image} alt={post.title} />
                 <BlogDate>{post.date}</BlogDate>
+              </div>
+              <BlogContent>
+                <div style={{display: 'flex', gap: '20px',margin:'0 20px'}}>
+                  <Content1>
+                    <UserOutlined style={{color: '#f8b600'}}/> Admin
+                  </Content1>
+                  <Content1>
+                    <CommentOutlined style={{color: '#f8b600'}}/> 0 Comments
+                  </Content1>
+                </div>
+                <BlogTitle>{post.title}</BlogTitle>
               </BlogContent>
             </BlogPost>
           ))}
         </BlogGrid>
         
         <Pagination>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <PageButton 
-              key={i + 1} 
-              onClick={() => paginate(i + 1)}
-              isActive={currentPage === i + 1}
+          {[...Array(totalPages)].map((_, index) => (
+            <motion.button
+              key={index}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.05 }}
+              onClick={() => handlePageChange(index + 1)}
+              style={{
+                width: '15px',
+                height: '15px',
+                borderRadius: '50%',
+                margin: '0 5px',
+                padding: '0',
+                backgroundColor: currentPage === index + 1 ? "#f8b600" : "#ffffff",
+                border: `2px solid ${currentPage === index + 1 ? "#f8b600" : "#cccccc"}`,
+                color: currentPage === index + 1 ? "#ffffff" : "#333333",
+                cursor: 'pointer'
+              }}
             >
-              {i + 1}
-            </PageButton>
+            </motion.button>
           ))}
         </Pagination>
       </Container>

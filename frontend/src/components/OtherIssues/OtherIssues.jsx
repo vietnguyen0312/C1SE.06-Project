@@ -4,22 +4,24 @@ import { RightOutlined } from '@ant-design/icons';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import ServiceList from '../../Service/ServiceList.jsx';
+import ButtonCPN from '../Button/Button.jsx';
 const Section = styled.section`
 display: flex;
-  padding: 80px 0;
+  padding: 20px 0;
   background-color: #f9f9f9;
     user-select: none;
   outline: none;
 `;
 
 const Title = styled.h1`
-  font-size: 36px;
+  font-size: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f8b600;
+  margin-top: 30px;
 `;
 
-const Subtitle = styled.p`
-  color: #666;
-  font-size: 18px;
-`;
 
 const IssueGrid = styled.div`
   display: flex;
@@ -29,19 +31,7 @@ const IssueGrid = styled.div`
   
 `;
 
-const IssueItem = styled.div`
-  width: 23%;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  text-align: center;
-  transition: transform 0.3s ease;
 
-  &:hover {
-    transform: translateY(-10px);
-  }
-`;
 
 const ImgLeftWrapper = styled.div`
   position: relative;
@@ -84,14 +74,23 @@ const Container1 = styled.div`
   padding: 0 15px;
 `;
 
-const All = styled.div`
-  background-color: #999999;
-  padding: 5px 10px;
-  border-radius: 10px;
-  cursor: pointer;
- 
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  align-items: center;
 `;
 
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+`
+const Title1 = styled.p`
+  font-size: 20px;
+`
 const OtherIssues = () => {
   
   useEffect(() => {
@@ -99,29 +98,30 @@ const OtherIssues = () => {
   }, []);
 
   return (
-    <Section data-aos="fade-up" data-aos-delay="400">
-      
-      <ImgLeftWrapper>
+    <Container>
+      <div>
+        <Title className='Allison'>Services Hot</Title>
+      </div>
+      <Section>
+        <ImgLeftWrapper>
         <ImgLeft src='img/home1.png' />
         <ContentImage>
           <ProductCategory style={{ color: 'white' }}>Heal all wounds</ProductCategory>
         </ContentImage>
       </ImgLeftWrapper>
       <Container1>
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <Header>
           <div>
-            <Title >Dịch Vụ Nổi Bật Của Chúng Tôi</Title>
-            <Subtitle>Khám phá những dịch vụ đặc biệt chúng tôi cung cấp để nâng cao trải nghiệm du lịch của bạn</Subtitle>
+            <Title1 className='LibreBaskerville'>Một số dịch vụ nổi bật ở chúng tôi</Title1>
           </div>
-          <All >
-            <a href="/services" style={{ textDecoration: 'none', color: 'white', fontSize:'14px' }}>Xem Tất Cả <RightOutlined /></a>
-          </All>
-        </div>
-        <IssueGrid>
+          <ButtonCPN text='Xem tất cả' style={{fontSize:'14px',width:'150px'}} />
+        </Header>
+        <IssueGrid data-aos="fade-left" data-aos-delay="400">
           <ServiceList limit={3} />
         </IssueGrid>
       </Container1>
-    </Section>
+      </Section>
+    </Container>
   );
 };
 
