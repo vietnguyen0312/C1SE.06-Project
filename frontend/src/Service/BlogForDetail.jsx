@@ -351,7 +351,6 @@ const parseContent = (content, images) => {
       }
     } else if (section.startsWith("*title1*")) {
       const title = section.replace("*title1*", "").trim();
-      console.log("Tiêu đề:", title);
       parsedContent.push(
         <Title1 key={`title-${index}`} style={{ margin: "1rem 0" }}>
           {title}
@@ -432,14 +431,11 @@ const BlogDetail = () => {
     stompClient.current = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
-      debug: (str) => console.log(str),
     });
 
     stompClient.current.onConnect = () => {
-      console.log("Connected to WebSocket server");
 
       stompClient.current.subscribe("/topic/comments", (message) => {
-        console.log("Received comment:", message.body);
         const newCommentData = JSON.parse(message.body);
 
         if (newCommentData.type === "CREATE") {
@@ -523,6 +519,13 @@ const BlogDetail = () => {
     return response.result;
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleCommentSubmit(e); 
+    }
+  };
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
 
@@ -538,7 +541,6 @@ const BlogDetail = () => {
     };
 
     const comment = await submitComment(newComment);
-    setComments((prevComments) => [comment, ...prevComments]);
     setCommentContent("");
   };
   const handleDeleteComment = async (commentId) => {
@@ -743,6 +745,7 @@ const BlogDetail = () => {
                     placeholder="Nội dung bình luận"
                     value={commentContent}
                     onChange={(e) => setCommentContent(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     required
                   />
                   <Button type="submit" primary style={{ padding: "0 10px" }}>

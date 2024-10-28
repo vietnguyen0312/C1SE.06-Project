@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import ButtonCPN from '../../components/Button/Button';
-import { Title, Subtitle } from '../TestimonialArea/TestimonialArea';
-import { motion } from 'framer-motion';
-import { UserOutlined, CommentOutlined } from '@ant-design/icons';
-import Aos from 'aos';
-import 'aos/dist/aos.css';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import ButtonCPN from "../../components/Button/Button";
+import { Title, Subtitle } from "../TestimonialArea/TestimonialArea";
+import { motion } from "framer-motion";
+import { UserOutlined, CommentOutlined } from "@ant-design/icons";
+import Aos from "aos";
+import "aos/dist/aos.css";
+import axios from "../../Configuration/AxiosConfig";
+import { Link } from 'react-router-dom'; 
 const Section = styled.section`
   padding: 80px 0;
   user-select: none;
@@ -17,12 +19,12 @@ const Section = styled.section`
 
 const HalfBackground = styled.div`
   position: absolute;
-  top: 0; 
+  top: 0;
   right: 0;
-  width: 50%; 
-  height: 50%; 
-  background-color: #fff5da; 
-  z-index: 0; 
+  width: 50%;
+  height: 50%;
+  background-color: #fff5da;
+  z-index: 0;
 `;
 
 const Container = styled.div`
@@ -33,38 +35,34 @@ const Container = styled.div`
   z-index: 1;
 `;
 
-
 const BlogGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 30px;
-  font-family: 'PTSerif';
+  font-family: "PTSerif";
 `;
 
 const BlogPost = styled.div`
   border-radius: 10px;
   overflow: hidden;
- 
 `;
 
 const BlogImage = styled.img`
   width: 100%;
   height: 350px;
   object-fit: fill;
-  cursor: pointer;  
+  cursor: pointer;
   transition: transform 0.3s ease;
   &:hover {
     transform: scale(1.05);
   }
 `;
 
-
 const BlogContent = styled.div`
   padding: 20px 0;
   background-color: #fff;
   box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
 `;
-
 
 const BlogTitle = styled.h3`
   margin: 10px 20px;
@@ -103,24 +101,43 @@ const Content1 = styled.div`
 `;
 
 const BlogArea = () => {
+  const [blogPosts, setBlogPosts] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 3;
+  const [totalPages, setTotalPages] = useState(0);
 
-  const blogPosts = [
-    { image: '/img/User/userProfile.jpg', title: 'Low Cost Advertising', excerpt: 'Acres of Diamonds…', date: '31 JAN' },
-    { image: '/img/User/userProfile.jpg', title: 'Creative Outdoor Ads', excerpt: 'Acres of Diamonds…', date: '31 JAN' },
-    { image: '/img/User/userProfile.jpg', title: 'It is Classified', excerpt: 'Acres of Diamonds…', date: '31 JAN' },
-    { image: '/img/User/userProfile.jpg', title: 'Tech Revolution', excerpt: 'Embrace the change…', date: '15 FEB' },
-    { image: '/img/User/userProfile.jpg', title: 'Healthy Living Tips', excerpt: 'Staying fit…', date: '22 MAR' },
-    { image: '/img/User/userProfile.jpg', title: 'Top 10 Restaurants', excerpt: 'Explore the best…', date: '30 APR' },
-  ];
+  const fetchBlog = async () => {
+    const params = {
+      page: currentPage,
+      size: 3,
+    };
+    const blogResponse = await axios.get(`/blogs`, { params });
+    const blogWithImages = await Promise.all(
+      blogResponse.result.data.map(async (blog) => {
+        const imagesResponse = await axios.get(
+          `/images/findImagesByBlog/${blog.id}`
+        );
+        const commentResponse = await axios.get(
+          `/blogComments/byBlog/${blog.id}`
+        );
+        const commentsCount = commentResponse.result.totalElements;
+        return {
+          ...blog,
+          images: imagesResponse.result[0],
+          comments: commentsCount,
+        };
+      })
+    );
+    setTotalPages(blogResponse.result.totalPages);
+    setCurrentPage(blogResponse.result.currentPage);
+    setBlogPosts(blogWithImages);
+  };
+
   useEffect(() => {
+    fetchBlog();
     Aos.init({ duration: 1000 });
-  }, []);
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = blogPosts.slice(indexOfFirstPost, indexOfLastPost);
-  const totalPages = Math.ceil(blogPosts.length / postsPerPage);
+  }, [currentPage]);
+
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -133,30 +150,39 @@ const BlogArea = () => {
             <Title>From the blog post</Title>
             <Subtitle>Tin tức & Bài viết</Subtitle>
           </div>
-          <ButtonCPN text='View All Posts' style={{width: '160px'}} />
+          <Link to="/blogs">
+            <ButtonCPN text="View All Posts" style={{ width: "160px" }} />
+          </Link>
         </Header>
         <BlogGrid>
-          {currentPosts.map((post, index) => (
+          {blogPosts.map((post, index) => (
             <BlogPost key={index}>
-              <div style={{position: 'relative'}}>
-                <BlogImage src={post.image} alt={post.title} />
-                <BlogDate>{post.date}</BlogDate>
-              </div>
-              <BlogContent>
-                <div style={{display: 'flex', gap: '20px',margin:'0 20px'}}>
-                  <Content1>
-                    <UserOutlined style={{color: '#f8b600'}}/> Admin
-                  </Content1>
-                  <Content1>
-                    <CommentOutlined style={{color: '#f8b600'}}/> 0 Comments
-                  </Content1>
+              <Link to={`/blogDetail/${post.id}`} style={{ textDecoration: 'none', color: "#f8b600"  }}>
+                <div style={{ position: "relative" }}>
+                  <BlogImage
+                    src={`/img/blog/${post.images.image}`}
+                    alt={post.title}
+                  />
+                  <BlogDate>{post.date}</BlogDate>
                 </div>
-                <BlogTitle>{post.title}</BlogTitle>
-              </BlogContent>
+                <BlogContent>
+                  <div style={{ display: "flex", gap: "20px", margin: "0 20px" }}>
+                    <Content1>
+                      <UserOutlined style={{ color: "#f8b600" }} />{" "}
+                      {post.user ? post.user.name : "Admin"}
+                    </Content1>
+                    <Content1>
+                      <CommentOutlined style={{ color: "#f8b600" }} />{" "}
+                      {post.comments} Comments
+                    </Content1>
+                  </div>
+                  <BlogTitle>{post.title}</BlogTitle>
+                </BlogContent>
+              </Link>
             </BlogPost>
           ))}
         </BlogGrid>
-        
+
         <Pagination>
           {[...Array(totalPages)].map((_, index) => (
             <motion.button
@@ -165,18 +191,20 @@ const BlogArea = () => {
               whileHover={{ scale: 1.05 }}
               onClick={() => handlePageChange(index + 1)}
               style={{
-                width: '15px',
-                height: '15px',
-                borderRadius: '50%',
-                margin: '0 5px',
-                padding: '0',
-                backgroundColor: currentPage === index + 1 ? "#f8b600" : "#ffffff",
-                border: `2px solid ${currentPage === index + 1 ? "#f8b600" : "#cccccc"}`,
+                width: "15px",
+                height: "15px",
+                borderRadius: "50%",
+                margin: "0 5px",
+                padding: "0",
+                backgroundColor:
+                  currentPage === index + 1 ? "#f8b600" : "#ffffff",
+                border: `2px solid ${
+                  currentPage === index + 1 ? "#f8b600" : "#cccccc"
+                }`,
                 color: currentPage === index + 1 ? "#ffffff" : "#333333",
-                cursor: 'pointer'
+                cursor: "pointer",
               }}
-            >
-            </motion.button>
+            ></motion.button>
           ))}
         </Pagination>
       </Container>
