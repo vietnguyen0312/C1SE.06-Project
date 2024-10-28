@@ -149,7 +149,9 @@ const Authentication = () => {
                 const redirectPath = await login(email, password);
                 navigate(redirectPath);
             } else {
-                navigate('/otp-submit', { state: { email, phoneNumber, username, gender, password, isRegister: true } });
+                await axios.post('/users', { email, phoneNumber, username, gender, password });
+                const redirectPath = await login(email, password);
+                navigate(redirectPath);
             }
         }
     };

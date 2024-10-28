@@ -4,7 +4,6 @@ import MainLayoutPublic from '../Layout/PublicLayout/MainLayout';
 import Error403 from '../Layout/PublicLayout/Error403/Error403';
 import { Navigate, Outlet } from "react-router-dom";
 import Authentication from '../components/Authentication';
-import OtpSubmit from '../components/OtpSubmit';
 import About from '../Layout/PublicLayout/About/About';
 import Contact from '../Layout/PublicLayout/Contact/Contact'
 import BlogHome from '../Layout/PublicLayout/BlogHome/BlogHome';
@@ -83,10 +82,6 @@ const PublicRouters = [
         path: "/403",
         element: <Error403 />
     },
-    {
-        path: "/otp-submit",
-        element: <OtpSubmit />
-    }
 
 ];
 

@@ -65,10 +65,6 @@ public class ApplicationInitConfig {
                         .build();
 
                 userRepository.save(user);
-
-                cartRepository.save(Cart.builder()
-                        .user(user)
-                        .build());
                 log.warn("Manager user has been created with default password: manager, please change it.");
             }
         };

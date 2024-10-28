@@ -37,7 +37,7 @@ public class CustomJwtDecoder implements JwtDecoder {
                     .build());
 
             if (!response.isValid())
-                log.info("Token Invalid");
+                throw new JwtException("Token invalid");
         } catch (JOSEException | ParseException e) {
             throw new JwtException(e.getMessage());
         }

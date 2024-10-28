@@ -14,7 +14,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: vietnguyen0312@gmail.com
-    password: tglrlkfbfamvlghz
+    password: iurthiqycrlszgmn
     properties:
       mail:
         smtp:
@@ -34,6 +34,7 @@ jwt:
   signerKey: "fJn3xzOOIjzVhaRYqAbtI0g9AC0hUXRwATg9k1RNaVWYtSdXT5mdjHEsVJYowipI"
   valid-duration: 36000 # in second
   refreshable-duration: 360000 # in seconds
+  reset-duration: 300 # in seconds
 
 payment:
   vnPay:
@@ -44,4 +45,7 @@ payment:
     version: "2.1.0"
     command: "pay"
     orderType: "other"
+
+endpoint:
+  afterConfirmEmailRegis: "http://localhost:3000/authentication"
 
