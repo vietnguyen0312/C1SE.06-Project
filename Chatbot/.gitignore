@@ -1,0 +1,18 @@
+# Logs
+logs/
+# Môi trường ảo
+env/
+# Models
+models/
+# Các file cache
+*.cache
+# Các file tạm thời
+*.tmp
+# Các file nhị phân
+*.bin
+# Các file backup
+*.bak
+# Các file log
+*.log
+# Các file dữ liệu nhạy cảm
+*.env

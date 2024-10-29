@@ -1,0 +1,43 @@
+recipe: default.v1
+
+assistant_id: 20240921-013310-antique-mole
+
+language: vi
+pipeline:
+  - name: WhitespaceTokenizer
+  - name: RegexFeaturizer
+    case_sensitive: true
+    known_patterns:
+       - name: "numberPhone"
+         pattern: "\\b\\d{10}\\b"
+       - name: "gmail"
+         pattern: "\\b[\\w._%+-]+@[\\w.-]+\\.com\\b"  
+       - name: "email"
+         pattern: "\\b[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,6}\\b"
+  - name: LexicalSyntacticFeaturizer
+  - name: CountVectorsFeaturizer
+    analyzer: char_wb
+    min_ngram: 1
+    max_ngram: 4
+  - name: DIETClassifier
+    epochs: 100
+    constrain_similarities: true
+    batch_size: 32
+  - name: EntitySynonymMapper
+  - name: ResponseSelector
+    epochs: 100
+    constrain_similarities: true
+  - name: FallbackClassifier
+    threshold: 0.6
+    ambiguity_threshold: 0.1
+ 
+policies:
+  - name: MemoizationPolicy
+  - name: RulePolicy
+  - name: UnexpecTEDIntentPolicy
+    max_history: 5
+    epochs: 100
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 100
+    constrain_similarities: true
