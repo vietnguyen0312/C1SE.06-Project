@@ -231,29 +231,33 @@ export class ServiceList extends Component {
     }
 
     setSelectedService = async (service) => {
-        const AVG_RATING = await axios.get(`/rate-services/get-AVG-Score/${service.id}`);
-        const RATINGS = await axios.get('/rate-services', {
-            params: {
-                serviceId: service.id,
-                page: 1,
-                size: 5
-            }
-        });
-
-        this.setState({
-            selectedService: { service, averageRating: AVG_RATING.result },
-            isModalOpen: true,
-            totalRatings: RATINGS.result.totalElements
-        });
-
-        if (RATINGS.result.data && RATINGS.result.data.length > 0) {
-            this.setState({
-                ratingsOfSelectedService: RATINGS.result.data
-            });
+        if (this.props.onServiceSelect) {
+            this.props.onServiceSelect(service);
         } else {
-            this.setState({
-                hasMoreRatings: false
+            const AVG_RATING = await axios.get(`/rate-services/get-AVG-Score/${service.id}`);
+            const RATINGS = await axios.get('/rate-services', {
+                params: {
+                    serviceId: service.id,
+                    page: 1,
+                    size: 5
+                }
             });
+
+            this.setState({
+                selectedService: { service, averageRating: AVG_RATING.result },
+                isModalOpen: true,
+                totalRatings: RATINGS.result.totalElements
+            });
+
+            if (RATINGS.result.data && RATINGS.result.data.length > 0) {
+                this.setState({
+                    ratingsOfSelectedService: RATINGS.result.data
+                });
+            } else {
+                this.setState({
+                    hasMoreRatings: false
+                });
+            }
         }
     };
 

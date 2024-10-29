@@ -97,6 +97,10 @@ const OtherIssues = () => {
     AOS.init({ duration: 2000 });
   }, []);
 
+  const handleServiceSelect = (service) => {
+    console.log(service);
+  }
+
   return (
     <Container>
       <div>
@@ -117,7 +121,7 @@ const OtherIssues = () => {
           <ButtonCPN text='Xem tất cả' style={{fontSize:'14px',width:'150px'}} />
         </Header>
         <IssueGrid data-aos="fade-left" data-aos-delay="400">
-          <ServiceList limit={3} />
+          <ServiceList limit={3} onServiceSelect={handleServiceSelect}/>
         </IssueGrid>
       </Container1>
       </Section>

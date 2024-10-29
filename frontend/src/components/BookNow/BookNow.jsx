@@ -25,10 +25,10 @@ const HalfBackground = styled.div`
   width: 50%; 
   height: 40%; 
   z-index: 0; 
-  animation: swing 4s ease-in-out infinite;
-  @keyframes swing {
+  animation: leftToRight 4s ease-in-out infinite;
+  @keyframes leftToRight {
     0%, 100% { transform: translateX(0); }
-    50% { transform: translateX(-15px); }
+    50% { transform: translateX(-20px); }
   } 
 `;
 
