@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import axios from '../../Configuration/AxiosConfig';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import DOMPurify from 'dompurify';
 
 const Up = styled(UpOutlined)`
   position: fixed;
@@ -117,8 +118,8 @@ const ChatWindow = styled.div`
   position: fixed;
   bottom: 20px;
   left: 80px;
-  width: ${({ isExpanded }) => (isExpanded ? '620px' : '300px')};
-  height: ${({ isExpanded }) => (isExpanded ? '600px' : '400px')};
+  width: ${({ isExpanded }) => (isExpanded ? '720px' : '400px')};
+  height: ${({ isExpanded }) => (isExpanded ? '700px' : '500px')};
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);  
@@ -327,21 +328,28 @@ const Fixed = () => {
         <ChatBody ref={chatBodyRef}>
           {messages.map((msg, index) => (
             <div key={index} style={{ margin: '5px 0' }}>
-              {msg.isUser ? null : <div style={{ marginBottom: '5px', color: '#44cbcb',opacity: '0.7',fontSize: '14px'}}>Bot</div>}
-              <div style={{
-                display: 'flex',
-                justifyContent: msg.isUser ? 'flex-end' : 'flex-start',
-              }}>
-                <div style={{
-                  padding: '10px',
-                  borderRadius: '10px',
-                  backgroundColor: msg.isUser ? '#79CDCD' : '#f1f1f1',
-                  maxWidth: '60%',
-                  wordWrap: 'break-word',
-                  color: msg.isUser ? 'white' : 'black',
-                }}>
-                  {msg.text}
+              {msg.isUser ? null : (
+                <div style={{ marginBottom: '5px', color: '#44cbcb', opacity: '0.7', fontSize: '14px' }}>
+                  Bot
                 </div>
+              )}
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: msg.isUser ? 'flex-end' : 'flex-start',
+                }}
+              >
+                <div
+                  style={{
+                    padding: '10px',
+                    borderRadius: '10px',
+                    backgroundColor: msg.isUser ? '#79CDCD' : '#f1f1f1',
+                    maxWidth: '60%',
+                    wordWrap: 'break-word',
+                    color: msg.isUser ? 'white' : 'black',
+                  }}
+                  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(msg.text) }}
+                />
               </div>
             </div>
           ))}

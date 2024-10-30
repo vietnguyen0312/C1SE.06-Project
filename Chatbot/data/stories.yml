@@ -215,4 +215,10 @@ stories:
     - action: action_get_return_faq
     - action: utter_ask_dining_options   
 
+- story: Hỏi về thời tiết cho ngày cụ thể
+  steps:
+    - intent: ask_weather_for_specific_day
+    - action: action_weather_query_specific_day
+    - action: utter_ask_about_weather_for_specific_day
+
 

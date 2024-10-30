@@ -10,6 +10,14 @@ nlu:
     - Nhiệt độ hiện tại là bao nhiêu?
     - Có thể cho tôi biết thời tiết trong khu du lịch không?
 
+- intent: ask_weather_for_specific_day
+  examples: |
+    - Thời tiết vào ngày [6 tháng 10](specific_date) như thế nào?
+    - Có thể cho tôi biết thời tiết vào ngày [6 tháng 10](specific_date) không?
+    - Tôi muốn biết thời tiết vào ngày [15 tháng 11](specific_date).
+    - Ngày [20 tháng 12](specific_date) có mưa không?
+    - Thời tiết ở đây vào ngày [1 tháng 1](specific_date) ra sao?
+    
 - intent: ask_about_location
   examples: |
     - Khu du lịch nằm ở đâu?

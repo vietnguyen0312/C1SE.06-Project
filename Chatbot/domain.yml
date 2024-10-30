@@ -29,7 +29,7 @@ actions:
 # - action_scenic_drives
 # - action_water_activities
 # - action_wildlife_sightings
-
+- action_weather_query_specific_day
 entities:
 - name
 - service_list
@@ -37,6 +37,53 @@ entities:
 - numberPhone
 - gmail
 - email
+- specific_date
+
+slots: 
+  combined_data:
+    type: any 
+    influence_conversation: false
+    initial_value: 
+      text: "the first time"
+      image: "https://i.imgur.com/nGF1K8f.jpg"
+      video: "https://www.example.com/video.mp4"
+    mappings:
+      - type: from_text
+  numberPhone:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+  gmail:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+  email:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+  name:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+  service_name:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_text
+  specific_date:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: specific_date
+        role: inform
+
+
+
 
 intents:
 - greet
@@ -141,6 +188,9 @@ intents:
 - ask_parking
 - ask_dining_options
 - ask_about_specific_service
+- ask_weather_for_specific_day
+- ask_booking_room
+
 
 responses:
   utter_cheer_up:
@@ -374,43 +424,16 @@ responses:
   utter_ask_about_specific_service:
   - text: "Dịch vụ  {combined_data} của chúng tôi cung cấp những gì?"
 
+  utter_ask_about_weather_for_specific_day:
+  - text: "Thời tiết vào ngày  {combined_data}"
+
+  utter_ask_about_weather_for_specific_day_error:
+  - text: |
+      Vui lòng nhập ngày cụ thể để kiểm tra thời tiết.
+      Ví dụ: "ngày mai",  "ngày 1 tháng 1 năm 2024", "1-1-2024", "1-1", "1/1/2024", "1/1"
+
 session_config:
   carry_over_slots_to_new_session: true
   session_expiration_time: 60
 
 
-slots: 
-  combined_data:
-    type: any 
-    influence_conversation: false
-    initial_value: 
-      text: "the first time"
-      image: "https://i.imgur.com/nGF1K8f.jpg"
-      video: "https://www.example.com/video.mp4"
-    mappings:
-      - type: from_text
-  numberPhone:
-    type: text
-    influence_conversation: false
-    mappings:
-      - type: from_text
-  gmail:
-    type: text
-    influence_conversation: false
-    mappings:
-      - type: from_text
-  email:
-    type: text
-    influence_conversation: false
-    mappings:
-      - type: from_text
-  name:
-    type: text
-    influence_conversation: false
-    mappings:
-      - type: from_text
-  service_name:
-    type: text
-    influence_conversation: false
-    mappings:
-      - type: from_text

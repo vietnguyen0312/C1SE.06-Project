@@ -71,4 +71,10 @@ rules:
       - intent: ask_about_specific_service
       - action: action_service_entity
       - action: utter_ask_about_specific_service
+
+  - rule: hỏi về thời tiết cho ngày cụ thể
+    steps:
+      - intent: ask_weather_for_specific_day
+      - action: action_weather_query_specific_day
+      - action: utter_ask_about_weather_for_specific_day
   

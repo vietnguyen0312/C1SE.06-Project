@@ -19,13 +19,13 @@ class ActionListServices(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
 
-        # URL của API
+       
         url = BASE_URL + "serviceTypes"
         combined_data = ""
         try:
-            # Gửi yêu cầu GET đến API
+            
             response = requests.get(url)
-            response.raise_for_status()  # Kiểm tra mã trạng thái HTTP
+            response.raise_for_status() 
 
             data = response.json()
             

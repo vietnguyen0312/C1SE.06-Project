@@ -446,18 +446,14 @@ const BlogDetail = () => {
           setComments((prevComments) =>
             prevComments.filter((comment) => comment.id !== deletedCommentId)
           );
-          toast.success("Bình luận đã được xóa thành công");
         } else if (newCommentData.type === "UPDATE") {
           const updatedComment = newCommentData.comment;
           setComments((prevComments) =>
             prevComments.map((comment) =>
               comment.id === updatedComment.id ? updatedComment : comment
             )
-          );
-          toast.success("Bình luận đã được cập nhật thành công");
-        } else {
-          toast.error("Lỗi bình luận");
-        }
+          );     
+        } 
       });
     };
     stompClient.current.onStompError = (frame) => {
@@ -516,7 +512,7 @@ const BlogDetail = () => {
   };
   const submitComment = async (commentData) => {
     const response = await axios.post("/blogComments", commentData);
-    return response.result;
+    toast.success("Bình luận của bạn đã được thêm thành công");
   };
 
   const handleKeyDown = (e) => {
@@ -540,19 +536,22 @@ const BlogDetail = () => {
       comment: commentContent,
     };
 
-    const comment = await submitComment(newComment);
+    await submitComment(newComment);
     setCommentContent("");
+   
   };
   const handleDeleteComment = async (commentId) => {
     await axios.delete(`/blogComments/${commentId}`);
     setComments((prevComments) =>
       prevComments.filter((comment) => comment.id !== commentId)
     );
+    toast.success("Bình luận đã được xóa thành công");
   };
 
   const handleEditComment = (comment) => {
     setEditingCommentId(comment.id);
     setEditedCommentContent(comment.comment);
+    
   };
 
   const handleUpdateComment = async (e, commentId) => {
@@ -574,7 +573,7 @@ const BlogDetail = () => {
           : comment
       )
     );
-
+    toast.success("Bình luận đã được cập nhật thành công");
     setEditingCommentId(null);
     setEditedCommentContent("");
   };

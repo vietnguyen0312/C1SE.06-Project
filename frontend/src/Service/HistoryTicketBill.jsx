@@ -17,7 +17,7 @@ import {
   ModalFooter,
   WriteRating,
 } from "../Layout/PublicLayout/HistoryBill/style";
-import NoInvoices from '../components/NoInvoices'; // Adjust the path as necessary
+import NoInvoices from "../components/NoInvoices"; // Adjust the path as necessary
 
 export const AboutContent = styled.div`
   text-align: center;
@@ -202,14 +202,14 @@ const HistoryTicketBill = () => {
     if (selectedService && tempRating > 0) {
       console.log("selectedService", selectedService);
       const response = await axios.post("http://localhost:8080/rate-services", {
-        serviceId: selectedService.key.id, 
-        score: tempRating, 
-        comment: tempReview, 
-        billTicketDetailId: billTicketDetailId, 
+        serviceId: selectedService.key.id,
+        score: tempRating,
+        comment: tempReview,
+        billTicketDetailId: billTicketDetailId,
       });
       setServiceRatings((prev) => ({
         ...prev,
-        [selectedService.key.id]: tempRating, 
+        [selectedService.key.id]: tempRating,
       }));
       handleCloseModal();
       fetchHistoryBill();
@@ -285,7 +285,7 @@ const HistoryTicketBill = () => {
                       </div>
                       <div>
                         <FaCircle style={{ color: "#84b0ca" }} /> Ngày đặt:{" "}
-                        {new Date(item.datePay).toLocaleString()}
+                        {new Date(item.dateCreated).toLocaleString()}
                       </div>
                       <div>
                         <FaCircle style={{ color: "#84b0ca" }} /> Trạng thái:{" "}
@@ -309,12 +309,13 @@ const HistoryTicketBill = () => {
                     </thead>
                     <tbody>
                       {item.detail && item.detail.length > 0 ? (
-                        item.detail.map((bill, index) => (
+                        item.detail.map((bill, index) =>
                           bill.value.value.map((ticketdetail, ticketIndex) => (
                             <tr
                               key={`${bill.key.id}-${ticketIndex}`}
                               style={{
-                                backgroundColor: index % 2 === 0 ? "#e0e0e0" : "#f9f9f9",
+                                backgroundColor:
+                                  index % 2 === 0 ? "#e0e0e0" : "#f9f9f9",
                               }}
                             >
                               {ticketIndex === 0 && (
@@ -338,7 +339,8 @@ const HistoryTicketBill = () => {
                                           height: "50px",
                                           objectFit: "cover",
                                           borderRadius: "10px",
-                                          boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.1)",
+                                          boxShadow:
+                                            "0 0 10px 0 rgba(0, 0, 0, 0.1)",
                                           cursor: "pointer",
                                         }}
                                       />
@@ -380,35 +382,47 @@ const HistoryTicketBill = () => {
                                   VNĐ
                                 </div>
                               </td>
-                              {ticketIndex === 0 && item.status === "Đã thanh toán" && (
-                                <td rowSpan={bill.value.value.length} className="center">
-                                  
-                                  <div style={{ display: "inline-block", justifyContent: "center" }}>
-                                    {item.status === "Đã thanh toán" && (
-                                     serviceRatings[bill.key.id] || bill.value.key ? (
-                                        <span>Đã đánh giá</span> 
-                                      ) : (
-                                        <ButtonCPN
-                                          text="Đánh giá"
-                                          onClick={() => handleOpenModal(bill, ticketdetail.id)}
-                                          style={{
-                                            width: "110px",
-                                            height: "30px",
-                                            fontSize: "13px",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                          }}
-                                        />
-                                      )
-                                    )}
-                                  </div>
-                                  
-                                </td>
-                              )}
+                              {ticketIndex === 0 &&
+                                item.status === "Đã thanh toán" && (
+                                  <td
+                                    rowSpan={bill.value.value.length}
+                                    className="center"
+                                  >
+                                    <div
+                                      style={{
+                                        display: "inline-block",
+                                        justifyContent: "center",
+                                      }}
+                                    >
+                                      {item.status === "Đã thanh toán" &&
+                                        (serviceRatings[bill.key.id] ||
+                                        bill.value.key ? (
+                                          <span>Đã đánh giá</span>
+                                        ) : (
+                                          <ButtonCPN
+                                            text="Đánh giá"
+                                            onClick={() =>
+                                              handleOpenModal(
+                                                bill,
+                                                ticketdetail.id
+                                              )
+                                            }
+                                            style={{
+                                              width: "110px",
+                                              height: "30px",
+                                              fontSize: "13px",
+                                              display: "flex",
+                                              alignItems: "center",
+                                              justifyContent: "center",
+                                            }}
+                                          />
+                                        ))}
+                                    </div>
+                                  </td>
+                                )}
                             </tr>
                           ))
-                        ))
+                        )
                       ) : (
                         <tr>
                           <td colSpan="6" className="center">
@@ -456,7 +470,7 @@ const HistoryTicketBill = () => {
                       {item.status === "Chưa thanh toán" && (
                         <ButtonCPN
                           text="Thanh toán"
-                          onClick={() => handlePayment(item.id)} 
+                          onClick={() => handlePayment(item.id)}
                         />
                       )}
                     </div>
@@ -466,7 +480,7 @@ const HistoryTicketBill = () => {
             </HistoryBill>
           ))
         ) : (
-          <NoInvoices /> // Render the NoInvoices component if there are no invoices
+          <NoInvoices />
         )}
       </InfiniteScroll>
       <ModalWrapper show={showModal} onHide={handleCloseModal} centered>

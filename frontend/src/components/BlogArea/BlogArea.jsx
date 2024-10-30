@@ -72,15 +72,14 @@ const BlogTitle = styled.h3`
 
 const BlogDate = styled.span`
   color: white;
-  font-size: 20px;
+  font-size: 15px;
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 55px;
+  width: 150px;
   background-color: #f8b600;
   padding: 5px 10px;
   border-radius: 10px 0 0 0;
-  text-align: center;
   font-weight: bold;
 `;
 
@@ -163,7 +162,7 @@ const BlogArea = () => {
                     src={`/img/blog/${post.images.image}`}
                     alt={post.title}
                   />
-                  <BlogDate>{post.date}</BlogDate>
+                  <BlogDate>{post.createdDate}</BlogDate>
                 </div>
                 <BlogContent>
                   <div style={{ display: "flex", gap: "20px", margin: "0 20px" }}>
