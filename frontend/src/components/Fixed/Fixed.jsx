@@ -118,7 +118,7 @@ const ChatWindow = styled.div`
   position: fixed;
   bottom: 20px;
   left: 80px;
-  width: ${({ isExpanded }) => (isExpanded ? '720px' : '400px')};
+  width: ${({ isExpanded }) => (isExpanded ? '720px' : '500px')};
   height: ${({ isExpanded }) => (isExpanded ? '700px' : '500px')};
   background-color: white;
   border-radius: 10px;

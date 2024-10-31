@@ -1,0 +1,37 @@
+name: myenv
+channels:
+  - defaults
+dependencies:
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - scipy
+  - statsmodels
+  - xgboost
+  - lightgbm
+  - catboost
+  - jupyterlab  # Thêm JupyterLab để phát triển và chạy notebook
+  - pip  # Đảm bảo pip được cài đặt
+  - pip:
+      - requests  # Thêm requests để thực hiện các yêu cầu HTTP
+      - python-dotenv  # Thêm python-dotenv để quản lý biến môi trường
+      - rasa  # Thêm Rasa nếu bạn đang phát triển chatbot
+      - rasa-sdk  # Thêm Rasa SDK cho các action tùy chỉnh
+      - aiohttp  # Thêm aiohttp cho các yêu cầu bất đồng bộ
+      - grpcio  # Thêm grpcio cho các ứng dụng gRPC
+      - tensorflow  # Thêm TensorFlow cho học sâu
+      - keras  # Thêm Keras cho học sâu
+      - sqlalchemy  # Thêm SQLAlchemy cho ORM
+      - psycopg2-binary  # Thêm psycopg2 cho PostgreSQL
+      - redis  # Thêm redis cho lưu trữ dữ liệu
+      - twilio  # Thêm Twilio cho tích hợp SMS
+      - sentry-sdk  # Thêm Sentry cho theo dõi lỗi
+      - webexteamssdk  # Thêm Webex SDK cho tích hợp Webex
+      - prettytable  # Thêm PrettyTable cho hiển thị bảng
+      - pydantic  # Thêm Pydantic cho xác thực dữ liệu
+      - jmespath  # Thêm JMESPath cho truy vấn JSON
+      - humanfriendly  # Thêm Humanfriendly cho hiển thị thông tin
+      - colorama  # Thêm Colorama cho màu sắc trong terminal
+      - tqdm  # Thêm tqdm cho thanh tiến trình
