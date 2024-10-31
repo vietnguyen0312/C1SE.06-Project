@@ -6,12 +6,14 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BookingRoomDetailsRequest {
+public class BookingRoomDetailsCreationRequest {
     @NotNull(message = "NOT_NULL")
     String roomId;
 
@@ -22,4 +24,10 @@ public class BookingRoomDetailsRequest {
 
     @Column(nullable = false)
     double price;
+
+    Instant checkIned;
+
+    Instant checkOuted;
+
+    String status;
 }

@@ -125,7 +125,10 @@ public class RoomService {
                     Instant checkInInstant = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
 
                     return bookingDetails.stream()
-                            .noneMatch(details -> details.getBookingRoom().getCheckOutDate().compareTo(checkInInstant) >= 0);
+                            .noneMatch(details ->
+                                    details.getBookingRoom().getStatus().equals("đã thanh toán") &&
+                                            details.getBookingRoom().getCheckOutDate().compareTo(checkInInstant) >= 0
+                            );
                 })
                 .toList();
         List<RoomResponse> roomResponses = availableRooms.stream()

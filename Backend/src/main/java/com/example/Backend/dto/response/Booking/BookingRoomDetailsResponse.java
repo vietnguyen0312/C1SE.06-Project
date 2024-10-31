@@ -5,6 +5,8 @@ import com.example.Backend.entity.Room.Room;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,4 +17,7 @@ public class BookingRoomDetailsResponse {
     BookingRoom bookingRoom;
     Room room;
     double price;
+    Instant checkIned;
+    Instant checkOuted;
+    String status;
 }

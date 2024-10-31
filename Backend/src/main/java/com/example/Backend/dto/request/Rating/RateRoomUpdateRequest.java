@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,4 +17,7 @@ public class RateRoomUpdateRequest {
 
     @Size(max = 255, message = "MAX_SIZE")
     String comment;
+
+    @NotNull(message = "NOT_NULL")
+    Instant dateUpdate;
 }

@@ -1,5 +1,6 @@
 package com.example.Backend.entity.Rating;
 
+import com.example.Backend.entity.Booking.BookingRoomDetails;
 import com.example.Backend.entity.Room.Room;
 import com.example.Backend.entity.User.User;
 import jakarta.persistence.*;
@@ -21,19 +22,19 @@ public class RateRoom {
     String id;
 
     @ManyToOne
-    @JoinColumn(name = "room_id")
-    Room room;
+    @JoinColumn(name = "bookingRoomDetails_id")
+    BookingRoomDetails bookingRoomDetails;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     User user;
 
     @Column(nullable = false)
-    int score;
+    double score;
 
     @Column(columnDefinition = "TEXT")
     String comment;
 
-    @Column(nullable = false)
+
     Date dateUpdate;
 }

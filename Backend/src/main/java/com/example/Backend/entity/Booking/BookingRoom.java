@@ -38,6 +38,10 @@ public class BookingRoom {
     @Column
     String status;
 
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    Instant datePay;
+
     @PrePersist
     public void prePersist() {
         if (!StringUtils.hasLength(status)) {

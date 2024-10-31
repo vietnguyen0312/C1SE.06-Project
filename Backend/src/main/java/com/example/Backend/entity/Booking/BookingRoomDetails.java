@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+
 @Entity
 @Table(name = "booking_room_details")
 @Data
@@ -28,4 +30,12 @@ public class BookingRoomDetails {
     @Column(nullable = false)
     double price;
 
+    @Column(nullable = true)
+    Instant checkIned;
+
+    @Column(nullable = true)
+    Instant checkOuted;
+
+    @Column(name = "status")
+    String status;
 }

@@ -4,18 +4,24 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RateRoomCreationRequest {
-    @NotBlank(message = "USER_ID_NOT_BLANK")
-    String userId;
 
     @NotNull(message = "NOT_NULL")
-    int  score;
+    double  score;
+
+    @NotNull(message = "NOT_NULL")
+    String  bookingRoomDetailsID;
 
     @Size(max = 255, message = "MAX_SIZE")
     String comment;
+
+    @NotNull(message = "NOT_NULL")
+    Instant dateUpdate;
 }

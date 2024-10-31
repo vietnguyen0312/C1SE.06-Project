@@ -1,8 +1,9 @@
 package com.example.Backend.controller;
 
-import com.example.Backend.dto.request.Booking.BookingRoomDetailsRequest;
+import com.example.Backend.dto.request.Booking.BookingRoomDetailsCreationRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Booking.BookingRoomDetailsResponse;
+import com.example.Backend.dto.response.Booking.BookingRoomResponse;
 import com.example.Backend.dto.response.MapEntryResponse;
 import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.Room.RoomTypeResponse;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -26,7 +28,7 @@ public class BookingRoomDetailsController {
     // Tạo mới BookingRoomDetails
     @PostMapping
     public ApiResponse<BookingRoomDetailsResponse> createBookingRoomDetails(
-            @RequestBody @Valid BookingRoomDetailsRequest request) {
+            @RequestBody @Valid BookingRoomDetailsCreationRequest request) {
         BookingRoomDetailsResponse bookingRoomDetailsResponse = bookingRoomDetailsService
                 .createBookingRoomDetails(request);
         return ApiResponse.<BookingRoomDetailsResponse>builder()
@@ -37,7 +39,7 @@ public class BookingRoomDetailsController {
     // Cập nhật BookingRoomDetails theo ID (giả sử có update method)
     @PutMapping("/{id}")
     public ApiResponse<BookingRoomDetailsResponse> git(@PathVariable String id,
-            @RequestBody @Valid BookingRoomDetailsRequest request) {
+                                                       @RequestBody @Valid BookingRoomDetailsCreationRequest request) {
         BookingRoomDetailsResponse bookingRoomDetailsResponse = bookingRoomDetailsService.updateBookingRoomDetails(id,
                 request);
         return ApiResponse.<BookingRoomDetailsResponse>builder()
@@ -81,4 +83,28 @@ public class BookingRoomDetailsController {
                 .result(bookingRoomDetailsService.getBookingRoomDetailsByBookingRoom(bookingRoomId))
                 .build();
     }
+
+    @GetMapping("/byUser/{userId}")
+    public ApiResponse<List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>>
+    getBookingRoomDetailsByUserId(
+            @PathVariable("userId") String userId) {
+        return ApiResponse.<List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>>
+                        builder()
+                .result(bookingRoomDetailsService.getBookingRoomDetailsByUserID(userId))
+                .build();
+    }
+
+    @GetMapping("/byUser/page/{userId}")
+    public ApiResponse<PageResponse<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>>
+    getPagedBookingRoomDetailsByUserId(
+            @PathVariable("userId") String userId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+        return ApiResponse.<PageResponse<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>>
+                        builder()
+                .result(bookingRoomDetailsService.getBookingRoomDetailsByUserID1(userId, page, size))
+                .build();
+    }
+
+
 }

@@ -1,7 +1,6 @@
 package com.example.Backend.service.Booking;
 
-import com.example.Backend.dto.request.Booking.BookingRoomDetailsRequest;
-import com.example.Backend.dto.request.Room.RoomCreationRequest;
+import com.example.Backend.dto.request.Booking.BookingRoomDetailsCreationRequest;
 import com.example.Backend.dto.response.Booking.BookingRoomDetailsResponse;
 import com.example.Backend.dto.response.Booking.BookingRoomResponse;
 import com.example.Backend.dto.response.MapEntryResponse;
@@ -11,10 +10,10 @@ import com.example.Backend.entity.Booking.BookingRoom;
 import com.example.Backend.entity.Booking.BookingRoomDetails;
 import com.example.Backend.entity.Room.Room;
 import com.example.Backend.entity.Room.RoomType;
-import com.example.Backend.entity.Service.ServiceEntity;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Booking.BookingRoomDetailsMapper;
+import com.example.Backend.mapper.Booking.BookingRoomMapper;
 import com.example.Backend.mapper.Room.RoomTypeMapper;
 import com.example.Backend.repository.Booking.BookingRoomDetailsRepository;
 import com.example.Backend.repository.Booking.BookingRoomRepository;
@@ -33,7 +32,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,8 +46,9 @@ public class BookingRoomDetailsService {
         RoomRepository roomRepository;
         BookingRoomRepository bookingRoomRepository;
         RoomTypeMapper roomTypeMapper;
+        BookingRoomMapper bookingRoomMapper;
 
-        public BookingRoomDetailsResponse createBookingRoomDetails(BookingRoomDetailsRequest request) {
+        public BookingRoomDetailsResponse createBookingRoomDetails(BookingRoomDetailsCreationRequest request) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsMapper.toBookingRoomDetails(request);
                 Room room = roomRepository.findById(request.getRoomId())
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -107,8 +109,8 @@ public class BookingRoomDetailsService {
                         .toList();
         }
 
-        @PreAuthorize("hasRole('EMPLOYEE')")
-        public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDetailsRequest request) {
+        //        @PreAuthorize("hasRole('EMPLOYEE')")
+        public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDetailsCreationRequest request) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
@@ -116,12 +118,27 @@ public class BookingRoomDetailsService {
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
                 BookingRoom bookingRoom = bookingRoomRepository.findById(request.getBookingId())
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
                 bookingRoomDetails.setRoom(room);
                 bookingRoomDetails.setBookingRoom(bookingRoom);
                 bookingRoomDetails.setPrice(request.getPrice());
+
+                if (request.getCheckIned() != null) {
+                        bookingRoomDetails.setCheckIned(request.getCheckIned());
+                }
+
+                if (request.getCheckOuted() != null) {
+                        bookingRoomDetails.setCheckOuted(request.getCheckOuted());
+                }
+                if(request.getStatus() != null){
+                        bookingRoomDetails.setStatus(request.getStatus());
+                }
+
                 BookingRoomDetails updatedBookingRoomDetails = bookingRoomDetailsRepository.save(bookingRoomDetails);
                 return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(updatedBookingRoomDetails);
         }
+
+
 
         public List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> getBookingRoomDetailsByBookingRoom(String bookingRoomId) {
                 List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> bookingRoomDetailsMap = new LinkedList<>();
@@ -153,5 +170,163 @@ public class BookingRoomDetailsService {
                 return bookingRoomDetailsMap;
         }
 
+        public List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
+        getBookingRoomDetailsByUserID(String userId) {
 
+                List<BookingRoom> bookingRooms = bookingRoomRepository.findByUser_Id(userId, Sort.by(Sort.Direction.DESC, "datePay"));
+
+                Map<Instant, List<BookingRoom>> bookingRoomMap = bookingRooms.stream()
+                        .collect(Collectors.groupingBy(BookingRoom::getDatePay, LinkedHashMap::new, Collectors.toList()));
+
+                // Sắp xếp bookingRoomMap theo khóa (Instant) giảm dần
+                Map<Instant, List<BookingRoom>> sortedBookingRoomMap = bookingRoomMap.entrySet().stream()
+                        .sorted(Map.Entry.<Instant, List<BookingRoom>>comparingByKey().reversed())
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (oldValue, newValue) -> oldValue,
+                                LinkedHashMap::new
+                        ));
+
+                List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
+                        bookingRoomDetailsMap = new ArrayList<>();
+
+                for (Map.Entry<Instant, List<BookingRoom>> entry : sortedBookingRoomMap.entrySet()) {
+                        Instant payDate = entry.getKey();
+                        List<BookingRoom> rooms = entry.getValue();
+
+                        List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>> bookingRoomEntries = new ArrayList<>();
+
+                        for (BookingRoom bookingRoom : rooms) {
+                                List<BookingRoomDetails> bookingRoomDetailsList = bookingRoomDetailsRepository.findByBookingRoom_Id(
+                                        bookingRoom.getId(), Sort.by(Sort.Direction.DESC, "room.roomType.name"));
+
+                                Map<RoomType, List<BookingRoomDetails>> roomTypeMap = bookingRoomDetailsList.stream()
+                                        .collect(Collectors.groupingBy(bd -> bd.getRoom().getRoomType()));
+
+                                List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>> roomTypeResponses = roomTypeMap.entrySet().stream()
+                                        .map(roomTypeEntry -> {
+                                                RoomType roomType = roomTypeEntry.getKey();
+                                                List<BookingRoomDetails> details = roomTypeEntry.getValue();
+
+                                                RoomTypeResponse roomTypeResponse = roomTypeMapper.toRoomTypeResponse(roomType);
+                                                List<BookingRoomDetailsResponse> bookingRoomDetailsResponses = details.stream()
+                                                        .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
+                                                        .collect(Collectors.toList());
+
+                                                return MapEntryResponse.<RoomTypeResponse, List<BookingRoomDetailsResponse>>builder()
+                                                        .key(roomTypeResponse)
+                                                        .value(bookingRoomDetailsResponses)
+                                                        .build();
+                                        })
+                                        .collect(Collectors.toList());
+
+                                BookingRoomResponse bookingRoomResponse = bookingRoomMapper.toBookingRoomResponse(bookingRoom);
+                                bookingRoomEntries.add(
+                                        MapEntryResponse.<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>builder()
+                                                .key(bookingRoomResponse)
+                                                .value(roomTypeResponses)
+                                                .build()
+                                );
+                        }
+
+                        bookingRoomDetailsMap.add(
+                                MapEntryResponse.<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>builder()
+                                        .key(payDate)
+                                        .value(bookingRoomEntries)
+                                        .build()
+                        );
+                }
+
+                return bookingRoomDetailsMap;
+        }
+
+
+        public PageResponse<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
+        getBookingRoomDetailsByUserID1(String userId, int page, int size) {
+
+                List<BookingRoom> bookingRooms = bookingRoomRepository.findByUser_Id(userId, Sort.by(Sort.Direction.DESC, "datePay"));
+
+                Map<Instant, List<BookingRoom>> bookingRoomMap = bookingRooms.stream()
+                        .collect(Collectors.groupingBy(BookingRoom::getDatePay, LinkedHashMap::new, Collectors.toList()));
+
+                Map<Instant, List<BookingRoom>> sortedBookingRoomMap = bookingRoomMap.entrySet().stream()
+                        .sorted(Map.Entry.<Instant, List<BookingRoom>>comparingByKey().reversed())
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue,
+                                (oldValue, newValue) -> oldValue,
+                                LinkedHashMap::new
+                        ));
+
+                List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
+                        bookingRoomDetailsMap = new ArrayList<>();
+
+                for (Map.Entry<Instant, List<BookingRoom>> entry : sortedBookingRoomMap.entrySet()) {
+                        Instant payDate = entry.getKey();
+                        List<BookingRoom> rooms = entry.getValue();
+
+                        List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>> bookingRoomEntries = new ArrayList<>();
+
+                        for (BookingRoom bookingRoom : rooms) {
+                                List<BookingRoomDetails> bookingRoomDetailsList = bookingRoomDetailsRepository.findByBookingRoom_Id(
+                                        bookingRoom.getId(), Sort.by(Sort.Direction.DESC, "room.roomType.name"));
+
+                                Map<RoomType, List<BookingRoomDetails>> roomTypeMap = bookingRoomDetailsList.stream()
+                                        .collect(Collectors.groupingBy(bd -> bd.getRoom().getRoomType()));
+
+                                List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>> roomTypeResponses = roomTypeMap.entrySet().stream()
+                                        .map(roomTypeEntry -> {
+                                                RoomType roomType = roomTypeEntry.getKey();
+                                                List<BookingRoomDetails> details = roomTypeEntry.getValue();
+
+                                                RoomTypeResponse roomTypeResponse = roomTypeMapper.toRoomTypeResponse(roomType);
+                                                List<BookingRoomDetailsResponse> bookingRoomDetailsResponses = details.stream()
+                                                        .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
+                                                        .collect(Collectors.toList());
+
+                                                return MapEntryResponse.<RoomTypeResponse, List<BookingRoomDetailsResponse>>builder()
+                                                        .key(roomTypeResponse)
+                                                        .value(bookingRoomDetailsResponses)
+                                                        .build();
+                                        })
+                                        .collect(Collectors.toList());
+
+                                BookingRoomResponse bookingRoomResponse = bookingRoomMapper.toBookingRoomResponse(bookingRoom);
+                                bookingRoomEntries.add(
+                                        MapEntryResponse.<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>builder()
+                                                .key(bookingRoomResponse)
+                                                .value(roomTypeResponses)
+                                                .build()
+                                );
+                        }
+
+                        bookingRoomDetailsMap.add(
+                                MapEntryResponse.<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>builder()
+                                        .key(payDate)
+                                        .value(bookingRoomEntries)
+                                        .build()
+                        );
+                }
+
+                // Phân trang kết quả
+                int totalElements = bookingRoomDetailsMap.size();
+                int totalPages = (int) Math.ceil((double) totalElements / size);
+                int fromIndex = Math.min((page - 1) * size, totalElements);
+                int toIndex = Math.min(fromIndex + size, totalElements);
+
+                List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
+                        paginatedResults = bookingRoomDetailsMap.subList(fromIndex, toIndex);
+
+                return PageResponse.<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>builder()
+                        .currentPage(page)
+                        .totalPages(totalPages)
+                        .pageSize(size)
+                        .totalElements(totalElements)
+                        .data(paginatedResults)
+                        .build();
+        }
+
+
+//List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
 }

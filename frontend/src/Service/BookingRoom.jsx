@@ -548,7 +548,7 @@ class BookingRoom extends Component {
             }
             totalBookings[groupKey] += selectedRoom.roomType.price * this.calculateDays(checkInDate, checkOutDate);
         }
-
+        let lastBookingId = null
         // Tạo booking_room cho từng nhóm checkIn/checkOut
         for (const groupKey in totalBookings) {
             const [checkInDate, checkOutDate] = groupKey.split('--');
@@ -564,6 +564,7 @@ class BookingRoom extends Component {
                     status: 'chưa thanh toán'
                 });
 
+                lastBookingId = response1.result.id;
                 // Lưu lại bookingId cho nhóm
                 bookingRoomsMap.set(groupKey, response1.result.id);
             }
@@ -586,13 +587,13 @@ class BookingRoom extends Component {
 
 
 
-        // const paymentUrl = await axios.get('/payment/vn-pay', {
-        //     params: {
-        //         amount: this.state.totalPrice,
-        //         orderInfo: `r${response1.result.id}`
-        //     }
-        // });
-        // window.location.href = paymentUrl.result;
+        const paymentUrl = await axios.get('/payment/vn-pay', {
+            params: {
+                amount: this.state.totalPrice,
+                orderInfo: `r${lastBookingId}`
+            }
+        });
+        window.location.href = paymentUrl.result;
     };
 
     handleRoomTypeSelect = async (index) => {
@@ -815,7 +816,7 @@ class BookingRoom extends Component {
 
     render() {
         const { startDate, endDate, showRoomSelection, totalPrice, rooms_type, roomPrice, selectedRooms, currentRoomDetails, selectedImage, sampleImages, roomTypes, activeRoomIndex, isLoading } = this.state;
-        
+
         return (
             <>
                 <BannerSectionHotels>
@@ -921,7 +922,7 @@ class BookingRoom extends Component {
                                 </div>
                                 {currentRoomDetails.length > 0 && (
                                     <div>
-                                        <h3 style={{display: 'flex', justifyContent: 'center',alignItems: 'center', margin: '10px 0'}}>Thông tin các phòng đã chọn</h3>
+                                        <h3 style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '10px 0' }}>Thông tin các phòng đã chọn</h3>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', margin: '0 10px' }}>
                                             {currentRoomDetails.map((roomDetail, index) => {
                                                 const formattedPrice = this.formatCurrency(roomDetail.roomType.price);
