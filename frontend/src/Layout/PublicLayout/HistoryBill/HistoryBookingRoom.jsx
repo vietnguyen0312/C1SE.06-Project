@@ -4,7 +4,7 @@ import { FaPhone, FaCircle } from "react-icons/fa";
 import MaleIcon from '@mui/icons-material/Male';
 import FemaleIcon from '@mui/icons-material/Female';
 import ButtonCPN from '../../../components/Button/Button';
-import { ModalTitle, ModalWrapper, ModalHeader, ModalBody, ModalFooter, WriteRating } from './style';
+import { ModalTitle, ModalWrapper, ModalHeader, ModalBody, ModalFooter, WriteRating, TableExtend } from './style';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import ReactRating from 'react-rating';
@@ -147,6 +147,7 @@ const RateService = styled.div`
     justify-content: center;
     align-items: center;
     height: 100%;
+    margin-top: 27px;
 `;
 
 const StarIcon = styled(FontAwesomeIcon)`
@@ -270,7 +271,8 @@ const renderRateServiceButton = (bookingRoomDetail, color, text, handleOpenModal
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: color
+                backgroundColor: color,
+
             }}
         />
     </RateService>
@@ -1078,10 +1080,11 @@ const HistoryBookingRoom = () => {
                                 <img src={"/img/hotels/room_type/" + selectedBookingRoomDetails.room.roomType.image} alt={selectedBookingRoomDetails.room.roomTypeName} style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
                                 <div>
                                     {selectedBookingRoomDetails.room.roomTypeName}
-                                    <div style={{ fontSize: '23px', color: '#7e8d9f' }}>số phòng:{selectedBookingRoomDetails.room.roomNumber}</div>
+                                    <div style={{ fontSize: '16px', color: '#7e8d9f' }}>số phòng: {selectedBookingRoomDetails.room.roomNumber}</div>
+                                    <div style={{ fontSize: '16px', color: '#7e8d9f' }}>Loại phòng: {selectedBookingRoomDetails.room.roomType.name}</div>
                                 </div>
                             </div>
-                            <Row>
+                            <Row style={{margin:'20px 0'}}>
                                 <DatePickerContainer>
                                     <StyledDatePicker
                                         selected={new Date(selectedBookingRoomDetails.bookingRoom.checkOutDate)}
@@ -1102,8 +1105,21 @@ const HistoryBookingRoom = () => {
                                     />
                                 </DatePickerContainer>
                             </Row>
-                            <div>Số ngày bạn gia hạng là {calculateDays(startDate, endDate)} ngày</div>
-                            <div>Số tiền bạn phải trả là {selectedBookingRoomDetails.room.roomType.price * calculateDays(startDate, endDate)} VNĐ</div>
+                            <TableExtend>
+                                <thead>
+                                    <tr>
+                                        <th>Số ngày gia hạn</th>
+                                        <th>Tổng tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{calculateDays(startDate, endDate)} ngày</td>
+                                        <td style={{color:'#e65c5c'}}>{(selectedBookingRoomDetails.room.roomType.price * calculateDays(startDate, endDate)).toLocaleString()} VNĐ</td>
+                                    </tr>
+                                </tbody>
+                            </TableExtend>
+
                         </>
                     )}
                 </ModalBody>

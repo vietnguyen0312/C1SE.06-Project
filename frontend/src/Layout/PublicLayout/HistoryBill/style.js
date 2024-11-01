@@ -51,3 +51,18 @@ export const WriteRating = styled.div`
     margin: 30px 0;
 `;
 
+
+export const TableExtend = styled.table`
+    width: 100%;
+    color: white;
+    th {
+        text-align: center; 
+        background-color: #84b0ca;
+        padding: 5px 0;
+    }
+    td {
+        text-align: center; 
+        color: black;
+        padding: 5px 0;
+    }
+`;
