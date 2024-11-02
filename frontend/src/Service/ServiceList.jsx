@@ -93,14 +93,14 @@ const ServiceDescription = styled.p`
   margin-bottom: 0;
 `;
 
-const RatingContainer = styled.div`
+export const RatingContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin-top: 20px;
 `;
 
-const RatingItem = styled.div`
+export const RatingItem = styled.div`
   display: flex;
   width: 100%;
   padding: 20px;
@@ -109,7 +109,7 @@ const RatingItem = styled.div`
   
 `;
 
-const RatingImage = styled.img`
+export const RatingImage = styled.img`
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -119,27 +119,27 @@ const RatingImage = styled.img`
   align-items: center;
 `;
 
-const RatingContent = styled.div`
+export const RatingContent = styled.div`
   flex: 1;
 `;
 
-const RatingText = styled.p`
+export const RatingText = styled.p`
   margin: 10px 0;
   font-size: 15px;
   color: #555;
 `;
 
-const RatingAuthor = styled.h4`
+export const RatingAuthor = styled.h4`
   margin-bottom: 5px;
   font-size: 18px;
   color: #333;
 `;
 
-const StarRating = styled.div`
+export const StarRating = styled.div`
   color: #ffc107;
 `;
 
-const TotalRating = styled.div`
+export const TotalRating = styled.div`
   font-size: 15px;
   color: #333;
   display: flex;
@@ -147,7 +147,7 @@ const TotalRating = styled.div`
   gap:5px;
 `;
 
-const Bottom = styled.div`
+export const Bottom = styled.div`
     display: flex;
     align-items: center;
     gap: 15px;

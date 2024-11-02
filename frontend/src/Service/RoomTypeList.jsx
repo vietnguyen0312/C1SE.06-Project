@@ -6,6 +6,12 @@ import 'aos/dist/aos.css';
 import SliderCpn from '../components/Slider/SliderCpn';
 import axios from "../Configuration/AxiosConfig";
 import ButtonCpn from '../components/Button/Button';
+import { RatingItem, RatingImage, RatingContent, StarRating, TotalRating, Bottom, RatingAuthor, RatingText, RatingContainer } from './ServiceList';
+import { faStar, faStarHalf } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import LoadingIcons from 'react-loading-icons'
+
 
 const Overlay = styled.div`
   position: absolute;
@@ -220,22 +226,25 @@ const ModalOverlay = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  height: 100vh;
+  overflow-y: auto;
 `;
 
 const ModalContent = styled.div`
   background: white;
-  padding: 20px;
+  padding: 40px; // Increased padding
   border-radius: 10px;
-  max-width: 500px;
+  max-width: 600px; // Increased max-width
   width: 100%;
   position: relative;
 `;
 
 const ModalImage = styled.img`
   width: 100%;
-  height: 50vh;
+  height: 48vh;
   border-radius: 7px;
   cursor: pointer;
+  object-fit: cover;
   transition: transform 0.3s ease;
   &:hover {
     transform: scale(1.05);
@@ -244,17 +253,26 @@ const ModalImage = styled.img`
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 2px;
+  right: 0px;
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 25px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  width: 30px;
+  background-color: #f8b600;
+  border-radius: 0 0 0 10px;
   cursor: pointer;
 `;
 
 const ModalTitle = styled.h2`
-  margin-top: 20px;
   border-top: 1px solid #f8b600;
+  margin-top: 10px;
+  padding-top: 10px;
 `;
 
 const ModalPrice = styled.p`
@@ -300,6 +318,52 @@ class RoomTypeList extends Component {
 
   render() {
     const { rooms, selectedRoom, isModalOpen } = this.state;
+    const ratingsOfSelectedService = [
+      {
+        user: {
+          avatar: 'avatar1.jpg',
+          username: 'Nguyen Van A',
+        },
+        score: 1,
+        comment: 'Dịch vụ rất tốt, nhân viên thân thiện!',
+        formatDate: '01/11/2024',
+      },
+      {
+        user: {
+          avatar: 'avatar2.jpg',
+          username: 'Tran Thi B',
+        },
+        score: 4,
+        comment: 'Cơ sở vật chất ổn, giá cả hợp lý.',
+        formatDate: '28/10/2024',
+      },
+      {
+        user: {
+          avatar: 'avatar3.jpg',
+          username: 'Le Van C',
+        },
+        score: 3,
+        comment: 'Dịch vụ cần cải thiện thêm, đặc biệt là vệ sinh.',
+        formatDate: '15/10/2024',
+      },
+    ];
+    
+    const totalRatings = ratingsOfSelectedService.length;
+    
+    const averageRating = parseFloat(ratingsOfSelectedService.reduce((sum, rating) => sum + rating.score, 0) / totalRatings).toFixed(1);
+    
+    this.state = {
+      totalRatings,
+      selectedService: {
+        averageRating,
+        service: {
+          id: 1,
+        },
+      },
+      ratingsOfSelectedService,
+      hasMoreRatings: true,
+    };
+    
     return (
       <>
         <BannerSectionHotels>
@@ -327,7 +391,7 @@ class RoomTypeList extends Component {
               <InfoRight>
                 <h1>Chào mừng đến với <br />Healing Ecotourism</h1>
                 <InfoText>
-                  Healing Hotel, bao quanh bởi cảnh sắc thiên nhiên hoang sơ và không gian yên tĩnh đến lạ thường, mang đến cho du khách sự thư thái tuyệt đối.
+                  Healing Hotel, bao quanh bởi cảnh sắc thiên nhiên hoang sơ và không gian yên tĩnh đến lạ thường, mang ến cho du khách sự thư thái tuyệt đối.
                 </InfoText>
               </InfoRight>
             </InfoRow>
@@ -363,7 +427,7 @@ class RoomTypeList extends Component {
         </TypeRoom>
 
         {/* Modal hiển thị chi tiết phòng */}
-        {isModalOpen && selectedRoom && (
+        {/* {isModalOpen && selectedRoom && (
           <ModalOverlay onClick={this.handleModalClose}>
             <ModalContent onClick={(e) => e.stopPropagation()}>
               <CloseButton onClick={this.handleModalClose}>×</CloseButton>
@@ -374,8 +438,106 @@ class RoomTypeList extends Component {
               <ButtonCpn text="Đặt Phòng" />
             </ModalContent>
           </ModalOverlay>
+        )} */}
+        {isModalOpen && selectedRoom && (
+        <ModalOverlay onClick={this.handleModalClose}>
+          <ModalContent onClick={(e) => e.stopPropagation()} style={{ overflowY: 'auto', maxHeight: '100vh' }}>
+            <CloseButton onClick={this.handleModalClose}>×</CloseButton>
+            <div style={{ overflowY: 'auto' }}>
+              <div style={{ width: '100%', maxHeight: '50vh', overflow: 'hidden' }}>
+                <ModalImage src={`/img/hotels/room_type/${selectedRoom.image}`} alt={selectedRoom.name} />
+              </div>
+              <ModalTitle>{selectedRoom.name}</ModalTitle>
+              <ModalPrice>Giá: {selectedRoom.price.toLocaleString('vi-VN')} VNĐ</ModalPrice>
+              <p>Mô Tả: {selectedRoom.detail}</p>
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px',paddingBottom: '20px',borderBottom: '1px solid #f8b600' }}>
+                <ButtonCpn text="Đặt Phòng" />
+              </div>
+              <div>
+                <RatingContainer>
+                  <h5>Đánh giá dịch vụ ({this.state.totalRatings})</h5>
+                  <TotalRating>
+                    {averageRating}<div style={{ color: '#787878' }}>/ 5</div>
+                    <StarRating style={{ marginLeft: '5px' }}>
+                      {[...Array(5)].map((_, i) => {
+                        if (i < Math.floor(this.state.selectedService.averageRating)) {
+                          return (
+                            <FontAwesomeIcon key={i} icon={faStar} color="#ffc107" />
+                          );
+                        } else if (i === Math.floor(this.state.selectedService.averageRating)) {
+                          const decimalPart = this.state.selectedService.averageRating % 1;
+                          if (decimalPart <= 0.2) {
+                            return (
+                              <FontAwesomeIcon key={i} icon={faStar} color="#e4e5e9" />
+                            );
+                          } else if (decimalPart >= 0.3 && decimalPart < 0.8) {
+                            return (
+                              <FontAwesomeIcon key={i} icon={faStarHalf} color="#ffc107" />
+                            );
+                          } else {
+                            return (
+                              <FontAwesomeIcon key={i} icon={faStar} color="#ffc107" />
+                            );
+                          }
+                        } else {
+                          return (
+                            <FontAwesomeIcon key={i} icon={faStar} color="#e4e5e9" />
+                          );
+                        }
+                      })}
+                    </StarRating>
+                  </TotalRating>
+                  <div style={{ marginTop: '20px' }}>
+                    <InfiniteScroll
+                      key={this.state.selectedService.service.id}
+                      dataLength={this.state.ratingsOfSelectedService.length}
+                      next={this.loadMoreRatings}
+                      hasMore={this.state.hasMoreRatings}
+                      loader={<div className="loading-container">
+                        <LoadingIcons.TailSpin stroke="#000" />
+                      </div>}
+                    >
+                      {this.state.ratingsOfSelectedService.length > 0 ? (
+                        this.state.ratingsOfSelectedService.map((rating, index) => (
+                          <div key={index} style={{ marginBottom: '30px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+                            <RatingItem>
+                              <div>
+                                <RatingImage src={`/img/user/${rating.user.avatar}`} />
+                              </div>
+                              <RatingContent>
+                                <RatingAuthor>{rating.user.username}</RatingAuthor>
+                                <StarRating>
+                                  {[...Array(5)].map((_, i) => (
+                                    <FontAwesomeIcon
+                                      key={i}
+                                      icon={faStar}
+                                      color={i < rating.score ? "#ffc107" : "#e4e5e9"}
+                                    />
+                                  ))}
+                                </StarRating>
+                                <RatingText>{rating.comment}</RatingText>
+                              </RatingContent>
+                            </RatingItem>
+                            <Bottom>
+                              <div>{rating.formatDate}</div>
+                              <div>Sửa</div>
+                              <div>Xóa</div>
+                            </Bottom>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="no-ratings" style={{ textAlign: 'center', marginTop: '20px' }}>
+                          Không có bình luận nào.
+                        </div>
+                      )}
+                    </InfiniteScroll>
+                  </div>
+                </RatingContainer>
+              </div>
+            </div>
+          </ModalContent>
+        </ModalOverlay>
         )}
-
         {/* Slider Section */}
         <TypeRoom>
           <Container>
