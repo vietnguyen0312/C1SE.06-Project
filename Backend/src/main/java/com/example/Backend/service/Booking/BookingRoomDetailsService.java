@@ -10,6 +10,7 @@ import com.example.Backend.entity.Booking.BookingRoom;
 import com.example.Backend.entity.Booking.BookingRoomDetails;
 import com.example.Backend.entity.Room.Room;
 import com.example.Backend.entity.Room.RoomType;
+import com.example.Backend.entity.User.User;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.mapper.Booking.BookingRoomDetailsMapper;
@@ -18,6 +19,7 @@ import com.example.Backend.mapper.Room.RoomTypeMapper;
 import com.example.Backend.repository.Booking.BookingRoomDetailsRepository;
 import com.example.Backend.repository.Booking.BookingRoomRepository;
 import com.example.Backend.repository.Room.RoomRepository;
+import com.example.Backend.repository.User.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -47,6 +49,7 @@ public class BookingRoomDetailsService {
         BookingRoomRepository bookingRoomRepository;
         RoomTypeMapper roomTypeMapper;
         BookingRoomMapper bookingRoomMapper;
+        UserRepository userRepository;
 
         public BookingRoomDetailsResponse createBookingRoomDetails(BookingRoomDetailsCreationRequest request) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsMapper.toBookingRoomDetails(request);
@@ -85,7 +88,7 @@ public class BookingRoomDetailsService {
                         .data(pageData.stream().map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse).toList())
                         .build();
         }
-
+        @PostAuthorize("returnObject.bookingRoom.user.email == authentication.name or hasRole('MANAGER')")
         public BookingRoomDetailsResponse getBookingRoomDetailsById(String id) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -100,7 +103,7 @@ public class BookingRoomDetailsService {
                 bookingRoomDetailsRepository.deleteById(id);
         }
 
-
+        @PreAuthorize("hasRole('MANAGER')")
         public List<BookingRoomDetailsResponse> getBookingRoomDetailsByBookingRoom1(String bookingRoomId) {
                 BookingRoom bookingRoom = bookingRoomRepository.findById(bookingRoomId)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -109,7 +112,7 @@ public class BookingRoomDetailsService {
                         .toList();
         }
 
-        //        @PreAuthorize("hasRole('EMPLOYEE')")
+        @PostAuthorize("returnObject.bookingRoom.user.email == authentication.name or hasRole('EMPLOYEE')")
         public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDetailsCreationRequest request) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -139,7 +142,7 @@ public class BookingRoomDetailsService {
         }
 
 
-
+        @PreAuthorize("hasRole('MANAGER')")
         public List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> getBookingRoomDetailsByBookingRoom(String bookingRoomId) {
                 List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> bookingRoomDetailsMap = new LinkedList<>();
 
@@ -170,6 +173,8 @@ public class BookingRoomDetailsService {
                 return bookingRoomDetailsMap;
         }
 
+
+        @PreAuthorize("#userId == authentication.principal.id or hasRole('EMPLOYEE')")
         public List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
         getBookingRoomDetailsByUserID(String userId) {
 
@@ -241,9 +246,10 @@ public class BookingRoomDetailsService {
                 return bookingRoomDetailsMap;
         }
 
-
+        @PreAuthorize("#userId == authentication.principal.id or hasRole('EMPLOYEE')")
         public PageResponse<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
         getBookingRoomDetailsByUserID1(String userId, int page, int size) {
+
 
                 List<BookingRoom> bookingRooms = bookingRoomRepository.findByUser_Id(userId, Sort.by(Sort.Direction.DESC, "datePay"));
 

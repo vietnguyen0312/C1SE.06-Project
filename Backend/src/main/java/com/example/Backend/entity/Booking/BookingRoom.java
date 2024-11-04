@@ -32,15 +32,17 @@ public class BookingRoom {
     @Column(nullable = false)
     Instant checkOutDate;
 
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    Instant datePay;
+
     @Column(nullable = false) // test commit
     double total;
 
     @Column
     String status;
 
-    @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    Instant datePay;
+
 
     @PrePersist
     public void prePersist() {

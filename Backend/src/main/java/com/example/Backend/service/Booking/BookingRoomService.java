@@ -76,10 +76,13 @@ public class BookingRoomService {
                 .build();
     }
 
+    @PostAuthorize("returnObject.user.email == authentication.name or hasRole('MANAGER')")
     public BookingRoomResponse getBookingRoomById(String id) {
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
+
+
 
     @PostAuthorize("returnObject.user.email == authentication.name or hasRole('EMPLOYEE')")
     public BookingRoomResponse updateBookingRoom(String id, BookingRoomUpdateRequest request) {

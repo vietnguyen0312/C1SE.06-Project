@@ -351,6 +351,19 @@ const HistoryBookingRoom = () => {
         }
     },);
 
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth() + 1; // Months are zero-indexed
+        const year = date.getUTCFullYear();
+        const hours = date.getUTCHours();
+        const minutes = date.getUTCMinutes();
+        const seconds = date.getUTCSeconds();
+
+        return ` 🕒 ${hours.toString().padStart(2, '0')}h:${minutes.toString().padStart(2, '0')}m:${seconds.toString().padStart(2, '0')}s   📅 ${day} / ${month} / ${year}`;
+    };
+
     useEffect(() => {
         GetHistoryBookingRoom();
     }, [currentPage, pageSize]);
@@ -383,6 +396,8 @@ const HistoryBookingRoom = () => {
         const response = await axios.get('/users/myInfo');
 
         setUser(response.result)
+        console.log(response.result)
+        console.log("dsadsadsadsads")
         const Id = response.result.id
         const response1 = await axios.get(`/booking_room_details/byUser/page/${Id}`, { params })
         console.log(response1)
@@ -675,116 +690,7 @@ const HistoryBookingRoom = () => {
                     </Row>
                 </Container>
             </BannerSectionTicket>
-            {historyBookingRoom.map((item) => (
-                <HistoryBill key={item.id}>
-                    <HistoryBillContainer>
-                        <Container1>
-                            <div>
-                                <InvoiceText>
-                                    Thời Gian Thanh Toán: <strong>#{item.id}</strong>
-                                </InvoiceText>
-                            </div>
-                            <hr />
-                            <div>
-                                <InvoiceText>
-                                    Hoá Đơn: <strong>#{item.id}</strong>
-                                </InvoiceText>
-                            </div>
-                            <hr />
-                            <Infomation>
-                                <InfomationLeft>
-                                    <span style={{ color: "#5d9fc5" }}>{userInfo.name}</span>
-                                    <Gender>
-                                        Giới tính:
-                                        {userInfo.gender === 'Female' ? (
-                                            <FemaleIcon style={{ color: 'pink', marginLeft: '5px' }} />
-                                        ) : (
-                                            <MaleIcon style={{ color: 'blue', marginLeft: '5px' }} />
-                                        )}
-                                    </Gender>
-                                    <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                                        Thành viên: <div style={{ color: "#5d9fc5" }}>{userInfo.customerType}</div>
-                                    </div>
-                                    <div><FaPhone /> {userInfo.phone}</div>
-                                </InfomationLeft>
-                                <InfoRight>
-                                    <div><FaCircle style={{ color: "#84b0ca" }} /> ID: #{item.id}</div>
-                                    <div><FaCircle style={{ color: "#84b0ca" }} /> Ngày đặt: {item.checkInDate}</div>
-                                    <div><FaCircle style={{ color: "#84b0ca" }} /> Ngày trả: {item.checkOutDate}</div>
-                                    <div><FaCircle style={{ color: "#84b0ca" }} /> Số ngày thuê: {item.soNgayThue}</div>
-                                    <div><FaCircle style={{ color: "#84b0ca" }} /> Trạng thái: <Status>{item.status}</Status></div>
-                                </InfoRight>
-                            </Infomation>
-                            <Table>
-                                <thead>
-                                    <tr>
-                                        <th className='marginLeft'>STT</th>
-                                        <th>Tên Phòng</th>
-                                        <th className='center'>Số Lượng Người</th>
-                                        <th className='center'>Trạng thái</th>
-                                        <th className='center'>Giá</th>
-                                        {item.status === "Đã thanh toán" && (
-                                            <th className='center'>Đánh giá</th>
-                                        )}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {item.bookingRooms.map((bookingRoom, index) => (
-                                        <tr key={index}>
-                                            <td>{index + 1}</td>
-                                            <td>
-                                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                                    <img src={bookingRoom.img} alt={bookingRoom.roomTypeName} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
-                                                    <div>
-                                                        {bookingRoom.roomTypeName}
-                                                        <div style={{ fontSize: '13px', color: '#7e8d9f' }}>Phòng: {bookingRoom.roomNumber}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className='center'>{bookingRoom.numberPeople}</td>
-                                            <td className='center'>{bookingRoom.status}</td>
-                                            <td className='center'>{bookingRoom.roomTypePrice.toLocaleString()} VNĐ</td>
-                                            {item.status === "Đã thanh toán" && (
-                                                <td className='center'>
-                                                    <RateService>
-                                                        <ButtonCPN text="Đánh giá" onClick={() => handleOpenModal(bookingRoom)} style={{ width: '110px', height: '30px', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
-                                                    </RateService>
-                                                </td>
-                                            )}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                            <hr />
-                            <Price>
-                                <div>
-                                    <div>
-                                        {item.status === "chưa thanh toán" ? (
-                                            <div style={{ color: 'red' }}>Vui lòng thanh toán để sử dụng phòng</div>
-                                        ) : (
-                                            <div style={{ color: 'green' }}>Cảm ơn bạn đã thanh toán</div>
-                                        )}
-                                    </div>
-                                </div>
-                                <div style={{ display: "flex", alignItems: "center", flexDirection: "column" }}>
-                                    {item.status === "Đã thanh toán" ? (
-                                        <div style={{ color: 'green' }}>
-                                            <TotalText>Tổng tiền: {calculateTotal(item.bookingRooms).toLocaleString()} VNĐ</TotalText>
-                                        </div>
-                                    ) : (
-                                        <div style={{ color: 'red' }}>
-                                            <TotalText>Tổng tiền: {calculateTotal(item.bookingRooms).toLocaleString()} VNĐ</TotalText>
-                                        </div>
-                                    )}
-                                    {item.status === "Chưa thanh toán" && (
-                                        <ButtonCPN text="Đặt phòng" onClick={() => handleOpenModal(item)} />
-                                    )}
-                                </div>
-                            </Price>
-                        </Container1>
-                    </HistoryBillContainer>
-                </HistoryBill>
-            ))}
+
             <InfiniteScroll
                 dataLength={ListBookingRoom.length}
                 next={fetchData}
@@ -798,24 +704,26 @@ const HistoryBookingRoom = () => {
                             <Container1>
                                 <div>
                                     <InvoiceText>
-                                        Thời Gian Thanh Toán: <strong>{item.key ? item.key : "Không có thông tin"}</strong>
+                                        Thời Gian : <strong>{item.key ? formatDate(item.key) : "Không có thông tin"}</strong>
                                     </InvoiceText>
                                 </div>
                                 <hr />
                                 <InfomationLeft>
-                                    <span style={{ color: "#5d9fc5" }}>{userInfo.name}</span>
+                                    <span style={{ color: "#5d9fc5" }}>{user.username}</span>
                                     <Gender>
                                         Giới tính:
-                                        {userInfo.gender === 'Female' ? (
+                                        {user.gender === 'Female' ? (
                                             <FemaleIcon style={{ color: 'pink', marginLeft: '5px' }} />
-                                        ) : (
+                                        ) : user.gender === 'Male' ? (
                                             <MaleIcon style={{ color: 'blue', marginLeft: '5px' }} />
+                                        ) : (
+                                            <span>Không xác định</span>
                                         )}
                                     </Gender>
                                     <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                                        Thành viên: <div style={{ color: "#5d9fc5" }}>{userInfo.customerType}</div>
+                                        Thành viên: <div style={{ color: "#5d9fc5" }}>{user.customerType.name}</div>
                                     </div>
-                                    <div><FaPhone /> {userInfo.phone}</div>
+                                    <div><FaPhone /> {user.phoneNumber ? user.phoneNumber : "Không có thông tin"}</div>
                                 </InfomationLeft>
 
                                 {Array.isArray(item.value) && item.value.map((subItem, subIndex) => (
@@ -1084,7 +992,7 @@ const HistoryBookingRoom = () => {
                                     <div style={{ fontSize: '16px', color: '#7e8d9f' }}>Loại phòng: {selectedBookingRoomDetails.room.roomType.name}</div>
                                 </div>
                             </div>
-                            <Row style={{margin:'20px 0'}}>
+                            <Row style={{ margin: '20px 0' }}>
                                 <DatePickerContainer>
                                     <StyledDatePicker
                                         selected={new Date(selectedBookingRoomDetails.bookingRoom.checkOutDate)}
@@ -1115,7 +1023,7 @@ const HistoryBookingRoom = () => {
                                 <tbody>
                                     <tr>
                                         <td>{calculateDays(startDate, endDate)} ngày</td>
-                                        <td style={{color:'#e65c5c'}}>{(selectedBookingRoomDetails.room.roomType.price * calculateDays(startDate, endDate)).toLocaleString()} VNĐ</td>
+                                        <td style={{ color: '#e65c5c' }}>{(selectedBookingRoomDetails.room.roomType.price * calculateDays(startDate, endDate)).toLocaleString()} VNĐ</td>
                                     </tr>
                                 </tbody>
                             </TableExtend>

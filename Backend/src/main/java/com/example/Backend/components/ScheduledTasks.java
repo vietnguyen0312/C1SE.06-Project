@@ -1,9 +1,11 @@
 package com.example.Backend.components;
 
 import com.example.Backend.entity.Bill.BillTicket;
+import com.example.Backend.entity.Booking.BookingRoom;
 import com.example.Backend.entity.InvalidatedToken;
 import com.example.Backend.entity.ResetToken;
 import com.example.Backend.repository.Bill.BillTicketRepository;
+import com.example.Backend.repository.Booking.BookingRoomRepository;
 import com.example.Backend.repository.InvalidatedTokenRepository;
 import com.example.Backend.repository.ResetTokenRepository;
 import lombok.AccessLevel;
@@ -27,6 +29,7 @@ public class ScheduledTasks {
     InvalidatedTokenRepository invalidatedTokenRepository;
     ResetTokenRepository resetTokenRepository;
     BillTicketRepository billTicketRepository;
+    BookingRoomRepository bookingRoomRepository;
 
     @Scheduled(fixedDelay = 12, timeUnit = TimeUnit.HOURS)
     public void removeOutDateToken() {
@@ -53,6 +56,16 @@ public class ScheduledTasks {
         billTicketList.forEach(billTicket -> {
             billTicket.setStatus("Đã huỷ");
             billTicketRepository.save(billTicket);
+        });
+    }
+
+    @Scheduled(fixedDelay = 2, timeUnit = TimeUnit.HOURS)
+    public void autoCancelBookingRoom() {
+        Instant twoDaysAgo = Instant.now().minus(2, ChronoUnit.HOURS);
+        List<BookingRoom> bookingRoomList = bookingRoomRepository.findByDatePayBeforeAndStatusIs(twoDaysAgo,"chưa thanh toán");
+        bookingRoomList.forEach(bookingRoom -> {
+            bookingRoom.setStatus("đã hủy");
+            bookingRoomRepository.save(bookingRoom);
         });
     }
 }
