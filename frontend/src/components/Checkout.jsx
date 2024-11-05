@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from '../Configuration/AxiosConfig';
-import { CheckOutlined } from '@ant-design/icons';
+import ButtonCPN from './Button/Button';
 
 const Container = styled.div`
     width: 70%;
@@ -112,6 +112,7 @@ const Checkout = () => {
                                     <InfoText>Tổng tiền: {ticket.price.toLocaleString()} VNĐ</InfoText>
                                     <InfoText>Trạng thái: <Status>{ticket.status}</Status></InfoText>
                                 </OrderContainer>
+                                <ButtonCPN text="Quay lại trang chủ"/>
                         </div>
                     ))}
                 </>
@@ -126,6 +127,7 @@ const Checkout = () => {
                         <InfoText>Tổng tiền: {billData.billInfo?.total.toLocaleString()} VNĐ</InfoText>
                         <InfoText>Trạng thái: <Status status={billData.billInfo?.status}>{billData.billInfo?.status}</Status></InfoText>
                     </OrderContainer>
+                    <ButtonCPN text="Quay lại trang chủ"/>
                 </>
             )}
         </Container>
