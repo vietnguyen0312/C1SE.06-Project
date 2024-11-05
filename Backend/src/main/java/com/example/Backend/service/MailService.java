@@ -1,5 +1,6 @@
 package com.example.Backend.service;
 
+import com.example.Backend.dto.request.ContactRequest;
 import com.example.Backend.dto.request.MailSenderRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
@@ -36,6 +37,14 @@ public class MailService {
     @Value("${spring.mail.username}")
     String emailFrom;
 
+    @NonFinal
+    @Value("${spring.mail.feedback}")
+    String handleFeedbackEmail;
+
+    @NonFinal
+    @Value("${spring.mail.business}")
+    String businessBrand;
+
     public String sendMail(String toEmail, MailSenderRequest request) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(emailFrom);
@@ -55,10 +64,27 @@ public class MailService {
         properties.put("link", link);
         context.setVariables(properties);
 
-        helper.setFrom(emailFrom, "Healing Ecotourism");
+        helper.setFrom(emailFrom, businessBrand);
         helper.setTo(emailTo);
         helper.setSubject("Please confirm your email");
         String html = templateEngine.process("confirm-email.html", context);
+        helper.setText(html, true);
+        mailSender.send(message);
+    }
+
+    public void sendContactFeedback(ContactRequest request) throws MessagingException, UnsupportedEncodingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, StandardCharsets.UTF_8.name());
+        Context context = new Context();
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("request", request);
+        context.setVariables(properties);
+
+        helper.setFrom(emailFrom, "Contact Feedback From Healing Ecotourism");
+        helper.setTo(handleFeedbackEmail);
+        helper.setSubject(request.getSubject());
+        String html = templateEngine.process("contact-feedback.html", context);
         helper.setText(html, true);
         mailSender.send(message);
     }

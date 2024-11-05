@@ -4,10 +4,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faStarHalf, faTimes } from '@fortawesome/free-solid-svg-icons'
 import axios from '../Configuration/AxiosConfig'
 import { Pagination } from '@mui/material';
-import styled from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 import '../Style/Service.css';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 import InfiniteScroll from 'react-infinite-scroll-component';
+
+// Animation keyframes
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const fadeOut = keyframes`
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+`;
 
 const ModalBackdrop = styled.div`
   position: fixed;
@@ -20,6 +39,7 @@ const ModalBackdrop = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 1050;
+  animation: ${props => props.isVisible ? fadeIn : fadeOut} 0.5s forwards;
 `;
 
 const ModalWrapper = styled.div`
@@ -31,6 +51,8 @@ const ModalWrapper = styled.div`
   border-radius: 5px;
   box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
   transition: transform 0.3s ease-out;
+  transform: scale(${props => props.isVisible ? 1 : 0.9});
+  opacity: ${props => props.isVisible ? 1 : 0};
 `;
 
 const ModalContent = styled.div`
@@ -230,6 +252,14 @@ export class ServiceList extends Component {
 
     }
 
+    disableScroll() {
+        document.body.style.overflow = 'hidden';
+    }
+
+    enableScroll() {
+        document.body.style.overflow = 'unset';
+    }
+
     setSelectedService = async (service) => {
         if (this.props.onServiceSelect) {
             this.props.onServiceSelect(service);
@@ -259,6 +289,7 @@ export class ServiceList extends Component {
                 });
             }
         }
+        this.disableScroll();
     };
 
     loadMoreRatings = () => {
@@ -284,7 +315,8 @@ export class ServiceList extends Component {
     };
 
     closeModal = () => {
-        this.setState({ isModalOpen: false, hasMoreRatings: true })
+        this.setState({ isModalOpen: false, hasMoreRatings: true });
+        this.enableScroll();
     }
 
     paginate = (pageNumber) => {
@@ -335,8 +367,8 @@ export class ServiceList extends Component {
                         </div>
                     ))}
                     {this.state.isModalOpen && this.state.selectedService && (
-                        <ModalBackdrop onClick={this.closeModal}>
-                            <ModalWrapper onClick={(e) => e.stopPropagation()}>
+                        <ModalBackdrop isVisible={this.state.isModalOpen} onClick={this.closeModal}>
+                            <ModalWrapper isVisible={this.state.isModalOpen} onClick={(e) => e.stopPropagation()}>
                                 <ModalContent>
                                     <ModalHeader>
                                         <ModalTitle>{this.state.selectedService.service.serviceType.name}</ModalTitle>
@@ -424,11 +456,6 @@ export class ServiceList extends Component {
                                                                             <RatingText>{rating.comment}</RatingText>
                                                                         </RatingContent>
                                                                     </RatingItem>
-                                                                    <Bottom>
-                                                                        <div>{rating.formatDate}</div>
-                                                                        <div>Sửa</div>
-                                                                        <div>Xóa</div>
-                                                                    </Bottom>
                                                                 </div>
                                                             ))
                                                         ) : (

@@ -10,7 +10,6 @@ import PopularDestinations from '../../../components/PopularDestinations/Popular
 import BookNow from '../../../components/BookNow/BookNow';
 import OtherIssues from '../../../components/OtherIssues/OtherIssues';
 import TestimonialArea from '../../../components/TestimonialArea/TestimonialArea';
-import HomeAbout from '../../../components/HomeAbout/HomeAbout';
 import BlogArea from '../../../components/BlogArea/BlogArea';
 import AOS from 'aos';
 import 'aos/dist/aos.css';

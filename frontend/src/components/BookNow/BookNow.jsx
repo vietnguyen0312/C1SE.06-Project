@@ -121,7 +121,9 @@ const BookNow = () => {
           <p><CheckIcon />Cam kết an toàn và sức khỏe tuyệt đối</p>
           <p><CheckIcon />Đa dạng các loại dịch vụ vui chơi giải trí</p>
           <p><CheckIcon />Chất lượng dịch vụ đạt chuẩn cao, được khách hàng đánh giá tích cực</p>
-          <ButtonCPN text='Đặt vé ngay' />
+          <ButtonCPN text='Đặt vé ngay' onClick={() => {
+            window.location.href = '/ticket';
+          }}/>
         </ContainerRight>
       </Container>
     </Section>

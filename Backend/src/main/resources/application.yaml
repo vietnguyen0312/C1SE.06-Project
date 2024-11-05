@@ -13,6 +13,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
+    business: Healing Ecotourism
+    feedback: nguyenhoangviet8@dtu.edu.vn
     username: vietnguyen0312@gmail.com
     password: iurthiqycrlszgmn
     properties:

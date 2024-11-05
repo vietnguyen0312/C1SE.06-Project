@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { RightOutlined } from '@ant-design/icons';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
-import ServiceList from '../../Service/ServiceList.jsx';
-import ButtonCPN from '../Button/Button.jsx';
+import React from "react";
+import styled from "styled-components";
+import "aos/dist/aos.css";
+import ServiceList from "../../Service/ServiceList.jsx";
+import ButtonCPN from "../Button/Button.jsx";
 const Section = styled.section`
-display: flex;
+  display: flex;
   padding: 20px 0;
   background-color: #f9f9f9;
-    user-select: none;
+  user-select: none;
   outline: none;
 `;
 
@@ -22,37 +20,33 @@ const Title = styled.h1`
   margin-top: 30px;
 `;
 
-
 const IssueGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   row-gap: 30px;
-  
 `;
-
-
 
 const ImgLeftWrapper = styled.div`
   position: relative;
-    width: 30%;
-    overflow: hidden;
-    cursor: pointer;
-    margin-left: 20px;
-    height: 100%;
+  width: 30%;
+  overflow: hidden;
+  cursor: pointer;
+  margin-left: 20px;
+  height: 100%;
 `;
 
 const ImgLeft = styled.img`
-   position: relative;
-    width: 100%;
-    height: 517px;
-    margin-right: 20px;
-    border-radius: 20px;
-    transition: transform 0.5s ease;
-    overflow: hidden;
-    &:hover {
-        transform: scale(1.1);
-    } 
+  position: relative;
+  width: 100%;
+  height: 517px;
+  margin-right: 20px;
+  border-radius: 20px;
+  transition: transform 0.5s ease;
+  overflow: hidden;
+  &:hover {
+    transform: scale(1.1);
+  }
 `;
 const ContentImage = styled.div`
   position: absolute;
@@ -74,7 +68,6 @@ const Container1 = styled.div`
   padding: 0 15px;
 `;
 
-
 const Header = styled.div`
   display: flex;
   justify-content: space-between;
@@ -87,43 +80,42 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #f9f9f9;
-`
+`;
 const Title1 = styled.p`
   font-size: 20px;
-`
+`;
 const OtherIssues = () => {
-  
-  useEffect(() => {
-    AOS.init({ duration: 2000 });
-  }, []);
-
-  const handleServiceSelect = (service) => {
-    console.log(service);
-  }
-
   return (
     <Container>
       <div>
-        <Title className='Allison'>Services Hot</Title>
+        <Title className="Allison">Services Hot</Title>
       </div>
       <Section>
         <ImgLeftWrapper>
-        <ImgLeft src='img/home1.png' />
-        <ContentImage>
-          <ProductCategory style={{ color: 'white' }}>Heal all wounds</ProductCategory>
-        </ContentImage>
-      </ImgLeftWrapper>
-      <Container1>
-        <Header>
-          <div>
-            <Title1 className='LibreBaskerville'>Một số dịch vụ nổi bật ở chúng tôi</Title1>
-          </div>
-          <ButtonCPN text='Xem tất cả' style={{fontSize:'14px',width:'150px'}} />
-        </Header>
-        <IssueGrid data-aos="fade-left" data-aos-delay="400">
-          <ServiceList limit={3} onServiceSelect={handleServiceSelect}/>
-        </IssueGrid>
-      </Container1>
+          <ImgLeft src="img/home1.png" />
+          <ContentImage>
+            <ProductCategory style={{ color: "white" }}>
+              Heal all wounds
+            </ProductCategory>
+          </ContentImage>
+        </ImgLeftWrapper>
+        <Container1>
+          <Header>
+            <div>
+              <Title1 className="LibreBaskerville">
+                Một số dịch vụ nổi bật ở chúng tôi
+              </Title1>
+            </div>
+            <ButtonCPN
+              text="Xem tất cả"
+              style={{ fontSize: "14px", width: "150px" }}
+              onClick={() => {
+                window.location.href = '/services';
+              }}
+            />
+          </Header>
+          <ServiceList limit={3} />
+        </Container1>
       </Section>
     </Container>
   );

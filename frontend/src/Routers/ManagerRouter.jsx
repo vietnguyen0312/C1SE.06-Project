@@ -1,4 +1,4 @@
-import MainLayout from "../Layout/ManagerLayout/MainLayout";
+import MainLayout from "../Layout/PrivateLayout/MainLayout";
 import ProtectedRoute from "./ProtectedRouter";
 
 const ManagerRouter = [
