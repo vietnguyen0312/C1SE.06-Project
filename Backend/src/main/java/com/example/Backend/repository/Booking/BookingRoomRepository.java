@@ -15,6 +15,6 @@ import java.util.List;
 public interface BookingRoomRepository extends JpaRepository<BookingRoom, String> {
     List<BookingRoom> findByUser(User user);
     Page<BookingRoom> findByUser_Email(String email, Pageable pageable);
-    List<BookingRoom> findByUser_Id(String userId, Sort sort);
+    List<BookingRoom> findByUser_Email(String email, Sort sort);
     List<BookingRoom> findByDatePayBeforeAndStatusIs(Instant datePay, String status);
 }

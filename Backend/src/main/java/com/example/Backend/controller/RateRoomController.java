@@ -3,6 +3,7 @@ package com.example.Backend.controller;
 import com.example.Backend.dto.request.Rating.RateRoomCreationRequest;
 import com.example.Backend.dto.request.Rating.RateRoomUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.Rating.RateRoomResponse;
 import com.example.Backend.service.Rating.RateRoomService;
 import jakarta.validation.Valid;
@@ -44,4 +45,23 @@ public class RateRoomController {
                 .build();
     }
 
+    @GetMapping("/by-room-type/{roomTypeID}")
+    public ApiResponse<PageResponse<RateRoomResponse>> getRateRoomsByRoomType(
+            @PathVariable String roomTypeID,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+
+        PageResponse<RateRoomResponse> rateRoomsPageResponse = rateRoomService.getRateRoomByRoomType(roomTypeID, page, size);
+
+        return ApiResponse.<PageResponse<RateRoomResponse>>builder()
+                .result(rateRoomsPageResponse)
+                .build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteRateRoom(@PathVariable String id) {
+        rateRoomService.deleteRateRoom(id);
+        return ApiResponse.<Void>builder()
+                .build();
+    }
 }

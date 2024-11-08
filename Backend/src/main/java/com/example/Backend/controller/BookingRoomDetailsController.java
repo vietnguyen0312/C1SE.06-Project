@@ -90,19 +90,18 @@ public class BookingRoomDetailsController {
             @PathVariable("userId") String userId) {
         return ApiResponse.<List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>>
                         builder()
-                .result(bookingRoomDetailsService.getBookingRoomDetailsByUserID(userId))
+                .result(bookingRoomDetailsService.getBookingRoomDetailsByUserID())
                 .build();
     }
 
-    @GetMapping("/byUser/page/{userId}")
+    @GetMapping("/byUser/page")
     public ApiResponse<PageResponse<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>>
     getPagedBookingRoomDetailsByUserId(
-            @PathVariable("userId") String userId,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
         return ApiResponse.<PageResponse<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>>
                         builder()
-                .result(bookingRoomDetailsService.getBookingRoomDetailsByUserID1(userId, page, size))
+                .result(bookingRoomDetailsService.getBookingRoomDetailsByUserID1( page, size))
                 .build();
     }
 

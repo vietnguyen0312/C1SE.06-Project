@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -36,5 +37,6 @@ public class RateRoom {
     String comment;
 
 
-    Date dateUpdate;
+
+    Instant dateUpdate;
 }

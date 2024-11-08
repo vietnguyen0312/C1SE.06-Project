@@ -181,78 +181,8 @@ export const BannerSectionTicket = styled.section`
     outline: none;
     
   `;
-const historyBookingRoom = [
-    {
-        id: 1,
-        checkInDate: "2024-02-02",
-        checkOutDate: "2024-02-03",
-        soNgayThue: 1,
-        status: "Đã thanh toán",
-        bookingRooms: [
-            {
-                id: 1,
-                img: '/img/hotels/room_type/coupleRoom.jpg',
-                roomTypeName: 'Standard',
-                roomNumber: 101,
-                numberPeople: 2,
-                status: "Đang hoạt động",
-                roomTypePrice: 100000,
-            },
-            {
-                id: 2,
-                img: '/img/hotels/room_type/coupleRoom.jpg',
-                roomTypeName: 'Standard',
-                roomNumber: 101,
-                numberPeople: 2,
-                status: "Đang hoạt động",
-                roomTypePrice: 100000,
-            },
-            {
-                id: 3,
-                img: '/img/hotels/room_type/coupleRoom.jpg',
-                roomTypeName: 'Standard',
-                roomNumber: 101,
-                numberPeople: 2,
-                status: "Đang hoạt động",
-                roomTypePrice: 100000,
-            },
-        ]
-    },
-    {
-        id: 2,
-        checkInDate: "2024-03-15",
-        checkOutDate: "2024-03-16",
-        soNgayThue: 1,
-        status: "Chưa thanh toán",
-        bookingRooms: [
-            {
-                id: 1,
-                img: '/img/hotels/room_type/coupleRoom.jpg',
-                roomTypeName: 'Standard',
-                roomNumber: 101,
-                numberPeople: 2,
-                status: "Đang hoạt động",
-                roomTypePrice: 100000,
-            },
-            {
-                id: 2,
-                img: '/img/hotels/room_type/coupleRoom.jpg',
-                roomTypeName: 'Standard',
-                roomNumber: 101,
-                numberPeople: 2,
-                status: "Đang hoạt động",
-                roomTypePrice: 100000,
-            },
-        ]
-    },
-];
 
-const userInfo = {
-    name: "Hoang Nghia Quyen",
-    gender: "Male",
-    phone: "123-456-789",
-    customerType: "VIP"
-};
+
 const calculateTotal = (bookingRooms) => {
     return bookingRooms.reduce((total, bookingRoom) => {
         return total + bookingRoom.roomTypePrice;
@@ -398,8 +328,8 @@ const HistoryBookingRoom = () => {
         setUser(response.result)
         console.log(response.result)
         console.log("dsadsadsadsads")
-        const Id = response.result.id
-        const response1 = await axios.get(`/booking_room_details/byUser/page/${Id}`, { params })
+        // const Id = response.result.id
+        const response1 = await axios.get(`/booking_room_details/byUser/page`, { params })
         console.log(response1)
         const hasMore = response1.result.currentPage < response1.result.totalPages; // Điều kiện kiểm tra trang
         console.log(`Current Page: ${response1.result.currentPage}, Total Pages: ${response1.result.totalPages}, Has More: ${hasMore}`);

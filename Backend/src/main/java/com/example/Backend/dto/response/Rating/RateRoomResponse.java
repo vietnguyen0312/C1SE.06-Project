@@ -21,4 +21,5 @@ public class RateRoomResponse {
     double score;
     String comment;
     Instant dateUpdate;
+    String createdDate;
 }

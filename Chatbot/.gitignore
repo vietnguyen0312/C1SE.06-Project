@@ -16,3 +16,5 @@ models/
 *.log
 # Các file dữ liệu nhạy cảm
 *.env
+# Các file nhạy cảm
+myenv/

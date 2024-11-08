@@ -174,11 +174,14 @@ public class BookingRoomDetailsService {
         }
 
 
-        @PreAuthorize("#userId == authentication.principal.id or hasRole('EMPLOYEE')")
-        public List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
-        getBookingRoomDetailsByUserID(String userId) {
 
-                List<BookingRoom> bookingRooms = bookingRoomRepository.findByUser_Id(userId, Sort.by(Sort.Direction.DESC, "datePay"));
+        public List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
+        getBookingRoomDetailsByUserID() {
+
+                var context = SecurityContextHolder.getContext();
+                String email = context.getAuthentication().getName();
+
+                List<BookingRoom> bookingRooms = bookingRoomRepository.findByUser_Email(email, Sort.by(Sort.Direction.DESC, "datePay"));
 
                 Map<Instant, List<BookingRoom>> bookingRoomMap = bookingRooms.stream()
                         .collect(Collectors.groupingBy(BookingRoom::getDatePay, LinkedHashMap::new, Collectors.toList()));
@@ -246,12 +249,13 @@ public class BookingRoomDetailsService {
                 return bookingRoomDetailsMap;
         }
 
-        @PreAuthorize("#userId == authentication.principal.id or hasRole('EMPLOYEE')")
         public PageResponse<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
-        getBookingRoomDetailsByUserID1(String userId, int page, int size) {
+        getBookingRoomDetailsByUserID1( int page, int size) {
 
+                var context = SecurityContextHolder.getContext();
+                String email = context.getAuthentication().getName();
 
-                List<BookingRoom> bookingRooms = bookingRoomRepository.findByUser_Id(userId, Sort.by(Sort.Direction.DESC, "datePay"));
+                List<BookingRoom> bookingRooms = bookingRoomRepository.findByUser_Email(email, Sort.by(Sort.Direction.DESC, "datePay"));
 
                 Map<Instant, List<BookingRoom>> bookingRoomMap = bookingRooms.stream()
                         .collect(Collectors.groupingBy(BookingRoom::getDatePay, LinkedHashMap::new, Collectors.toList()));
@@ -332,6 +336,7 @@ public class BookingRoomDetailsService {
                         .data(paginatedResults)
                         .build();
         }
+
 
 
 //List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
