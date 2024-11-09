@@ -29,14 +29,14 @@ class ActionListServices(Action):
 
             data = response.json()
             
-
+            print("data: ", data)
             if "result" in data and isinstance(data["result"], list):
                 services = data["result"]
                 num_services = len(services)
 
-                service_list = ", ".join([service["name"] for service in services])
+                service_list = "<li>" + "</li><li>".join([service["name"] for service in services]) + "</li>"
 
-                combined_data = f"Hiện tại có {num_services} loại dịch vụ: {service_list}."
+                combined_data = f"Hiện tại có {num_services} loại dịch vụ: <ol>{service_list}</ol>."
             else:
                 dispatcher.utter_message(template="utter_error")
         
@@ -57,14 +57,16 @@ class ActionServiceEntity(Action):
             tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         
-        service_name = tracker.get_slot("service_name")
-        set_slot = SlotSet("service_name", service_name)
+        service_name = tracker.latest_message['entities'][0]['value'] 
+        print("service_name: ", service_name)
+        # set_slot = SlotSet("service_name", service_name)
+        # print("service_name: ", service_name)
         
         try:
             response = requests.get(BASE_URL + "serviceTypes")
             response.raise_for_status()
             services = response.json()["result"]
-            best_match_id = None
+            best_match_id = ""
             best_match_score = 0
 
             for service in services:
@@ -72,6 +74,7 @@ class ActionServiceEntity(Action):
                 if score > best_match_score:
                     best_match_score = score
                     best_match_id = service["id"]
+
             if best_match_id:
                 detail_service_url = BASE_URL + f"services?page=1&size=6&serviceTypeId={best_match_id}&search="
                 detail_response = requests.get(detail_service_url)
@@ -80,7 +83,7 @@ class ActionServiceEntity(Action):
                 service_details = detail_data["result"]["data"]
                 service_names = [x["name"] for x in service_details]
                 combined_data = ", ".join(service_names)
-                return [SlotSet("combined_data", combined_data), set_slot]
+                return [SlotSet("combined_data", combined_data)]
         except requests.exceptions.RequestException as e:
             dispatcher.utter_message(template="utter_error")
         

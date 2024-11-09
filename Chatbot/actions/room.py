@@ -113,10 +113,10 @@ class ActionGetRoomDetails(Action):
                 response = f"Chi tiết của phòng {specific_room}: {room_info[specific_room]}"
             else:
 
-                response = "Chi tiết của tất cả các loại phòng là:\n"
+                response = "<h5>Chi tiết của tất cả các loại phòng là:</h5>\n<ol>"
                 for room_name, detail in room_info.items():
-                    response += f"- {room_name}: {detail}\n"
-
+                    response += f"<li> <strong>{room_name}</strong> : {detail}</li>"
+                response += "</ol>"
         else:
             response = "Hiện không có thông tin về chi tiết các loại phòng."
 

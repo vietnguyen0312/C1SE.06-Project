@@ -168,7 +168,7 @@ class ActionWeatherQuerySpecificDay(Action):
             dispatcher.utter_message(template="utter_ask_about_weather_for_specific_day_error")
             return [ActionExecutionRejected(self.name())]
         except Exception as e:
-            dispatcher.utter_message(template="utter_ask_about_weather_for_specific_day_error")
+            dispatcher.utter_message(template="utter_ask_about_weather_for_specific_day_error_daytime")
             return [ActionExecutionRejected(self.name())]
 
         return [SlotSet("combined_data", combined_data)]
