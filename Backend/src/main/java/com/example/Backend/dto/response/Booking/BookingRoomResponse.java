@@ -4,6 +4,7 @@ import com.example.Backend.entity.User.User;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Data
@@ -14,9 +15,9 @@ import java.util.Date;
 public class BookingRoomResponse {
     String id;
     User user;
-    Date checkInDate;
-    Date checkOutDate;
+    Instant checkInDate;
+    Instant checkOutDate;
     double total;
     String status;
-
+    Instant datePay;
 }

@@ -81,7 +81,7 @@ const Checkout = () => {
                         billDetails: detailsRes.result
                     });
                 } else if (category === 'r') {
-                    const res = await axios.put(`/booking_room/${id}`, { status: 'Đã thanh toán' });
+                    const res = await axios.put(`/booking_room/${id}`, { status: 'đã thanh toán' });
                     const detailsRes = await axios.get(`/booking_room_details/byBookingRoom/${id}`);
                     setBillData({
                         billInfo: res.result,
@@ -101,33 +101,33 @@ const Checkout = () => {
         <Container>
             {checkCategory === 't' ? (
                 <>
-                     {Ticket1.map(ticket => (
-                        <div style={{display:'flex',flexDirection:'column',width:'100%',height:'100%'}} key={ticket.id}>
-                                <Title className='Allison'>Checkout for room</Title>
-                                <OrderContainer>
-                                    <SectionTitle>Thông tin phòng</SectionTitle>
-                                    <InfoText>Phòng số: {ticket.RoomNumber}</InfoText>
-                                    <InfoText>Ngày bắt đầu: {ticket.Startday}</InfoText>
-                                    <InfoText>Ngày kết thúc: {ticket.EndDay}</InfoText>
-                                    <InfoText>Tổng tiền: {ticket.price.toLocaleString()} VNĐ</InfoText>
-                                    <InfoText>Trạng thái: <Status>{ticket.status}</Status></InfoText>
-                                </OrderContainer>
-                                <ButtonCPN text="Quay lại trang chủ"/>
+                    {Ticket1.map(ticket => (
+                        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }} key={ticket.id}>
+                            <Title className='Allison'>Checkout for room</Title>
+                            <OrderContainer>
+                                <SectionTitle>Thông tin phòng</SectionTitle>
+                                <InfoText>Phòng số: {ticket.RoomNumber}</InfoText>
+                                <InfoText>Ngày bắt đầu: {ticket.Startday}</InfoText>
+                                <InfoText>Ngày kết thúc: {ticket.EndDay}</InfoText>
+                                <InfoText>Tổng tiền: {ticket.price.toLocaleString()} VNĐ</InfoText>
+                                <InfoText>Trạng thái: <Status>{ticket.status}</Status></InfoText>
+                            </OrderContainer>
+                            <ButtonCPN text="Quay lại trang chủ" />
                         </div>
                     ))}
                 </>
             ) : (
                 <>
-                   
-                    <Title className='Allison'>Checkout for ticket</Title>
+
+                    <Title className='Allison'>Checkout for room</Title>
                     <OrderContainer>
                         <SectionTitle>Thông tin đơn hàng</SectionTitle>
                         <InfoText>Mã đơn hàng: {billData.billInfo?.id}</InfoText>
-                        <InfoText>Ngày đặt: {billData.billInfo?.datePay || billData.billInfo?.checkInDate}</InfoText>
+                        <InfoText>Ngày đặt: {billData.billInfo?.datePay}</InfoText>
                         <InfoText>Tổng tiền: {billData.billInfo?.total.toLocaleString()} VNĐ</InfoText>
                         <InfoText>Trạng thái: <Status status={billData.billInfo?.status}>{billData.billInfo?.status}</Status></InfoText>
                     </OrderContainer>
-                    <ButtonCPN text="Quay lại trang chủ"/>
+                    <ButtonCPN text="Quay lại trang chủ" />
                 </>
             )}
         </Container>

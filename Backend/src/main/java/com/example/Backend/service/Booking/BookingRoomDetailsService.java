@@ -142,7 +142,7 @@ public class BookingRoomDetailsService {
         }
 
 
-        @PreAuthorize("hasRole('MANAGER')")
+//        @PreAuthorize("hasRole('MANAGER')")
         public List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> getBookingRoomDetailsByBookingRoom(String bookingRoomId) {
                 List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> bookingRoomDetailsMap = new LinkedList<>();
 
