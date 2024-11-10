@@ -173,6 +173,7 @@ const HistoryTicketBill = () => {
     const detailsResponses = await Promise.all(detailsPromises);
     console.log("detailsResponses", detailsResponses);
     setHistoryBill((prev) => [...prev, ...detailsResponses]);
+    console.log("historyBill", historyBill);
     setTotalElements(billTicket.result.totalElements);
     setTotalPages(Math.ceil(billTicket.result.totalElements / pageSize));
   };
@@ -188,6 +189,7 @@ const HistoryTicketBill = () => {
   };
 
   const handleOpenModal = (service, billTicketDetailId) => {
+    console.log("serviceRatings", serviceRatings);
     setSelectedService(service);
     setBillTicketDetailId(billTicketDetailId);
     setTempRating(serviceRatings[service.key.id] || 0);
@@ -209,10 +211,10 @@ const HistoryTicketBill = () => {
       });
       setServiceRatings((prev) => ({
         ...prev,
-        [selectedService.key.id]: tempRating,
+        [selectedService.value.value[0].id]: selectedService.value.value[0].id,
       }));
+      console.log("serviceRatings", serviceRatings);
       handleCloseModal();
-      fetchHistoryBill();
     }
   };
 
@@ -395,8 +397,8 @@ const HistoryTicketBill = () => {
                                       }}
                                     >
                                       {item.status === "Đã thanh toán" &&
-                                        (serviceRatings[bill.key.id] ||
-                                        bill.value.key ? (
+                                        (serviceRatings[bill.value.value[0].id] ||
+                                        bill.value.key === "đã đánh giá" ? (
                                           <span>Đã đánh giá</span>
                                         ) : (
                                           <ButtonCPN
@@ -404,7 +406,7 @@ const HistoryTicketBill = () => {
                                             onClick={() =>
                                               handleOpenModal(
                                                 bill,
-                                                ticketdetail.id
+                                                ticketdetail.id,
                                               )
                                             }
                                             style={{

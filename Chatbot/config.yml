@@ -6,7 +6,7 @@ language: vi
 pipeline:
   - name: WhitespaceTokenizer
   - name: RegexFeaturizer
-    case_sensitive: true
+    case_sensitive: false
     known_patterns:
        - name: "numberPhone"
          pattern: "\\b\\d{10}\\b"

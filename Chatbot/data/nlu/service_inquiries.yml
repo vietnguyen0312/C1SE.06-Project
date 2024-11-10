@@ -31,16 +31,16 @@ nlu:
 
 - intent: ask_about_specific_service
   examples: |
-    - Tôi muốn biết thêm thông tin về [service_name](Hoạt Động Giải Trí)
-    - Có thể cho tôi biết thêm về [service_name](Hoạt Động Thư Giản) không?
-    - [service_name](Không Gian Ẩm Thực) có gì?
-    - [service_name](Không Gian Nghỉ Dưỡng) là gì?
-    - Tôi cần thông tin chi tiết về [service_name](Không Gian Văn Hóa).
-    - Bạn có thể mô tả [service_name](Phương Tiện Di Chuyển) cho tôi không?
-    - [service_name](dịch vụ) này có những gì?
-    - Tôi muốn tìm hiểu về [service_name](dịch vụ).
-    - Có thông tin gì về [service_name](dịch vụ) không?
-    - Hãy mô tả [service_name](dịch vụ) chi tiết cho tôi.
+    - Tôi muốn biết thêm thông tin về [Hoạt Động Giải Trí](service_name)
+    - Có thể cho tôi biết thêm về [Hoạt Động Thư Giản](service_name) không?
+    - [Không Gian Ẩm Thực](service_name) có gì?
+    - [Không Gian Nghỉ Dưỡng](service_name) là gì?
+    - Tôi cần thông tin chi tiết về [Không Gian Văn Hóa](service_name).
+    - Bạn có thể mô tả [Phương Tiện Di Chuyển](service_name) cho tôi không?
+    - [Dịch Vụ Spa](service_name) này có những gì?
+    - Tôi muốn tìm hiểu về [Dịch Vụ Ăn Uống](service_name).
+    - Có thông tin gì về [Dịch Vụ Mới](service_name) không?
+    - Hãy mô tả [Dịch Vụ Chăm Sóc Khách Hàng](service_name) chi tiết cho tôi.
 
 
 # - intent: ask_about_guide_services #hỏi về dịch vụ hướng dẫn viên

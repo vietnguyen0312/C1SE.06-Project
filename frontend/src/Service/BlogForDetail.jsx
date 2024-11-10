@@ -522,14 +522,24 @@ const BlogDetail = () => {
     }
   };
 
+  const CheckCommentLength = (commentContent) => {
+    if (commentContent.trim() === "" || !user) {
+      console.warn("User hoặc commentContent null");
+      return false;
+    }
+    if(commentContent.length > 100){
+      toast.error("Bình luận không được quá 100 ký tự");
+      return false;
+    }
+    return true;
+  }
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
 
-    if (commentContent.trim() === "" || !user) {
-      console.warn("User hoặc commentContent null");
+    if(!CheckCommentLength(commentContent)){
       return;
     }
-
     const newComment = {
       userId: user.id,
       blogId: id,
@@ -549,16 +559,15 @@ const BlogDetail = () => {
   };
 
   const handleEditComment = (comment) => {
+    
     setEditingCommentId(comment.id);
     setEditedCommentContent(comment.comment);
-    
   };
 
   const handleUpdateComment = async (e, commentId) => {
     e.preventDefault();
 
-    if (editedCommentContent.trim() === "") {
-      console.warn("Nội dung bình luận không được để trống");
+    if(!CheckCommentLength(editedCommentContent)){
       return;
     }
     const comment = {
@@ -577,7 +586,7 @@ const BlogDetail = () => {
     setEditingCommentId(null);
     setEditedCommentContent("");
   };
-
+  
   if (!post) {
     return <p>Loading...</p>;
   }
