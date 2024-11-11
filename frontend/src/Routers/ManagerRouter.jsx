@@ -1,5 +1,6 @@
 import MainLayout from "../Layout/PrivateLayout/MainLayout";
 import ProtectedRoute from "./ProtectedRouter";
+import Dashboard from "../Layout/PrivateLayout/Dashboard";
 
 const ManagerRouter = [
     {
@@ -11,7 +12,7 @@ const ManagerRouter = [
                 children: [
                     {
                         index: true,
-                        element: <div>Manager</div>,
+                        element: <Dashboard />,
                     },
                 ],
             }

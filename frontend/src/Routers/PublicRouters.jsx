@@ -97,7 +97,6 @@ const PublicRouters = [
         path: "/forgotPassword",
         element: <ForgotPassword />
     },
-
 ];
 
 export default PublicRouters;
