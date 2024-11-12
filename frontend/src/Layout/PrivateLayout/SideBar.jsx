@@ -13,7 +13,7 @@ import {
     FileDoneOutlined 
 } from '@ant-design/icons';
 import DropdownMenu from '../../components/Dropdown/dropdown';  
-
+import { useNavigate } from 'react-router-dom';
 const SidebarContainer = styled.div`
     width: 250px;
     height: 100vh;
@@ -28,6 +28,7 @@ const SidebarHeader = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 `;
 
 const SidebarContent = styled.div`
@@ -67,6 +68,7 @@ const Sidebar = () => {
     const toggleDropdown = (dropdownName) => {
         setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
     };
+    const navigate = useNavigate(); // Khởi tạo useNavigate
 
     const menuItems = (
         <>
@@ -78,13 +80,13 @@ const Sidebar = () => {
 
     const dashboard = (
         <>
-            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}} href='/dashboard'><FileTextOutlined />Report</div>
+            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={() => navigate('/manager')}><FileTextOutlined />Report</div>
         </>
     );
 
     return (
         <SidebarContainer>
-            <SidebarHeader className='Allison'>Healings</SidebarHeader>
+            <SidebarHeader className='Allison' onClick={() => navigate('/manager')}>Healings</SidebarHeader>
             <SidebarContent>
                 <DropdownMenu
                     icon={<DashboardOutlined />}

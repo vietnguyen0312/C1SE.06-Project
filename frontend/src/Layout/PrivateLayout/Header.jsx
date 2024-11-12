@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Input, Menu, Dropdown } from 'antd';
 import { AppstoreOutlined, BellOutlined, LogoutOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 const { Search } = Input;
 
 const HeaderContainer = styled.div`
@@ -78,12 +79,16 @@ const StyledMenu = styled(Menu)`
 const StyledLogoutOutlined = styled(LogoutOutlined)`
     margin-right: 5px;
 `;
-const UserMenu = (
+
+
+const Header = () => {
+    const navigate = useNavigate();
+    const UserMenu = (
     <StyledMenu>
         <Menu.Item key="0" style={{fontSize: '15px',fontWeight: 'bold'}}>Name</Menu.Item>
         <Menu.Item key="1" style={{fontSize: '14px',color: '#c0bfbf'}}>email@gmail.com</Menu.Item>
         <Menu.Divider />
-        <Menu.Item key="2">Profile</Menu.Item>
+        <Menu.Item key="2" onClick={() => navigate('/manager/profile')}>Profile</Menu.Item>
         <Menu.Item key="3">Help</Menu.Item>
         <Menu.Item key="4">Message</Menu.Item>
         <Menu.Item key="5">Setting</Menu.Item>
@@ -91,8 +96,6 @@ const UserMenu = (
         <Menu.Item key="6"><StyledLogoutOutlined />Logout</Menu.Item>
     </StyledMenu>
 );
-
-const Header = () => {
     return (
         <HeaderContainer>
             <HeaderContent>

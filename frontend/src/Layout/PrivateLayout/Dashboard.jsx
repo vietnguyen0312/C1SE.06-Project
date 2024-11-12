@@ -8,15 +8,16 @@ import { useState } from 'react';
 
 const Container = styled.div`
     padding: 20px;
+    background-color: #f5f5f5;
 `;
 
-const DashboardContainer = styled.div`
+export const DashboardContainer = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
 `;
 
-const Header = styled.div`
+export const Header = styled.div`
     display: flex;
     align-items: center;
     gap: 10px;
@@ -26,7 +27,7 @@ const Header = styled.div`
     transition: color 0.3s ease;
 `;
 
-const HeaderItem = styled.p`
+export const HeaderItem = styled.p`
     transition: color 0.3s ease;
     &:hover {
         color: #f8b600;
@@ -170,7 +171,7 @@ const RevenueContainerRight = styled.div`
     padding: 30px 20px;
     border-bottom: 1px solid #e5e5e5;
 `
-const DateStyle = styled.div`
+export const DateStyle = styled.div`
     color: #777;
 `
 const Revenue1 = styled.div`
@@ -366,8 +367,8 @@ const columns = [
         render: (record) => (
             <Popover content={
                 <div>
-                    <div onClick={() => handleEdit(record)}>Edit</div>
-                    <div onClick={() => handleDelete(record)}>Delete</div>
+                    <PopoverItem onClick={() => handleEdit(record)}>Edit</PopoverItem>
+                    <PopoverItem onClick={() => handleDelete(record)}>Delete</PopoverItem>
                 </div>
             } trigger="click" placement='left'>
                 <div style={{ cursor: 'pointer', fontSize: '20px', color: '#3518f0', display: 'flex', justifyContent: 'center' }}>
