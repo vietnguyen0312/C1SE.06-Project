@@ -56,7 +56,7 @@ const Bookings = () => {
     const [showBookingRoom, setShowBookingRoom] = useState(false);
     const [showHistoryBookingRoom, setShowHistoryBookingRoom] = useState(false);
     const [showHistoryTicketBill, setShowHistoryTicketBill] = useState(false);
-    const [showTicket, setShowTicket] = useState(false);
+    const [showTicket, setShowTicket] = useState(true);
     const [showSearch, setShowSearch] = useState(false);
 
     return (
@@ -66,26 +66,26 @@ const Bookings = () => {
                     <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Bookings</div>
                     <ButtonContainer>
                         <ButtonCPN 
-                            text='Rooms' 
-                            onClick={() => {
-                                setShowBookingRoom(!showBookingRoom);
-                                //setShowHistoryBookingRoom(!showHistoryBookingRoom);
-                                setShowSearch(!showSearch);
-                                setShowTicket(false);
-                                setShowHistoryTicketBill(false);
-                            }} 
-                            style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px' }}
-                        />
-                        <ButtonCPN 
                             text='Tickets' 
                             onClick={() => {
-                                setShowTicket(!showTicket);
+                                setShowTicket(true);
                                 setShowHistoryTicketBill(!showHistoryTicketBill);
-                                setShowSearch(!showSearch);
+                                setShowSearch(true);
                                 setShowBookingRoom(false);
                                 //setShowHistoryBookingRoom(false);
                             }} 
-                            style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px'  }}
+                        />
+                         <ButtonCPN 
+                            text='Rooms' 
+                            onClick={() => {
+                                setShowBookingRoom(true);
+                                //setShowHistoryBookingRoom(!showHistoryBookingRoom);
+                                setShowSearch(true);
+                                setShowTicket(false);
+                                setShowHistoryTicketBill(false);
+                            }} 
+                            style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
                         />
                     </ButtonContainer>
                 </div>
@@ -102,9 +102,11 @@ const Bookings = () => {
             <div style={{ marginTop: '20px' }}>
                 {showTicket && <Ticket style={{ padding: '0' }}/>}
             </div>
-            <InputContainer>
-                {showSearch && <SearchInput type="text" placeholder="Tìm kiếm ..." />}
-            </InputContainer>
+            {showSearch && (
+                <InputContainer>
+                    <SearchInput type="text" placeholder="Tìm kiếm ..." />
+                </InputContainer>
+            )}
             {/* <div >
                 {showHistoryBookingRoom && <HistoryBookingRoom />}
             </div> */}

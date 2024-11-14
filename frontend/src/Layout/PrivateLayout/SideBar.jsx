@@ -92,7 +92,7 @@ const Sidebar = () => {
                         <ProfileOutlined />
                         <div>Guest Details</div>
                     </Item>
-                    <Item>
+                    <Item onClick={() => navigate('/manager/rooms')}>
                         <HomeOutlined />
                         <div>Rooms</div>
                     </Item>

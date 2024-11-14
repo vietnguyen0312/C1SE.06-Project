@@ -3,6 +3,7 @@ import ProtectedRoute from "./ProtectedRouter";
 import Dashboard from "../Layout/PrivateLayout/Dashboard";
 import Profile from "../Layout/PrivateLayout/Profile";
 import Bookings from "../Layout/PrivateLayout/Bookings";
+import Rooms from "../Layout/PrivateLayout/Rooms";
 const ManagerRouter = [
     {
         children: [
@@ -21,6 +22,10 @@ const ManagerRouter = [
                     {
                         path: "bookings",
                         element: <Bookings />,
+                    },
+                    {
+                        path: "rooms",
+                        element: <Rooms />,
                     },
                 ],
             }
