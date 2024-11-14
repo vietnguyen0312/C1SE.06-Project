@@ -33,6 +33,7 @@ const GetUserInfo = () => {
 const UserInfo = () => {
     const { user, handleLogout } = GetUserInfo();
     const [activeDropdown, setActiveDropdown] = useState(null);
+    const [showSubmenu, setShowSubmenu] = useState(false);
 
     return (
         <>

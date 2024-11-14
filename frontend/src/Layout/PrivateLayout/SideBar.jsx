@@ -88,30 +88,12 @@ const Sidebar = () => {
         <SidebarContainer>
             <SidebarHeader className='Allison' onClick={() => navigate('/manager')}>Healings</SidebarHeader>
             <SidebarContent>
-                <DropdownMenu
-                    icon={<DashboardOutlined />}
-                    label="Dashboard"
-                    content={dashboard}
-                    isActive={activeDropdown === 'dashboard'}
-                    onClick={() => toggleDropdown('dashboard')}
-                    icon2={<RightOutlined />}
-                />
-                <DropdownMenu
-                    icon={<TeamOutlined />}
-                    label="Staff"
-                    content={menuItems}
-                    isActive={activeDropdown === 'staff'}
-                    onClick={() => toggleDropdown('staff')}
-                    icon2={<RightOutlined />}
-                />
-                <DropdownMenu
-                    icon={<KeyOutlined />}
-                    label="Authentication"
-                    content={menuItems}
-                    isActive={activeDropdown === 'authentication'}
-                    onClick={() => toggleDropdown('authentication')}
-                    icon2={<RightOutlined />}
-                />
+                <div style={{ padding: '15px 0', borderBottom: '1px solid #e5e5e5' }} onClick={() => navigate('/manager')}>
+                    <Item>
+                        <DashboardOutlined />
+                        <div>Dashboard</div>
+                    </Item>
+                </div>
                 <Hotel>
                     <Content>HOTEL | ROOM</Content>
                     <Item>
@@ -126,7 +108,7 @@ const Sidebar = () => {
                         <HomeOutlined />
                         <div>Rooms</div>
                     </Item>
-                    <Item>
+                    <Item onClick={() => navigate('/manager/bookings')}>
                         <CalendarOutlined />
                         <div>Bookings</div>
                     </Item>
