@@ -4,7 +4,6 @@ import Dashboard from "../Layout/PrivateLayout/Dashboard";
 import Profile from "../Layout/PrivateLayout/Profile";
 const ManagerRouter = [
     {
-        element: <ProtectedRoute role='MANAGER' />,
         children: [
             {
                 path: "/manager",

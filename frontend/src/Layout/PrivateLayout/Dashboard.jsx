@@ -174,14 +174,6 @@ const RevenueContainerRight = styled.div`
 export const DateStyle = styled.div`
     color: #777;
 `
-const Revenue1 = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 10px;
-`
 const Item = styled.div`
     display: flex;
     align-items: center;
@@ -189,7 +181,7 @@ const Item = styled.div`
     gap: 7px;
     width: 20%;
 `
-const Revenue2 = styled.div`
+const Revenue = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -259,11 +251,11 @@ const data = [
 ];
 
 const RevenueData = [
-    { date: 'June', Bookings: 1000, Revenue: 666, Expense: 500, Profit: 166 },
-    { date: 'July', Bookings: 1200, Revenue: 750, Expense: 550, Profit: 200 },
-    { date: 'August', Bookings: 1300, Revenue: 820, Expense: 600, Profit: 220 },
-    { date: 'September', Bookings: 1100, Revenue: 700, Expense: 520, Profit: 180 },
-    { date: 'October', Bookings: 1400, Revenue: 850, Expense: 650, Profit: 200 },
+    { month: 'June', Bookings: 1000, Revenue: 666, Expense: 500, Profit: 166 },
+    { month: 'July', Bookings: 1200, Revenue: 750, Expense: 550, Profit: 200 },
+    { month: 'August', Bookings: 1300, Revenue: 820, Expense: 600, Profit: 220 },
+    { month: 'September', Bookings: 1100, Revenue: 700, Expense: 520, Profit: 180 },
+    { month: 'October', Bookings: 1400, Revenue: 850, Expense: 650, Profit: 200 },
 ];
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -417,31 +409,6 @@ const Dashboard = () => {
                 </div>
             </DashboardContainer>
             <ChartContainer>
-                <ChartItem style={{ backgroundColor: '#ddddfc' }}>
-                    <ChartItemContainer>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <ChartTitle>Visitors</ChartTitle>
-                            <NumberStyle>100K</NumberStyle>
-                        </div>
-                        <div>
-                            <UserIcon />
-                        </div>
-                    </ChartItemContainer>
-                    <ChartFooter>
-                        <Percent increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors}>
-                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
-                            <div>10%</div>
-                        </Percent>
-                        <div style={{ color: '#999' }}>Last Month</div>
-                    </ChartFooter>
-                    <ChartLine>
-                        <LineChart width={220} height={90} data={data}>
-                            <Tooltip content={<CustomTooltip />} />
-                            <Line type="monotone" dataKey="Visitors" stroke="#000000" activeDot={{ r: 8 }} />
-                        </LineChart>
-                    </ChartLine>
-                </ChartItem>
-
                 <ChartItem style={{ backgroundColor: '#ffc6c6' }}>
                     <ChartItemContainer>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -466,30 +433,7 @@ const Dashboard = () => {
                         </BarChart>
                     </ChartLine>
                 </ChartItem>
-                <ChartItem style={{ backgroundColor: '#ffc6ff' }}>
-                    <ChartItemContainer>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <ChartTitle>Revenue</ChartTitle>
-                            <NumberStyle>100K</NumberStyle>
-                        </div>
-                        <div>
-                            <DollarIcon />
-                        </div>
-                    </ChartItemContainer>
-                    <ChartFooter>
-                        <Percent increase={data[data.length - 1].Revenue > data[data.length - 2].Revenue}>
-                            {data[data.length - 1].Revenue > data[data.length - 2].Revenue ? <RiseOutlined /> : <FallOutlined />}
-                            <div>10%</div>
-                        </Percent>
-                        <div style={{ color: '#999' }}>Last Month</div>
-                    </ChartFooter>
-                    <ChartLine>
-                        <LineChart width={220} height={90} data={data}>
-                            <Tooltip content={<CustomTooltip />} />
-                            <Line type="monotone" dataKey="Revenue" stroke="#000000" activeDot={{ r: 8 }} />
-                        </LineChart>
-                    </ChartLine>
-                </ChartItem>
+
                 <ChartItem style={{ backgroundColor: '#9df8cc' }}>
                     <ChartItemContainer>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -514,6 +458,56 @@ const Dashboard = () => {
                         </BarChart>
                     </ChartLine>
                 </ChartItem>
+                
+                <ChartItem style={{ backgroundColor: '#ddddfc' }}>
+                    <ChartItemContainer>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <ChartTitle>Visitors</ChartTitle>
+                            <NumberStyle>100K</NumberStyle>
+                        </div>
+                        <div>
+                            <UserIcon />
+                        </div>
+                    </ChartItemContainer>
+                    <ChartFooter>
+                        <Percent increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors}>
+                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
+                            <div>10%</div>
+                        </Percent>
+                        <div style={{ color: '#999' }}>Last Month</div>
+                    </ChartFooter>
+                    <ChartLine>
+                        <LineChart width={220} height={90} data={data}>
+                            <Tooltip content={<CustomTooltip />} />
+                            <Line type="monotone" dataKey="Visitors" stroke="#000000" activeDot={{ r: 8 }} />
+                        </LineChart>
+                    </ChartLine>
+                </ChartItem>
+                
+                <ChartItem style={{ backgroundColor: '#ffc6ff' }}>
+                    <ChartItemContainer>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <ChartTitle>Revenue</ChartTitle>
+                            <NumberStyle>100K</NumberStyle>
+                        </div>
+                        <div>
+                            <DollarIcon />
+                        </div>
+                    </ChartItemContainer>
+                    <ChartFooter>
+                        <Percent increase={data[data.length - 1].Revenue > data[data.length - 2].Revenue}>
+                            {data[data.length - 1].Revenue > data[data.length - 2].Revenue ? <RiseOutlined /> : <FallOutlined />}
+                            <div>10%</div>
+                        </Percent>
+                        <div style={{ color: '#999' }}>Last Month</div>
+                    </ChartFooter>
+                    <ChartLine>
+                        <LineChart width={220} height={90} data={data}>
+                            <Tooltip content={<CustomTooltip />} />
+                            <Line type="monotone" dataKey="Revenue" stroke="#000000" activeDot={{ r: 8 }} />
+                        </LineChart>
+                    </ChartLine>
+                </ChartItem>
             </ChartContainer>
             <RevenueContainer>
                 <RevenueContainerLeft>
@@ -525,62 +519,20 @@ const Dashboard = () => {
                         </div>
                     </DashboardContainer>
                     <div style={{ marginTop: '30px', paddingTop: '30px', borderTop: '1px solid #e5e5e5' }}>
-                        <Revenue1>
-                            <Item>
-                                <div>Bookings</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <NumberStyle style={{ fontSize: '16px' }}>666</NumberStyle>
-                                    <Percent increase={RevenueData[0].Bookings > RevenueData[1].Bookings} style={{ fontSize: '16px' }}>
-                                        {RevenueData[0].Bookings > RevenueData[1].Bookings ? <RiseOutlined /> : <FallOutlined />}
-                                        <div>10%</div>
-                                    </Percent>
-                                </div>
-                            </Item>
-                            <Item>
-                                <div>Revenue</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <NumberStyle style={{ fontSize: '16px' }}>666</NumberStyle>
-                                    <Percent increase={RevenueData[0].Revenue > RevenueData[1].Revenue} style={{ fontSize: '16px' }}>
-                                        {RevenueData[0].Revenue > RevenueData[1].Revenue ? <RiseOutlined /> : <FallOutlined />}
-                                        <div>10%</div>
-                                    </Percent>
-                                </div>
-                            </Item>
-                            <Item>
-                                <div>Expence</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <NumberStyle style={{ fontSize: '16px' }}>666</NumberStyle>
-                                    <Percent increase={RevenueData[0].Expence > RevenueData[1].Expence} style={{ fontSize: '16px' }}>
-                                        {RevenueData[0].Expence > RevenueData[1].Expence ? <RiseOutlined /> : <FallOutlined />}
-                                        <div>10%</div>
-                                    </Percent>
-                                </div>
-                            </Item>
-                            <Item>
-                                <div>Profit</div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                    <NumberStyle style={{ fontSize: '16px' }}>666</NumberStyle>
-                                    <Percent increase={RevenueData[0].Profit > RevenueData[1].Profit} style={{ fontSize: '16px' }}>
-                                        {RevenueData[0].Profit > RevenueData[1].Profit ? <RiseOutlined /> : <FallOutlined />}
-                                        <div>10%</div>
-                                    </Percent>
-                                </div>
-                            </Item>
-                        </Revenue1>
+                        <Revenue>
+                            <LineChart width={900} height={350} data={RevenueData}>
+                                <CartesianGrid stroke="#f5f5f5" />
+                                <XAxis dataKey="month" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Line type="monotone" dataKey="Bookings" stroke="#8884d8" name=" Bookings" />
+                                <Line type="monotone" dataKey="Revenue" stroke="#82ca9d" name=" Revenue" />
+                                <Line type="monotone" dataKey="Expense" stroke="#ffc658" name=" Expense" />
+                                <Line type="monotone" dataKey="Profit" stroke="#ff7300" name=" Profit" />
+                            </LineChart>
+                        </Revenue>
                     </div>
-                    <Revenue2>
-                        <LineChart width={900} height={350} data={RevenueData}>
-                            <CartesianGrid stroke="#f5f5f5" />
-                            <XAxis dataKey="date" />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line type="monotone" dataKey="Bookings" stroke="#8884d8" name=" Bookings" />
-                            <Line type="monotone" dataKey="Revenue" stroke="#82ca9d" name=" Revenue" />
-                            <Line type="monotone" dataKey="Expense" stroke="#ffc658" name=" Expense" />
-                            <Line type="monotone" dataKey="Profit" stroke="#ff7300" name=" Profit" />
-                        </LineChart>
-                    </Revenue2>
                 </RevenueContainerLeft>
                 <RevenueContainerRight>
                     <DashboardContainer>

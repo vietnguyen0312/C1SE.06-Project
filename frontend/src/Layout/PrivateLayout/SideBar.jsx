@@ -20,17 +20,6 @@ const SidebarContainer = styled.div`
     border-right: 1px solid #e5e5e5;
 `;
 
-const SidebarHeader = styled.div`
-    font-size: 60px;
-    font-weight: 600;
-    color: #f8b600;
-    border-bottom: 1px solid #e5e5e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-`;
-
 const SidebarContent = styled.div`
     height: 100%;
     padding: 0 20px;
@@ -86,7 +75,6 @@ const Sidebar = () => {
 
     return (
         <SidebarContainer>
-            <SidebarHeader className='Allison' onClick={() => navigate('/manager')}>Healings</SidebarHeader>
             <SidebarContent>
                 <DropdownMenu
                     icon={<DashboardOutlined />}
