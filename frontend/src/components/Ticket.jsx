@@ -12,11 +12,12 @@ import { CloseOutlined } from '@ant-design/icons';
 const TicketContainer = styled.div`
   display: flex;
   background-color: #f5f5f5;
-  height: 100vh;
-  padding: 30px 13vh 0 13vh;
+  height: auto;
+  padding: 20px 100px;
   user-select: none;  
   outline: none;
 `;
+
 
 const TicketList = styled.div`
   display: flex;
@@ -182,7 +183,7 @@ const TicketItem = styled.div`
   }
 `;
 
-const Ticket = () => {
+const Ticket = ({ style }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredTickets, setFilteredTickets] = useState([]);
     const [selectedTicket, setSelectedTicket] = useState(null);
@@ -326,10 +327,9 @@ const Ticket = () => {
        });
        window.location.href = paymentUrl.result;
     }
-
     return (
         <>
-            <TicketContainer>
+            <TicketContainer style={style}>
                 <TicketList>
                     <SearchContainer>
                         <SearchInput

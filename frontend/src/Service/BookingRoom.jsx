@@ -815,12 +815,13 @@ class BookingRoom extends Component {
     }
 
     render() {
-        const { startDate, endDate, showRoomSelection, totalPrice, rooms_type, roomPrice, selectedRooms, currentRoomDetails, selectedImage, sampleImages, roomTypes, activeRoomIndex, isLoading } = this.state;
+        const { startDate, endDate, showRoomSelection, totalPrice, showBanner, rooms_type, roomPrice, selectedRooms, currentRoomDetails, selectedImage, sampleImages, roomTypes, activeRoomIndex, isLoading } = this.state;
 
         return (
             <>
-                <BannerSectionHotels>
-                    <Overlay />
+                {showBanner && (
+                    <BannerSectionHotels>
+                        <Overlay />
                     <Container>
                         <Row>
                             <AboutContent>
@@ -835,7 +836,8 @@ class BookingRoom extends Component {
                             </AboutContent>
                         </Row>
                     </Container>
-                </BannerSectionHotels>
+                    </BannerSectionHotels>
+                )}
                 <ContainerDate>
                     <Row>
                         <DatePickerContainer>
