@@ -260,7 +260,7 @@ class BookingRoom extends Component {
             roomsByType: {},
             selectedRoomDetails: [],
             activeRoomIndex: 0,
-            showBanner: true
+            showBanner: props.showBanner !== undefined ? props.showBanner : true
         };
         this.lastPostElementRef = createRef();
         this.tempStartDate = null; // Biến tạm lưu giá trị startDate
