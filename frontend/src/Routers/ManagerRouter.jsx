@@ -4,6 +4,7 @@ import Dashboard from "../Layout/PrivateLayout/Dashboard";
 import Profile from "../Layout/PrivateLayout/Profile";
 import Bookings from "../Layout/PrivateLayout/Bookings";
 import Rooms from "../Layout/PrivateLayout/Rooms";
+import EmployeeAndCustomerList from "../Layout/PrivateLayout/EmployeeAndCustomerList/EmployeeAndCustomerList";
 const ManagerRouter = [
     {
         children: [
@@ -26,6 +27,10 @@ const ManagerRouter = [
                     {
                         path: "rooms",
                         element: <Rooms />,
+                    },
+                    {
+                        path: "employee-customer-list",
+                        element: <EmployeeAndCustomerList />,
                     },
                 ],
             }

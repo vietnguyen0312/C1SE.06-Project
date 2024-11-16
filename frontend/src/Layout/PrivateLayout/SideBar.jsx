@@ -30,6 +30,7 @@ const Hotel = styled.div`
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
+    border-bottom: 1px solid #e5e5e5;
 `;
 
 const Item = styled.div`
@@ -103,6 +104,13 @@ const Sidebar = () => {
                     <Item>
                         <FileDoneOutlined />
                         <div>Invoice</div>
+                    </Item>
+                </Hotel>
+                <Hotel>
+                    <Content>EMPLOYEE | CUSTOMER</Content>
+                    <Item onClick={() => navigate('/manager/employee-customer-list')}>
+                        <TeamOutlined />
+                        <div>Employee /n & Customer List</div>
                     </Item>
                 </Hotel>
             </SidebarContent>
