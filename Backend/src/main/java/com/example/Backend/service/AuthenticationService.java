@@ -219,6 +219,10 @@ public class AuthenticationService {
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
+        if (!(userRepository.findByEmail(signedJWT.getJWTClaimsSet().getSubject())
+                .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)).getStatus().equals("Đang hoạt động")))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
         String jid = signedJWT.getJWTClaimsSet().getJWTID();
 
         if (TokenType.RESET_TOKEN.getName().equals(type)) {
@@ -250,33 +254,27 @@ public class AuthenticationService {
     }
 
     private String generateToken(User user, long duration) {
-        if ("Bị khoá".equals(user.getStatus())){
-            throw new AppException(ErrorCode.LOCKED);
-        }
-        else
-        {
-            JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
-            JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                    .subject(user.getEmail())
-                    .issuer("HE.com")
-                    .issueTime(new Date())
-                    .expirationTime(new Date(Instant.now().plus(duration, ChronoUnit.SECONDS).toEpochMilli()))
-                    .jwtID(UUID.randomUUID().toString())
-                    .claim("scope", buildScope(user))
-                    .build();
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(user.getEmail())
+                .issuer("HE.com")
+                .issueTime(new Date())
+                .expirationTime(new Date(Instant.now().plus(duration, ChronoUnit.SECONDS).toEpochMilli()))
+                .jwtID(UUID.randomUUID().toString())
+                .claim("scope", buildScope(user))
+                .build();
 
-            Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
-            JWSObject jwsObject = new JWSObject(header, payload);
+        JWSObject jwsObject = new JWSObject(header, payload);
 
-            try {
-                jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
-                return jwsObject.serialize();
-            } catch (JOSEException e) {
-                log.error("Cannot create Token", e);
-                throw new RuntimeException(e);
-            }
+        try {
+            jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+            return jwsObject.serialize();
+        } catch (JOSEException e) {
+            log.error("Cannot create Token", e);
+            throw new RuntimeException(e);
         }
     }
 

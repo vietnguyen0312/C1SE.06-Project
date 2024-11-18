@@ -23,5 +23,6 @@ public class UserResponse {
     String gender;
     String avatar;
     CustomerType customerType;
+    String status;
     Set<RoleResponse> roles;
 }

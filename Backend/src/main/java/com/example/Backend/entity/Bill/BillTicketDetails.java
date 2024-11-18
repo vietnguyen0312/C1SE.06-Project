@@ -6,6 +6,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
+
 @Entity
 @Table(name = "bill_ticket_details")
 @Data
@@ -37,7 +39,7 @@ public class BillTicketDetails {
     @PrePersist
     public void prePersist() {
         if (!StringUtils.hasLength(status)) {
-            status = "Chưa đánh giá";
+            status = "Chưa sử dụng";
         }
     }
 }

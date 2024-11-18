@@ -3,7 +3,9 @@ package com.example.Backend.service.User;
 import com.example.Backend.dto.request.User.UserChangePasswordRequest;
 import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.User.UserResponse;
+import com.example.Backend.entity.Service.ServiceEntity;
 import com.example.Backend.entity.User.Role;
 import com.example.Backend.entity.User.User;
 import com.example.Backend.enums.CustomerTypeEnum;
@@ -18,11 +20,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -72,8 +79,24 @@ public class UserService {
     }
 
     @PreAuthorize("hasRole('MANAGER')")
-    public List<UserResponse> getUsers() {
-        return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
+    public PageResponse<UserResponse> getUsers(int page, int size, String search, String customerType) {
+        Sort sort = Sort.by(Sort.Direction.ASC, "username").ascending();
+
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<User> pageData;
+
+        if (StringUtils.hasLength(search))
+            pageData = userRepository.findByUsernameOrEmailOrPhoneNumberContaining(search, search,search, pageable);
+        else
+            pageData = userRepository.findAll(pageable);
+        return PageResponse.<UserResponse>builder()
+                .currentPage(page)
+                .totalPages(pageData.getTotalPages())
+                .pageSize(size)
+                .totalElements(pageData.getTotalElements())
+                .data(pageData.getContent().stream().map(userMapper::toUserResponse).toList())
+                .build();
     }
 
     public UserResponse getUser(String id) {

@@ -515,7 +515,7 @@ const Dashboard = () => {
                         <div style={{ fontSize: '20px', fontWeight: '600' }}>Revenue Overview</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <RetweetOutlined />
-                            <DateStyle>Nov 9, 2024 - Nov 15, 2024</DateStyle>
+                            <DateStyle>Last 5 Months    </DateStyle>
                         </div>
                     </DashboardContainer>
                     <div style={{ marginTop: '30px', paddingTop: '30px', borderTop: '1px solid #e5e5e5' }}>

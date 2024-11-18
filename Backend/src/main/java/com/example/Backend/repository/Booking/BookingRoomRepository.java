@@ -20,10 +20,11 @@ public interface BookingRoomRepository extends JpaRepository<BookingRoom, String
     List<BookingRoom> findByUser_Email(String email, Sort sort);
     List<BookingRoom> findByDatePayBeforeAndStatusIs(Instant datePay, String status);
 
-    @Query("SELECT SUM(b.total) FROM BookingRoom b WHERE MONTH(b.checkInDate) = :month")
-    Double findSumIncomeByMonth(@Param("month") int month);
+    @Query("SELECT COALESCE(SUM(b.total), 0) FROM BookingRoom b WHERE MONTH(b.checkInDate) = :month AND YEAR(b.checkInDate) = :year")
+    Double findSumIncomeByMonthAndYear(@Param("month") int month, @Param("year") int year);
 
-    @Query("SELECT COUNT(b) FROM BookingRoom b WHERE MONTH(b.checkInDate) = :month")
-    int countBillByMonth(@Param("month") int month);
+    @Query("SELECT COALESCE(COUNT(b), 0) FROM BookingRoom b WHERE MONTH(b.checkInDate) = :month AND YEAR(b.checkInDate) = :year")
+    int countBillByMonthAndYear(@Param("month") int month, @Param("year") int year);
+
 
 }

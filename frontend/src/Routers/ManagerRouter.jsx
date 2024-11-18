@@ -5,6 +5,7 @@ import Profile from "../Layout/PrivateLayout/Profile";
 import Bookings from "../Layout/PrivateLayout/Bookings";
 const ManagerRouter = [
     {
+        // element: <ProtectedRoute role='MANAGER' />,
         children: [
             {
                 path: "/manager",
