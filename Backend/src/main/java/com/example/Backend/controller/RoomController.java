@@ -113,4 +113,15 @@ public class RoomController {
                                 .build();
         }
 
+        @GetMapping("/all")
+        public ApiResponse<PageResponse<RoomResponse>> getAllRooms(
+                @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+                var rooms = roomService.getAllRoomsSortedByRoomNumber(page, size);
+
+                return ApiResponse.<PageResponse<RoomResponse>>builder()
+                        .result(rooms)
+                        .build();
+        }
+
 }

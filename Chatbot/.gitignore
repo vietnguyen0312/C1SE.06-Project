@@ -18,3 +18,4 @@ models/
 *.env
 # Các file nhạy cảm
 myenv/
+.rasa/

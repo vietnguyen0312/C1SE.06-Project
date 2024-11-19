@@ -14,4 +14,6 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     List<Room> findAllByRoomType(RoomType RoomType);
 
     Page<Room> findAllByRoomType(RoomType roomType, Pageable pageable);
+
+    Page<Room> findAllByOrderByRoomNumber(Pageable pageable);
 }

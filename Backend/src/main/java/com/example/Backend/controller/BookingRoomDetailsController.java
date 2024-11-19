@@ -105,5 +105,11 @@ public class BookingRoomDetailsController {
                 .build();
     }
 
-
+    @GetMapping("/active")
+    public ApiResponse<List<BookingRoomDetails>> getActiveBookingRoomDetails() {
+        List<BookingRoomDetails> activeBookingRoomDetails = bookingRoomDetailsService.getActiveBookingRoomDetails();
+        return ApiResponse.<List<BookingRoomDetails>>builder()
+                .result(activeBookingRoomDetails)
+                .build();
+    }
 }

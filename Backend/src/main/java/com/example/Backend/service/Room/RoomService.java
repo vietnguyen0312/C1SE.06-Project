@@ -159,4 +159,26 @@ public class RoomService {
                 .collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
+    public PageResponse<RoomResponse> getAllRoomsSortedByRoomNumber(int page, int size) {
+        Sort sort = Sort.by("roomNumber").ascending();
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<Room> roomPage = roomRepository.findAll(pageable);
+
+        List<RoomResponse> roomResponses = roomPage.getContent().stream()
+                .map(roomMapper::toRoomResponse)
+                .collect(Collectors.toList());
+
+        return PageResponse.<RoomResponse>builder()
+                .currentPage(page)
+                .totalPages(roomPage.getTotalPages())
+                .pageSize(size)
+                .totalElements(roomPage.getTotalElements())
+                .data(roomResponses)
+                .build();
+    }
+
+
+
 }
