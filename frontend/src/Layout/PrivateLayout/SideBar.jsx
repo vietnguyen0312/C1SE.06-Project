@@ -12,7 +12,6 @@ import {
     CalendarOutlined, 
     FileDoneOutlined 
 } from '@ant-design/icons';
-import DropdownMenu from '../../components/Dropdown/dropdown';  
 import { useNavigate } from 'react-router-dom';
 const SidebarContainer = styled.div`
     width: 250px;
@@ -108,9 +107,20 @@ const Sidebar = () => {
                 </Hotel>
                 <Hotel>
                     <Content>EMPLOYEE | CUSTOMER</Content>
-                    <Item onClick={() => navigate('/manager/employee-customer-list')}>
+                    <Item onClick={() => navigate('/manager/employee')}>
                         <TeamOutlined />
-                        <div>Employee /n & Customer List</div>
+                        <div>Employee</div>
+                    </Item>
+                    <Item onClick={() => navigate('/manager/customer')}>
+                        <TeamOutlined />
+                        <div>Customer</div>
+                    </Item>
+                </Hotel>
+                <Hotel>
+                    <Content>SERVICE</Content>
+                    <Item onClick={() => navigate('/manager/service')}>
+                        <KeyOutlined />
+                        <div>Service</div>
                     </Item>
                 </Hotel>
             </SidebarContent>

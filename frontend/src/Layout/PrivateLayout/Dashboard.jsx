@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import styled from 'styled-components';
-import { RetweetOutlined, UserOutlined, CalendarOutlined, HomeOutlined, DollarOutlined, RiseOutlined, FallOutlined, SettingOutlined, BarsOutlined, SortAscendingOutlined, SortDescendingOutlined } from '@ant-design/icons';
+import { RetweetOutlined, UserOutlined, CalendarOutlined, HomeOutlined, DollarOutlined, RiseOutlined, FallOutlined, SettingOutlined, BarsOutlined, SortAscendingOutlined, SortDescendingOutlined, EyeOutlined } from '@ant-design/icons';
 import { LineChart, Line, Tooltip, BarChart, Bar, CartesianGrid, XAxis, YAxis, Legend } from 'recharts';
-import { Select, Input, Table, Popover } from 'antd';
-import { useState } from 'react';
-
+import { Select, Input, Table, Popover, Modal } from 'antd';
+import ButtonCPN from '../../components/Button/Button';
+import HistoryBookingRoom from '../../Layout/PublicLayout/HistoryBill/HistoryBookingRoom';
+import HistoryTicketBill from '../../Service/HistoryTicketBill';
 
 const Container = styled.div`
     padding: 20px;
@@ -197,9 +198,9 @@ const ViewStyle = styled.div`
     }
 `
 const BookingContainer = styled.div`
-    margin-top: 30px;
     background-color: #fff;
     border-radius: 10px;
+    width: 74%;
 `
 const ProgressBar = styled.div`
     width: 100%; 
@@ -221,13 +222,7 @@ const ProgressBar = styled.div`
         border-radius: 5px;
     }
 `;
-const BookingFooter = styled.div`
-    padding: 30px 20px;
-    border-top: 1px solid #e5e5e5;
-`
-const SearchStyle = styled(Input)`
-    width: 200px;
-`
+
 const PopoverItem = styled.div`
     padding: 10px;
     cursor: pointer;
@@ -241,6 +236,12 @@ const BarsIcon = styled(BarsOutlined)`
     &:hover {
         color: #f8b600;
     }
+`
+const ImgService = styled.img`
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
 `
 const data = [
     { date: 'June', Visitors: 400, Bookings: 300, Revenue: 800, Rooms: 600 },
@@ -270,129 +271,370 @@ const CustomTooltip = ({ active, payload, label }) => {
     return null;
 };
 
-const EnhancedTable = () => (
-    <Table
-        dataSource={dataSource}
-        columns={columns}
-        pagination={{
-            pageSize: 5,
-            showTotal: (total, range) => (
-                <span style={{ marginRight: '900px' }}>
-                    Showing {range[0]} to {range[1]} of {total} entries
-                </span>
-            ),
-        }}
-    />
-);
 
-
-const columns = [
+const columnsTicket = [
     { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
-    { title: 'Name', dataIndex: 'name', key: 'name', sorter: (a, b) => a.name.localeCompare(b.name) },
-    { title: 'CheckIn', dataIndex: 'checkIn', key: 'checkIn', sorter: (a, b) => new Date(a.checkIn) - new Date(b.checkIn) },
-    { title: 'CheckOut', dataIndex: 'checkOut', key: 'checkOut', sorter: (a, b) => new Date(a.checkOut) - new Date(b.checkOut) },
-    { title: 'Proof', dataIndex: 'proof', key: 'proof' },
     {
-        title: 'Payment', dataIndex: 'payment', key: 'payment',
-        render: text => {
-            const [type, room] = text.split(':');
-            let color;
-
-            switch (type.trim()) {
-                case 'Credit Card':
-                    color = '#ff8c00';
-                    break;
-                case 'PayPal':
-                    color = '#4682b4';
-                    break;
-                case 'Cash':
-                    color = '#32cd32';
-                    break;
-                default:
-                    color = '#808080';
-            }
-
-            return (
-                <span>
-                    <span style={{ color }}>{type}:</span> {room}
-                </span>
-            );
-        },
-    },
-    {
-        title: 'Amount', dataIndex: 'amount', key: 'amount', sorter: (a, b) => a.amount - b.amount,
-        render: text => {
-            return <span><DollarOutlined /> {text}</span>
-        }
-
-    },
-    {
-        title: 'RoomNo', dataIndex: 'roomNo', key: 'roomNo',
-        render: text => {
-            const [type, room] = text.split(':');
-            let color;
-
-            switch (type.trim()) {
-                case 'Vip':
-                    color = '#d32f2f';
-                    break;
-                case 'Deluxe':
-                    color = '#1e88e5';
-                    break;
-                case 'Standard':
-                    color = '#388e3c';
-                    break;
-                default:
-                    color = '#6d6d6d';
-            }
-
-            return (
-                <span>
-                    <span style={{ color }}>{type}:</span> {room}
-                </span>
-            );
-        },
-    },
-    { title: 'Rooms', dataIndex: 'rooms', key: 'rooms' },
-    {
-        title: 'Action', dataIndex: 'action', key: 'action',
+        title: "Thông tin khách hàng",
+        key: "userInfo",
         render: (record) => (
-            <Popover content={
-                <div>
-                    <PopoverItem onClick={() => handleEdit(record)}>Edit</PopoverItem>
-                    <PopoverItem onClick={() => handleDelete(record)}>Delete</PopoverItem>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={record.image}
+              alt="Avatar"
+              style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
+            />
+            <span>{record.name}</span>
+          </div>
+        ),
+    },
+    { title: 'Giới tính', dataIndex: 'gender', key: 'gender' },
+    { title: 'Loại khách hàng', dataIndex: 'type', key: 'type' },
+    { title: 'Ngày đặt', dataIndex: 'bookingDate', key: 'bookingDate' },
+    { title: 'Số điện thoại', dataIndex: 'phoneNumber', key: 'phoneNumber' },
+    { 
+        title: 'Chi tiết', 
+        dataIndex: 'action', 
+        key: 'action',
+        render: () => (
+                <div style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center',display: 'flex' }}>
+                    <EyeOutlined />
                 </div>
-            } trigger="click" placement='left'>
-                <div style={{ cursor: 'pointer', fontSize: '20px', color: '#3518f0', display: 'flex', justifyContent: 'center' }}>
-                    <SettingOutlined />
-                </div>
-            </Popover>
-        )
+        ),
     },
 ];
 
-const dataSource = [
-    { key: '1', id: '1', name: 'John Brown', checkIn: '2023-01-01', checkOut: '2023-01-05', proof: 'ID', payment: 'Credit Card', amount: '300', roomNo: 'Vip: 101', rooms: '2', action: 'Edit/Delete' },
-    { key: '2', id: '2', name: 'Jane Smith', checkIn: '2023-02-01', checkOut: '2023-02-06', proof: 'Passport', payment: 'PayPal', amount: '400', roomNo: 'Deluxe: 202', rooms: '1', action: 'Edit/Delete' },
-    { key: '3', id: '3', name: 'Alex Johnson', checkIn: '2023-03-01', checkOut: '2023-03-04', proof: 'ID', payment: 'Credit Card', amount: '250', roomNo: 'Standard: 303', rooms: '1', action: 'Edit/Delete' },
-    { key: '4', id: '4', name: 'Chris Lee', checkIn: '2023-04-02', checkOut: '2023-04-06', proof: 'ID', payment: 'Cash', amount: '350', roomNo: 'Vip: 404', rooms: '3', action: 'Edit/Delete' },
-    { key: '5', id: '5', name: 'Emma White', checkIn: '2023-05-03', checkOut: '2023-05-08', proof: 'Passport', payment: 'Credit Card', amount: '500', roomNo: 'Deluxe: 505', rooms: '2', action: 'Edit/Delete' },
-    { key: '6', id: '6', name: 'Mike Brown', checkIn: '2023-06-04', checkOut: '2023-06-09', proof: 'ID', payment: 'Credit Card', amount: '320', roomNo: 'Standard: 606', rooms: '2', action: 'Edit/Delete' },
-    { key: '7', id: '7', name: 'Lucy Green', checkIn: '2023-07-05', checkOut: '2023-07-10', proof: 'Passport', payment: 'PayPal', amount: '450', roomNo: 'Vip: 707', rooms: '1', action: 'Edit/Delete' },
-    { key: '8', id: '8', name: 'David Black', checkIn: '2023-08-06', checkOut: '2023-08-11', proof: 'ID', payment: 'Credit Card', amount: '380', roomNo: 'Deluxe: 808', rooms: '3', action: 'Edit/Delete' },
-    { key: '9', id: '9', name: 'Olivia Young', checkIn: '2023-09-07', checkOut: '2023-09-12', proof: 'ID', payment: 'Cash', amount: '290', roomNo: 'Standard: 909', rooms: '1', action: 'Edit/Delete' },
-    { key: '10', id: '10', name: 'Lucas King', checkIn: '2023-10-08', checkOut: '2023-10-13', proof: 'Passport', payment: 'Credit Card', amount: '470', roomNo: 'Vip: 1010', rooms: '2', action: 'Edit/Delete' },
+const dataSourceTicket = [{ id: 1, name: 'Nguyễn Văn A', gender: 'Nam', type: 'âcsc', bookingDate: '2024-11-10', phoneNumber: '0123456789' }, { id: 2, name: 'Trần Thị B', gender: 'Nữ', type: 'Vip', bookingDate: '2024-11-12', phoneNumber: '0987654321' }, { id: 3, name: 'Lê Văn C', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-14', phoneNumber: '0912345678' }, { id: 4, name: 'Phạm Thị D', gender: 'Nữ', type: 'Vip', bookingDate: '2024-11-15', phoneNumber: '0901234567' }, { id: 5, name: 'Hoàng Văn E', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-16', phoneNumber: '0923456789' }];
+
+
+const roomColumns = [
+    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
+    {
+        title: "Thông tin khách hàng",
+        key: "userInfo",
+        render: (record) => (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={record.image}
+              alt="Avatar"
+              style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
+            />
+            <span>{record.name}</span>
+          </div>
+        ),
+    },
+    { title: 'Giới tính', dataIndex: 'gender', key: 'gender' },
+    { title: 'Loại khách hàng', dataIndex: 'type', key: 'type' },
+    { title: 'Ngày đặt', dataIndex: 'bookingDate', key: 'bookingDate' },
+    { title: 'Số điện thoại', dataIndex: 'phoneNumber', key: 'phoneNumber' },
+    { 
+        title: 'Chi tiết', 
+        dataIndex: 'action', 
+        key: 'action',
+        render: () => (
+                <div style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center',display: 'flex' }}>
+                    <EyeOutlined />
+                </div>
+        ),
+    },
+];
+const roomDataSource = [{ id: 1, name: 'Nguyễn Văn A', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-10', phoneNumber: '0123456789' }, { id: 2, name: 'Trần Thị B', gender: 'Nữ', type: 'Vip', bookingDate: '2024-11-12', phoneNumber: '0987654321' }, { id: 3, name: 'Lê Văn C', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-14', phoneNumber: '0912345678' }, { id: 4, name: 'Phạm Thị D', gender: 'Nữ', type: 'Vip', bookingDate: '2024-11-15', phoneNumber: '0901234567' }, { id: 5, name: 'Hoàng Văn E', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-16', phoneNumber: '0923456789' }];
+
+const ServiceDetailColumns = [
+    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
+    {
+        title: "Thông tin dịch vụ",
+        key: "serviceInfo",
+        render: (record) => (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={record.image}
+              alt="Avatar"
+              style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
+            />
+            <span>{record.name}</span>
+          </div>
+        ),
+    },
+    { title: 'Loại vé', dataIndex: 'type', key: 'type' },
+    { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity' },
+    { title: 'Đơn giá', dataIndex: 'price', key: 'price',
+        render :(price)=>{
+            return <div>{price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</div>
+        }
+    },
+    { title: 'Thành tiền', dataIndex: 'total', key: 'total', sorter: (a, b) => a.total - b.total,
+        render: (total)=>{
+            return <div>{total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
+        }
+     },
 ];
 
+const ServiceDetailDataSource = [
+    {
+        id: 1,
+        image: <img src="https://via.placeholder.com/80" alt="Service 1" style={{ borderRadius: '8px' }} />,
+        name: 'Dịch vụ Massage',
+        type: 'Người lớn',
+        quantity: 2,
+        price: 300000,
+        total: 600000,
+    },
+    {
+        id: 2,
+        image: <img src="https://via.placeholder.com/80" alt="Service 2" style={{ borderRadius: '8px' }} />,
+        name: 'Hồ bơi vô cực',
+        type: 'Trẻ em',
+        quantity: 3,
+        price: 100000,
+        total: 300000,
+    },
+];
 
+const RoomDetailColumns = [
+    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
+    {
+        title: "Thông tin phòng",
+        key: "roomInfo",
+        render: (record) => (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={record.image}
+              alt="Avatar"
+              style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
+            />
+            <span>{record.name}</span>
+          </div>
+        ),
+    },
+    { title: 'Loại phòng', dataIndex: 'type', key: 'type' },
+    { title: 'Phòng số', dataIndex: 'roomNumber', key: 'roomNumber' },
+    { title: 'Số lượng người', dataIndex: 'quantity', key: 'quantity' },
+    { title: 'Thành tiền', dataIndex: 'total', key: 'total', sorter: (a, b) => a.total - b.total,
+        render: (total)=>{
+            return <div>{total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
+        }
+     },
+];
+const RoomDetailDataSource = [
+    {
+        id: 1,
+        image: <img src="https://via.placeholder.com/80" alt="Room 1" style={{ borderRadius: '8px' }} />,
+        name: 'Ph��ng Deluxe',
+        type: 'Deluxe',
+        roomNumber: 101,
+        quantity: 2,
+        total: 2000000,
+    },
+    {
+        id: 2,
+        image: <img src="https://via.placeholder.com/80" alt="Room 2" style={{ borderRadius: '8px' }} />,
+        name: 'Phòng Suite',
+        type: 'Suite',
+        roomNumber: 202,
+        quantity: 3,
+        total: 4500000,
+    },
+];
 
+const viewServiceColumns = [
+    {
+        title: 'TOP', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id
+    },
+    {
+        title: "Thông tin dịch vụ",
+        key: "serviceInfo",
+        render: (record) => (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={record.image}
+              alt="Avatar"
+              style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
+            />
+            <span>{record.name}</span>
+          </div>
+        ),
+    },
+    {title:'Số lương vé bán',dataIndex:'quantity',key:'quantity'},
+    {title:'Tổng tiền',dataIndex:'total',key:'total',sorter: (a, b) => a.total - b.total,
+        render: (total)=>{
+            return <div>{total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
+        }
+    },
+]
+const viewServiceDataSource = [
+    {
+      id: 1,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ A - Tư vấn du lịch",
+      type: "Loại 1 - Du lịch trong nước",
+      quantity: 150,
+      total: 500000,
+      description: "Dịch vụ tư vấn du lịch trong nước, giúp khách hàng lên kế hoạch chuyến đi phù hợp."
+    },
+    {
+      id: 2,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ B - Hướng dẫn viên",
+      type: "Loại 2 - Hướng dẫn viên du lịch",
+      quantity: 120,
+      total: 400000,
+      description: "Dịch vụ cung cấp hướng dẫn viên chuyên nghiệp cho các tour du lịch trong và ngoài nước."
+    },
+    {
+      id: 3,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ C - Khám phá ẩm thực",
+      type: "Loại 3 - Tour ẩm thực",
+      quantity: 200,
+      total: 700000,
+      description: "Tour khám phá các món ăn đặc sản, mang đến trải nghiệm ẩm thực đặc sắc cho du khách."
+    },
+    {
+      id: 4,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ D - Khách sạn 5 sao",
+      type: "Loại 1 - Chỗ ở cao cấp",
+      quantity: 180,
+      total: 600000,
+      description: "Dịch vụ đặt phòng khách sạn cao cấp với đầy đủ tiện nghi, phục vụ 24/7."
+    },
+    {
+      id: 5,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ E - Tour sinh thái",
+      type: "Loại 2 - Du lịch sinh thái",
+      quantity: 220,
+      total: 800000,
+      description: "Tour khám phá thiên nhiên hoang dã, trải nghiệm các hoạt động sinh thái tại các khu vực bảo tồn."
+    },
+    {
+      id: 6,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ F - Du lịch biển",
+      type: "Loại 1 - Du lịch biển",
+      quantity: 140,
+      total: 450000,
+      description: "Dịch vụ tour biển, đưa khách đến các bãi biển nổi tiếng và các khu nghỉ dưỡng biển tuyệt vời."
+    },
+    {
+      id: 7,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ G - Tour văn hóa",
+      type: "Loại 2 - Du lịch văn hóa",
+      quantity: 110,
+      total: 350000,
+      description: "Dịch vụ khám phá các di tích văn hóa và các địa điểm lịch sử, mang lại cái nhìn sâu sắc về văn hóa bản địa."
+    },
+    {
+      id: 8,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ H - Nghỉ dưỡng spa",
+      type: "Loại 3 - Chăm sóc sức khỏe",
+      quantity: 180,
+      total: 700000,
+      description: "Dịch vụ nghỉ dưỡng kết hợp với các liệu trình spa cao cấp, mang đến sự thư giãn tuyệt đối cho khách hàng."
+    },
+    {
+      id: 9,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ I - Du lịch mạo hiểm",
+      type: "Loại 1 - Du lịch mạo hiểm",
+      quantity: 160,
+      total: 500000,
+      description: "Dịch vụ du lịch mạo hiểm, phù hợp cho những ai yêu thích thử thách và khám phá những địa điểm hoang sơ."
+    },
+    {
+      id: 10,
+      image: "https://via.placeholder.com/40",
+      name: "Dịch vụ J - Du lịch tâm linh",
+      type: "Loại 2 - Du lịch tâm linh",
+      quantity: 190,
+      total: 650000,
+      description: "Dịch vụ du lịch tìm hiểu về các địa điểm linh thiêng, tâm linh nổi tiếng ở các vùng miền."
+    },
+  ];
+  
+const viewRoomColumns = [
+    {
+        title: 'TOP', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id
+    },
+    {
+        title: "Thông tin phòng",
+        key: "roomInfo",
+        render: (record) => (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={record.image}
+              alt="Avatar"
+              style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
+            />
+            <span>{record.name}</span>
+          </div>
+        ),
+    },
+    {title:'Loại phòng',dataIndex:'type',key:'type'},
+    {title:'Phòng số',dataIndex:'roomNumber',key:'roomNumber'},
+    {title:'Số lương đã đặt',dataIndex:'quantity',key:'quantity'},
+    {title:'Tổng tiền',dataIndex:'total',key:'total',sorter: (a, b) => a.total - b.total,
+        render: (total)=>{
+            return <div>{total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
+        }
+    },  
+]
+const viewRoomDataSource = [
+    {
+        id: 1,
+        image: "https://via.placeholder.com/40",
+        name: "NameRoom1",
+        type: "Deluxe",
+        roomNumber: 101,
+        quantity: 2,
+        total: 2000000,
+    },
+    {
+        id: 2,
+        image: "https://via.placeholder.com/40",
+        name: "NameRoom2",
+        type: "Suite",
+        roomNumber: 202,
+        quantity: 3,
+        total: 4500000,
+    },
+    {
+        id: 3,
+        image: "https://via.placeholder.com/40",
+        name: "NameRoom3",
+        type: "Standard",
+        roomNumber: 303,
+        quantity: 1,
+        total: 1000000,
+    },
+]
 const Dashboard = () => {
     const [pageSize, setPageSize] = useState(5);
-
+    const [showHistoryTicket, setShowHistoryTicket] = useState(true);
+    const [showHistoryRoom, setShowHistoryRoom] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [modalContent, setModalContent] = useState(null);
+    const [modalSize, setModalSize] = useState({ width: 900, height: 500 });
     const handlePageSizeChange = value => {
         setPageSize(Number(value));
     };
 
+    const showModal = (content, size = {}) => {
+        setModalContent(content);
+        setIsModalVisible(true);
+        setModalSize(size);
+    };
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
     return (
         <Container>
             <DashboardContainer>
@@ -509,6 +751,8 @@ const Dashboard = () => {
                     </ChartLine>
                 </ChartItem>
             </ChartContainer>
+
+    
             <RevenueContainer>
                 <RevenueContainerLeft>
                     <DashboardContainer>
@@ -560,17 +804,32 @@ const Dashboard = () => {
                     </DashboardContainer>
                     <div style={{ marginTop: '30px', paddingTop: '30px', borderTop: '1px solid #e5e5e5' }}>
                         <div>
-
-                        </div>
-                        <div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e5e5e5', paddingBottom: '15px' }}>
                                 <div>Revenue</div>
-                                <ViewStyle>View →</ViewStyle>
+                                <ViewStyle
+                                onClick={() => showModal(
+                                    <Table
+                                        dataSource={viewServiceDataSource}
+                                        columns={viewServiceColumns}
+                                        pagination={{
+                                            pageSize: 6,
+                                        }}
+                                    />,
+                                    { width: 1200, height: 600 }
+                                )}
+                                >       
+                                    View →
+                                </ViewStyle>
                             </div>
                             <div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
                                     <div style={{ display: 'flex' }}>
-                                        <div style={{ marginRight: '10px' }}>Service1</div>
+                                        <ImgService src={('../../Assets/Images/service1.png')} />
+                                        <div>
+                                            <div style={{ marginRight: '10px' }}>Name Service1</div>
+                                            <div style={{ color: '#999', fontSize: '13px' }}> ServiceType1</div>
+                                        </div>
+                                        
                                         <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
                                             {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
                                             <div>10%</div>
@@ -581,7 +840,11 @@ const Dashboard = () => {
                                 <ProgressBar value={100} />
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
                                     <div style={{ display: 'flex' }}>
-                                        <div style={{ marginRight: '10px' }} >Service2</div>
+                                    <ImgService src={('../../Assets/Images/service1.png')} />
+                                        <div>
+                                            <div style={{ marginRight: '10px' }}>Name Service2</div>
+                                            <div style={{ color: '#999', fontSize: '13px' }}> ServiceType2</div>
+                                        </div>
                                         <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
                                             {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
                                             <div>10%</div>
@@ -592,7 +855,11 @@ const Dashboard = () => {
                                 <ProgressBar value={50} />
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
                                     <div style={{ display: 'flex' }}>
-                                        <div style={{ marginRight: '10px' }}>Service3</div>
+                                        <ImgService src={('../../Assets/Images/service1.png')} />
+                                        <div>
+                                            <div style={{ marginRight: '10px' }}>Name Service3</div>
+                                            <div style={{ color: '#999', fontSize: '13px' }}> ServiceType3</div>
+                                        </div>
                                         <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
                                             {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
                                             <div>10%</div>
@@ -606,10 +873,90 @@ const Dashboard = () => {
                     </div>
                 </RevenueContainerRight>
             </RevenueContainer>
-            <BookingContainer>
-                <div>
-                    <DashboardContainer style={{ padding: '30px 20px' }}>
-                        <div style={{ fontSize: '20px', fontWeight: '600' }}>Bookings</div>
+
+            <RevenueContainer>
+                <BookingContainer>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                        <div style={{ padding: '20px 20px 0 20px' }}>
+                            <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Lịch sử hoá đơn</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <ButtonCPN 
+                                    text='Ticket' 
+                                    onClick={() => {
+                                        setShowHistoryTicket(true); 
+                                        setShowHistoryRoom(false);  
+                                    }}
+                                    style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px'  }}
+                                />
+                                <ButtonCPN 
+                                    text='Rooms' 
+                                    onClick={() => {
+                                        setShowHistoryRoom(true); 
+                                        setShowHistoryTicket(false); 
+                                    }}
+                                    style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                />
+                            </div>
+                        </div>
+                        <div style={{ padding: '20px' }}>
+                            {showHistoryTicket && <Table
+                                dataSource={dataSourceTicket}
+                                columns={columnsTicket.map(column => ({
+                                    ...column,
+                                    render: column.dataIndex === 'action' ? () => (
+                                        <div 
+                                            style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center', display: 'flex' }}
+                                            onClick={() => showModal(
+                                            <Table
+                                                dataSource={ServiceDetailDataSource}
+                                                columns={ServiceDetailColumns}
+                                                pagination={{
+                                                    pageSize: 6,
+                                                }}
+                                            />,
+                                            { width: 1200, height: 600 }
+                                            )}
+                                        >
+                                            <EyeOutlined />
+                                        </div>
+                                    ) : column.render
+                                }))}
+                                pagination={{
+                                    pageSize: 6,
+                                }}
+                            />}
+                            {showHistoryRoom && <Table
+                                dataSource={roomDataSource}
+                                columns={roomColumns.map(column => ({
+                                    ...column,
+                                    render: column.dataIndex === 'action' ? () => (
+                                        <div 
+                                            style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center', display: 'flex' }}
+                                            onClick={() => showModal(
+                                            <Table
+                                                dataSource={RoomDetailDataSource}
+                                                columns={RoomDetailColumns}
+                                                pagination={{
+                                                    pageSize: 6,
+                                                }}
+                                            />,
+                                            { width: 1200, height: 600 }
+                                            )}
+                                        >
+                                            <EyeOutlined />
+                                        </div>
+                                    ) : column.render
+                                }))}
+                                pagination={{
+                                    pageSize: 6,
+                                }}
+                            />}
+                        </div>
+                    </div>
+                </BookingContainer>
+                <RevenueContainerRight>
+                    <DashboardContainer>
+                        <div style={{ fontSize: '20px', fontWeight: '600' }}>Top Room</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <Popover content={
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', justifyContent: 'center' }}>
@@ -631,30 +978,92 @@ const Dashboard = () => {
                             </Popover>
                         </div>
                     </DashboardContainer>
-                </div>
-                <BookingFooter>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Select
-                            defaultValue="5"
-                            style={{ width: 120, marginBottom: 16 }}
-                            onChange={handlePageSizeChange}
-                            options={[
-                                { value: '5', label: '5' },
-                                { value: '10', label: '10' },
-                                { value: '20', label: '20' },
-                                { value: '50', label: '50' },
-                                { value: '80', label: '80' },
-                                { value: 'All', label: 'All' },
-                            ]}
-                        />
-                        <SearchStyle placeholder="Search" />
+                    <div style={{ marginTop: '30px', paddingTop: '30px', borderTop: '1px solid #e5e5e5' }}>
+                        <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e5e5e5', paddingBottom: '15px' }}>
+                                <div>Revenue</div>
+                                <ViewStyle
+                                onClick={() => showModal(
+                                    <Table
+                                        dataSource={viewRoomDataSource}
+                                        columns={viewRoomColumns}
+                                        pagination={{
+                                            pageSize: 6,
+                                        }}
+                                    />,
+                                    { width: 1200, height: 600 }
+                                )}
+                                >       
+                                    View →
+                                </ViewStyle>
+                            </div>
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
+                                    <div style={{ display: 'flex' }}>
+                                        <ImgService src={('../../Assets/Images/service1.png')} />
+                                        <div>
+                                            <div style={{ marginRight: '10px' }}>Name Room1</div>
+                                            <div style={{ color: '#999', fontSize: '13px' }}> RoomType1</div>
+                                        </div>
+                                        
+                                        <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
+                                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
+                                            <div>10%</div>
+                                        </Percent1>
+                                    </div>
+                                    <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><DollarOutlined /><div>10</div></div>
+                                </div>
+                                <ProgressBar value={100} />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
+                                    <div style={{ display: 'flex' }}>
+                                    <ImgService src={('../../Assets/Images/service1.png')} />
+                                        <div>
+                                            <div style={{ marginRight: '10px' }}>Name Room2</div>
+                                            <div style={{ color: '#999', fontSize: '13px' }}> RoomType2</div>
+                                        </div>
+                                        <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
+                                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
+                                            <div>10%</div>
+                                        </Percent1>
+                                    </div>
+                                    <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><DollarOutlined /><div>10</div></div>
+                                </div>
+                                <ProgressBar value={50} />
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
+                                    <div style={{ display: 'flex' }}>
+                                        <ImgService src={('../../Assets/Images/service1.png')} />
+                                        <div>
+                                            <div style={{ marginRight: '10px' }}>Name Room3</div>
+                                            <div style={{ color: '#999', fontSize: '13px' }}> RoomType3</div>
+                                        </div>
+                                        <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
+                                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
+                                            <div>10%</div>
+                                        </Percent1>
+                                    </div>
+                                    <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><DollarOutlined /><div>10</div></div>
+                                </div>
+                                <ProgressBar value={10} />
+                            </div>
+                        </div>
                     </div>
-                    <div style={{ marginTop: '30px' }}>
-                        <EnhancedTable />
-                    </div>
-                </BookingFooter>
-            </BookingContainer>
-        </Container>
+                </RevenueContainerRight>
+            </RevenueContainer>
+
+            <Modal
+                visible={isModalVisible}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                footer={null}
+                centered
+                width={modalSize.width}
+                height={modalSize.height}
+                style={{ top: 20, borderRadius: '10px', overflow: 'hidden' }}
+                >
+                {modalContent}
+            </Modal>
+
+                </Container>
     );
 }
 

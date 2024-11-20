@@ -4,7 +4,8 @@ import Dashboard from "../Layout/PrivateLayout/Dashboard";
 import Profile from "../Layout/PrivateLayout/Profile";
 import Bookings from "../Layout/PrivateLayout/Bookings";
 import Rooms from "../Layout/PrivateLayout/Rooms";
-import EmployeeAndCustomerList from "../Layout/PrivateLayout/EmployeeAndCustomerList/EmployeeAndCustomerList";
+import Employee from "../Layout/PrivateLayout/EmployeeAndCustomerList/Employee";
+import Customer from "../Layout/PrivateLayout/EmployeeAndCustomerList/Customer";
 const ManagerRouter = [
     {
         // element: <ProtectedRoute role='MANAGER' />,
@@ -30,8 +31,12 @@ const ManagerRouter = [
                         element: <Rooms />,
                     },
                     {
-                        path: "employee-customer-list",
-                        element: <EmployeeAndCustomerList />,
+                        path: "employee",
+                        element: <Employee />,
+                    },
+                    {
+                        path: "customer",
+                        element: <Customer />,
                     },
                 ],
             }
