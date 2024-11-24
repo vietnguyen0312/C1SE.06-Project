@@ -65,27 +65,27 @@ const Bookings = () => {
                 <div>
                     <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Bookings</div>
                     <ButtonContainer>
-                        <ButtonCPN 
-                            text='Tickets' 
+                        <ButtonCPN
+                            text='Tickets'
                             onClick={() => {
                                 setShowTicket(true);
                                 setShowHistoryTicketBill(!showHistoryTicketBill);
                                 setShowSearch(true);
                                 setShowBookingRoom(false);
                                 //setShowHistoryBookingRoom(false);
-                            }} 
-                            style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px'  }}
+                            }}
+                            style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px' }}
                         />
-                         <ButtonCPN 
-                            text='Rooms' 
+                        <ButtonCPN
+                            text='Rooms'
                             onClick={() => {
                                 setShowBookingRoom(true);
                                 //setShowHistoryBookingRoom(!showHistoryBookingRoom);
                                 setShowSearch(true);
                                 setShowTicket(false);
                                 setShowHistoryTicketBill(false);
-                            }} 
-                            style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                            }}
+                            style={{ width: '100px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         />
                     </ButtonContainer>
                 </div>
@@ -100,7 +100,7 @@ const Bookings = () => {
                 </BookingRoomContainer>
             )}
             <div style={{ marginTop: '20px' }}>
-                {showTicket && <Ticket style={{ padding: '0' }}/>}
+                {showTicket && <Ticket style={{ padding: '0' }} />}
             </div>
             {showSearch && (
                 <InputContainer>

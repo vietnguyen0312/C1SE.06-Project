@@ -112,4 +112,15 @@ public class BookingRoomDetailsController {
                 .result(activeBookingRoomDetails)
                 .build();
     }
+
+    @GetMapping("/active/{roomId}")
+    public ApiResponse<List<BookingRoomDetails>> getActiveBookingRoomDetailsByRoomId(
+            @PathVariable String roomId) {
+        List<BookingRoomDetails> activeBookingRoomDetails = bookingRoomDetailsService.getBookingRoomDetailsByRoomId(roomId);
+        return ApiResponse.<List<BookingRoomDetails>>builder()
+                .result(activeBookingRoomDetails)
+                .build();
+    }
+
+
 }

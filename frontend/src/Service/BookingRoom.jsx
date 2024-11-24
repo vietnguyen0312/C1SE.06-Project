@@ -249,7 +249,7 @@ class BookingRoom extends Component {
             rooms: [],
             roomPrice: 0,
             roomPiceList: {},
-            roomId: props.roomTypeId,  // Lấy roomTypeId từ props
+            roomId: props.roomTypeId || "14dbb13e-d61d-4efc-8b5a-2bde1e6b66a7",  // Lấy roomTypeId từ props
             hasMore: true,
             selectedRoomsDetails: [], // Kiểm soát việc tải thêm
             currentRoomDetails: [],
@@ -523,8 +523,8 @@ class BookingRoom extends Component {
 
         // Trả về định dạng dưới dạng chuỗi ISO-8601 với múi giờ 'Asia/Ho_Chi_Minh'
         return {
-            checkInDate: checkInDate.format('YYYY-MM-DDTHH:mm:ss') + 'Z', // Thêm Z vào
-            checkOutDate: checkOutDate.format('YYYY-MM-DDTHH:mm:ss') + 'Z' // Thêm Z vào
+            checkInDate: checkInDate.format('YYYY-MM-DDTHH:mm:ssZ'), // Thêm Z vào
+            checkOutDate: checkOutDate.format('YYYY-MM-DDTHH:mm:ssZ') // Thêm Z vào
         };
     }
 
@@ -823,23 +823,120 @@ class BookingRoom extends Component {
                 {showBanner && (
                     <BannerSectionHotels>
                         <Overlay />
-                    <Container>
-                        <Row>
-                            <AboutContent>
-                                <LinkNav>
-                                    <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">
-                                        Xin chào đến với khách sạn Healing
-                                    </StyledLink>
-                                    <Title data-aos="fade-right" data-aos-delay="100">
-                                        Nơi tốt nhất để <br /> nghỉ dưỡng
-                                    </Title>
-                                </LinkNav>
-                            </AboutContent>
-                        </Row>
-                    </Container>
+                        <Container>
+                            <Row>
+                                <AboutContent>
+                                    <LinkNav>
+                                        <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">
+                                            Xin chào đến với khách sạn Healing
+                                        </StyledLink>
+                                        <Title data-aos="fade-right" data-aos-delay="100">
+                                            Nơi tốt nhất để <br /> nghỉ dưỡng
+                                        </Title>
+                                    </LinkNav>
+                                </AboutContent>
+                            </Row>
+                        </Container>
                     </BannerSectionHotels>
                 )}
+
                 <ContainerDate>
+                    {
+                        showBanner === false && (
+                            <>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        marginBottom: '20px',
+                                    }}
+                                >
+                                    <p style={{ fontSize: '20px', fontWeight: 'bold' }}>Khách sạn Healing</p>
+                                </div>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '15px',
+                                        border: '1px solid #ccc',
+                                        padding: '15px',
+                                        borderRadius: '10px',
+                                        maxWidth: '100%',
+                                        margin: '0 auto',
+                                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                                        backgroundColor: '#fff',
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
+                                            Họ và Tên:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Nhập họ và tên"
+                                            style={{
+                                                padding: '8px',
+                                                fontSize: '14px',
+                                                border: '1px solid #ccc',
+                                                borderRadius: '5px',
+                                                minWidth: '150px',
+                                            }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
+                                            Số điện thoại:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            placeholder="Nhập số điện thoại"
+                                            style={{
+                                                padding: '8px',
+                                                fontSize: '14px',
+                                                border: '1px solid #ccc',
+                                                borderRadius: '5px',
+                                                minWidth: '150px',
+                                            }}
+                                        />
+                                    </div>
+
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
+                                            Email:
+                                        </label>
+                                        <input
+                                            type="email"
+                                            placeholder="Nhập email"
+                                            style={{
+                                                padding: '8px',
+                                                fontSize: '14px',
+                                                border: '1px solid #ccc',
+                                                borderRadius: '5px',
+                                                minWidth: '150px',
+                                            }}
+                                        />
+                                    </div>
+
+                                    <button
+                                        style={{
+                                            padding: '10px 20px',
+                                            fontSize: '14px',
+                                            fontWeight: 'bold',
+                                            backgroundColor: '#4CAF50',
+                                            color: '#fff',
+                                            border: 'none',
+                                            borderRadius: '5px',
+                                            cursor: 'pointer',
+                                            alignSelf: 'flex-end',
+                                        }}
+                                    >
+                                        Gửi thông tin
+                                    </button>
+                                </div>
+                            </>
+                        )
+                    }
                     <Row>
                         <DatePickerContainer>
                             <StyledDatePicker
@@ -879,7 +976,7 @@ class BookingRoom extends Component {
                         )}
                     </Row>
                     <Row>
-                        <ButtonCPN text="Đặt phòng" onClick={this.handleBookingClick} />
+                        <ButtonCPN text="Tìm phòng" onClick={this.handleBookingClick} />
                     </Row>
                 </ContainerDate>
 

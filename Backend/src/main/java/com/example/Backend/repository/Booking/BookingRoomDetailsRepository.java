@@ -39,17 +39,15 @@ public interface BookingRoomDetailsRepository extends JpaRepository<BookingRoomD
                         @Param("endDate") Instant endDate,
                         Pageable pageable);
 
-        List<BookingRoomDetails> findByCheckOutedIsNullAndCheckInedIsNotNull();
-
         @Query("SELECT b FROM BookingRoomDetails b " +
-                        "JOIN b.bookingRoom br " +
-                        "WHERE " +
-                        "((b.checkOuted IS NULL AND b.checkIned IS NOT NULL) " +
-                        "OR (b.checkOuted IS NULL AND br.checkOutDate > CURRENT_TIMESTAMP AND br.checkInDate < CURRENT_TIMESTAMP) "
-                        +
-                        "OR (b.checkOuted IS NULL AND b.checkIned IS NULL AND br.checkOutDate > CURRENT_TIMESTAMP AND br.checkInDate < CURRENT_TIMESTAMP) "
-                        +
-                        "OR (DATE(br.checkInDate) = CURRENT_DATE AND DATE(br.checkOutDate) = CURRENT_DATE))")
+                "JOIN b.bookingRoom br " +
+                "WHERE " +
+                "((b.checkOuted IS NULL AND b.checkIned IS NOT NULL) " +
+                "OR (b.checkOuted IS NULL AND br.checkOutDate > CURRENT_TIMESTAMP AND br.checkInDate < CURRENT_TIMESTAMP) " +
+                "OR (b.checkOuted IS NULL AND b.checkIned IS NULL AND br.checkOutDate > CURRENT_TIMESTAMP AND br.checkInDate < CURRENT_TIMESTAMP) " +
+                "OR (DATE(br.checkInDate) = CURRENT_DATE AND DATE(br.checkOutDate) = CURRENT_DATE AND b.checkIned IS NULL AND b.checkOuted IS NULL))")
         List<BookingRoomDetails> findActiveBookingRoomDetails();
+
+        List<BookingRoomDetails> findByRoom_Id(String roomId, Sort sort);
 
 }

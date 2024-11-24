@@ -339,10 +339,17 @@ public class BookingRoomDetailsService {
 
 
 //List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
-
+        @PreAuthorize("hasRole('MANAGER')")
         public List<BookingRoomDetails> getActiveBookingRoomDetails() {
 
                 return bookingRoomDetailsRepository.findActiveBookingRoomDetails();
+        }
+
+        @PreAuthorize("hasRole('MANAGER')")
+        public List<BookingRoomDetails> getBookingRoomDetailsByRoomId(String roomId) {
+                // Sắp xếp theo checkInDate của BookingRoom
+                Sort sort = Sort.by(Sort.Order.asc("bookingRoom.checkInDate"));
+                return bookingRoomDetailsRepository.findByRoom_Id(roomId, sort);
         }
 
 }
