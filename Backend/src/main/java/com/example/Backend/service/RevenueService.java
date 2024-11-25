@@ -40,12 +40,12 @@ public class RevenueService {
     BillTicketRepository billTicketRepository;
     BillTicketDetailsRepository billTicketDetailsRepository;
 
-    @PreAuthorize("hasRole('EMPLOYER')")
+    @PreAuthorize("hasRole('MANAGER')")
     public List<RevenueResponse> getAllRevenue() {
         List<RevenueResponse> revenueResponseList = new LinkedList<>();
         int month = LocalDate.now().getMonthValue();
         int year = LocalDate.now().getYear();
-        for (int i=month; i>month-4; i--) {
+        for (int i=month; i>month-5; i--) {
             revenueResponseList.add(RevenueResponse.builder()
                         .month(month == i ? "Now" : Month.of(i).getDisplayName(TextStyle.FULL, Locale.ENGLISH))
                         .rooms(bookingRoomRepository.findSumIncomeByMonthAndYear(i, year))
@@ -57,7 +57,7 @@ public class RevenueService {
         return revenueResponseList.reversed();
     }
 
-    @PreAuthorize("hasRole('EMPLOYER')")
+    @PreAuthorize("hasRole('MANAGER')")
     public PageResponse<ServiceRevenueResponse> getTopService(Instant startDate, Instant endDate, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
@@ -72,7 +72,7 @@ public class RevenueService {
                 .build();
     }
 
-    @PreAuthorize("hasRole('EMPLOYER')")
+    @PreAuthorize("hasRole('MANAGER')")
     public PageResponse<RoomTypeRevenueResponse> getTopRoomType(Instant startDate, Instant endDate, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size);
 

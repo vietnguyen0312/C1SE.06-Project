@@ -31,8 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -79,17 +78,19 @@ public class UserService {
     }
 
     @PreAuthorize("hasRole('MANAGER')")
-    public PageResponse<UserResponse> getUsers(int page, int size, String search, String customerType) {
+    public PageResponse<UserResponse> getUsers(int page, int size, String search, String role) {
         Sort sort = Sort.by(Sort.Direction.ASC, "username").ascending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Page<User> pageData;
 
+        var priorityRole = getPriorityRole(role.toLowerCase());
+
         if (StringUtils.hasLength(search))
-            pageData = userRepository.findByUsernameOrEmailOrPhoneNumberContaining(search, search,search, pageable);
+            pageData = userRepository.findByRoles_SizeAndSearch(priorityRole, search, pageable);
         else
-            pageData = userRepository.findAll(pageable);
+            pageData = userRepository.findByRoles_Size(priorityRole, pageable);
         return PageResponse.<UserResponse>builder()
                 .currentPage(page)
                 .totalPages(pageData.getTotalPages())
@@ -98,6 +99,17 @@ public class UserService {
                 .data(pageData.getContent().stream().map(userMapper::toUserResponse).toList())
                 .build();
     }
+
+    private int getPriorityRole(String role) {
+        return switch (role) {
+            case "employer" -> 4;
+            case "manager" -> 3;
+            case "employee" -> 2;
+            case "customer" -> 1;
+            default -> throw new IllegalArgumentException("Invalid role: " + role);
+        };
+    }
+
 
     public UserResponse getUser(String id) {
         return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));

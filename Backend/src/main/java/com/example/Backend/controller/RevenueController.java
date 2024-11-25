@@ -34,8 +34,8 @@ public class RevenueController {
     ApiResponse<PageResponse<ServiceRevenueResponse>> getTopServiceRevenue(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "6") int size,
-            @RequestParam(value = "startDate", required = true) @DateTimeFormat(pattern = "MM/dd/yyyy") Date startDate,
-            @RequestParam(value = "endDate", required = true) @DateTimeFormat(pattern = "MM/dd/yyyy") Date endDate
+            @RequestParam(value = "startDate", required = true) @DateTimeFormat(pattern = "dd/MM/yyyy") Date startDate,
+            @RequestParam(value = "endDate", required = true) @DateTimeFormat(pattern = "dd/MM/yyyy") Date endDate
     ) {
         return ApiResponse.<PageResponse<ServiceRevenueResponse>>builder()
                 .result(revenueService.getTopService(startDate.toInstant(), endDate.toInstant(), page, size))
@@ -46,8 +46,8 @@ public class RevenueController {
     ApiResponse<PageResponse<RoomTypeRevenueResponse>> getTopRoomTypeRevenue(
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "6") int size,
-            @RequestParam(value = "startDate", required = true) @DateTimeFormat(pattern = "MM/dd/yyyy") Date startDate,
-            @RequestParam(value = "endDate", required = true) @DateTimeFormat(pattern = "MM/dd/yyyy") Date endDate
+            @RequestParam(value = "startDate", required = true) @DateTimeFormat(pattern = "dd/MM/yyyy") Date startDate,
+            @RequestParam(value = "endDate", required = true) @DateTimeFormat(pattern = "dd/MM/yyyy") Date endDate
     ) {
         return ApiResponse.<PageResponse<RoomTypeRevenueResponse>>builder()
                 .result(revenueService.getTopRoomType(startDate.toInstant(), endDate.toInstant(), page, size))

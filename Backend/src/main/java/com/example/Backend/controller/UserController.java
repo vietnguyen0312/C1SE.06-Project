@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
@@ -44,11 +45,11 @@ public class UserController {
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
             @RequestParam(value = "size", required = false, defaultValue = "6") int size,
             @RequestParam(value = "search", required = false, defaultValue = "") String search,
-            @RequestParam(value = "customerType", required = false, defaultValue = "")String customerType
+            @RequestParam(value = "role", required = false, defaultValue = "CUSTOMER")String role
     ) {
         return ApiResponse
                 .<PageResponse<UserResponse>>builder()
-                .result(userService.getUsers(page, size, search, customerType))
+                .result(userService.getUsers(page, size, search, role))
                 .build();
     }
 

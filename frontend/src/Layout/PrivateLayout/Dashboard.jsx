@@ -1,11 +1,10 @@
-import React, { Component, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { RetweetOutlined, UserOutlined, CalendarOutlined, HomeOutlined, DollarOutlined, RiseOutlined, FallOutlined, SettingOutlined, BarsOutlined, SortAscendingOutlined, SortDescendingOutlined, EyeOutlined } from '@ant-design/icons';
 import { LineChart, Line, Tooltip, BarChart, Bar, CartesianGrid, XAxis, YAxis, Legend } from 'recharts';
 import { Select, Input, Table, Popover, Modal } from 'antd';
 import ButtonCPN from '../../components/Button/Button';
-import HistoryBookingRoom from '../../Layout/PublicLayout/HistoryBill/HistoryBookingRoom';
-import HistoryTicketBill from '../../Service/HistoryTicketBill';
+import axios from '../../Configuration/AxiosConfig';
 
 const Container = styled.div`
     padding: 20px;
@@ -263,7 +262,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
         return (
             <TooltipContainer>
-                <TooltipTitle>{payload[0].payload.date}</TooltipTitle>
+                <TooltipTitle>{payload[0].payload.month}</TooltipTitle>
                 <TooltipContent><div style={{ width: '10px', height: '10px', backgroundColor: 'black', borderRadius: '50%' }}></div>{payload[0].value}</TooltipContent>
             </TooltipContainer>
         );
@@ -458,7 +457,7 @@ const viewServiceColumns = [
     {title:'Số lương vé bán',dataIndex:'quantity',key:'quantity'},
     {title:'Tổng tiền',dataIndex:'total',key:'total',sorter: (a, b) => a.total - b.total,
         render: (total)=>{
-            return <div>{total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
+            return <div>{total?.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
         }
     },
 ]
@@ -559,65 +558,70 @@ const viewRoomColumns = [
     {
         title: 'TOP', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id
     },
+    {title:'Loại phòng',dataIndex:'type',key:'type'},
     {
         title: "Thông tin phòng",
-        key: "roomInfo",
+        key: "roomType.detail",
         render: (record) => (
           <div style={{ display: "flex", alignItems: "center" }}>
             <img
-              src={record.image}
+              src={`/img/hotels/room_type/${record.image}`}
               alt="Avatar"
               style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
             />
-            <span>{record.name}</span>
           </div>
         ),
     },
-    {title:'Loại phòng',dataIndex:'type',key:'type'},
-    {title:'Phòng số',dataIndex:'roomNumber',key:'roomNumber'},
-    {title:'Số lương đã đặt',dataIndex:'quantity',key:'quantity'},
-    {title:'Tổng tiền',dataIndex:'total',key:'total',sorter: (a, b) => a.total - b.total,
+    {title:'Tổng tiền',dataIndex:'total',key:'revenue',sorter: (a, b) => a.total - b.total,
         render: (total)=>{
-            return <div>{total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
+            return <div>{total?.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
         }
     },  
 ]
-const viewRoomDataSource = [
-    {
-        id: 1,
-        image: "https://via.placeholder.com/40",
-        name: "NameRoom1",
-        type: "Deluxe",
-        roomNumber: 101,
-        quantity: 2,
-        total: 2000000,
-    },
-    {
-        id: 2,
-        image: "https://via.placeholder.com/40",
-        name: "NameRoom2",
-        type: "Suite",
-        roomNumber: 202,
-        quantity: 3,
-        total: 4500000,
-    },
-    {
-        id: 3,
-        image: "https://via.placeholder.com/40",
-        name: "NameRoom3",
-        type: "Standard",
-        roomNumber: 303,
-        quantity: 1,
-        total: 1000000,
-    },
-]
 const Dashboard = () => {
-    const [pageSize, setPageSize] = useState(5);
     const [showHistoryTicket, setShowHistoryTicket] = useState(true);
     const [showHistoryRoom, setShowHistoryRoom] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [modalContent, setModalContent] = useState(null);
     const [modalSize, setModalSize] = useState({ width: 900, height: 500 });
+    const [revenueData, setRevenueData] = useState([]);
+    const [revenueCurrentMonth, setRevenueCurrentMonth] = useState([]);
+    const [revenueService, setRevenueService] = useState([]);
+    const [revenueRoomType, setRevenueRoomType] = useState([]);
+
+    useEffect(() => {
+        const fetchRevenueData = async () => {
+            const response = await axios.get('/revenue/revenue-overall');
+            setRevenueData(response.result);
+            setRevenueCurrentMonth(response.result[response.result.length - 1]);
+        };
+        fetchRevenueData();
+    }, []);
+
+    useEffect(() => {
+        fetchRevenueService(30,0);
+        fetchRevenueRoomType(30,0);
+    }, []);
+
+    //truyền ngày startDate để lọc cho tới hiện tại
+    const fetchRevenueService = async (startDate, endDate) => {
+        const response = await axios.get('/revenue/service-revenue', {params: {
+            startDate: new Date(new Date().setDate(new Date().getDate() - startDate)).toLocaleDateString('vi-VN'),
+            endDate: new Date(new Date().setDate(new Date().getDate() - endDate)).toLocaleDateString('vi-VN'),
+            size: 4
+        }});
+        setRevenueService(response.result);
+    };
+
+    const fetchRevenueRoomType = async (startDate, endDate) => {
+        const response = await axios.get('/revenue/room-type-revenue', {params: {
+            startDate: new Date(new Date().setDate(new Date().getDate() - startDate)).toLocaleDateString('vi-VN'),
+            endDate: new Date(new Date().setDate(new Date().getDate() - endDate)).toLocaleDateString('vi-VN'),
+            size: 4
+        }});
+        setRevenueRoomType(response.result);
+    };
+
     const handlePageSizeChange = value => {
         setPageSize(Number(value));
     };
@@ -654,74 +658,74 @@ const Dashboard = () => {
                 <ChartItem style={{ backgroundColor: '#ffc6c6' }}>
                     <ChartItemContainer>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <ChartTitle>Bookings</ChartTitle>
-                            <NumberStyle>100K</NumberStyle>
-                        </div>
-                        <div>
-                            <BookIcon />
-                        </div>
-                    </ChartItemContainer>
-                    <ChartFooter>
-                        <Percent increase={data[data.length - 1].Bookings > data[data.length - 2].Bookings}>
-                            {data[data.length - 1].Bookings > data[data.length - 2].Bookings ? <RiseOutlined /> : <FallOutlined />}
-                            <div>10%</div>
-                        </Percent>
-                        <div style={{ color: '#999' }}>Last Month</div>
-                    </ChartFooter>
-                    <ChartLine>
-                        <BarChart width={220} height={90} data={data}>
-                            <Tooltip content={<CustomTooltip />} />
-                            <Bar dataKey="Bookings" fill="#cccccc" />
-                        </BarChart>
-                    </ChartLine>
-                </ChartItem>
-
-                <ChartItem style={{ backgroundColor: '#9df8cc' }}>
-                    <ChartItemContainer>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <ChartTitle>Rooms</ChartTitle>
-                            <NumberStyle>100K</NumberStyle>
+                            <ChartTitle>Hotel Room</ChartTitle>
+                            <NumberStyle>{revenueCurrentMonth.rooms?.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</NumberStyle>
                         </div>
                         <div>
                             <HomeIcon />
                         </div>
                     </ChartItemContainer>
                     <ChartFooter>
-                        <Percent increase={data[data.length - 1].Rooms > data[data.length - 2].Rooms}>
-                            {data[data.length - 1].Rooms > data[data.length - 2].Rooms ? <RiseOutlined /> : <FallOutlined />}
-                            <div>10%</div>
+                        <Percent increase={revenueCurrentMonth.rooms > revenueData[revenueData.length - 2]?.rooms}>
+                            {revenueCurrentMonth.rooms > revenueData[revenueData.length - 2]?.rooms ? <RiseOutlined /> : <FallOutlined />}
+                            <div>{((revenueCurrentMonth.rooms - revenueData[revenueData.length - 2]?.rooms) / revenueData[revenueData.length - 2]?.rooms * 100).toFixed(2)}%</div>
                         </Percent>
                         <div style={{ color: '#999' }}>Last Month</div>
                     </ChartFooter>
                     <ChartLine>
-                        <BarChart width={220} height={90} data={data}>
+                        <LineChart width={220} height={90} data={revenueData}>
                             <Tooltip content={<CustomTooltip />} />
-                            <Bar dataKey="Rooms" fill="#cccccc" />
-                        </BarChart>
+                            <Line type="monotone" dataKey="rooms" stroke="#000000" activeDot={{ r: 8 }} />
+                        </LineChart>
+                    </ChartLine>
+                </ChartItem>
+
+                <ChartItem style={{ backgroundColor: '#9df8cc' }}>
+                    <ChartItemContainer>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                            <ChartTitle>Tickets</ChartTitle>
+                            <NumberStyle>{revenueCurrentMonth.tickets?.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</NumberStyle>
+                        </div>
+                        <div>
+                            <BookIcon />
+                        </div>
+                    </ChartItemContainer>
+                    <ChartFooter>
+                        <Percent increase={revenueCurrentMonth.tickets > revenueData[revenueData.length - 2]?.tickets}>
+                            {revenueCurrentMonth.tickets > revenueData[revenueData.length - 2]?.tickets ? <RiseOutlined /> : <FallOutlined />}
+                            <div>{((revenueCurrentMonth.tickets - revenueData[revenueData.length - 2]?.tickets) / revenueData[revenueData.length - 2]?.tickets * 100).toFixed(2)}%</div>
+                        </Percent>
+                        <div style={{ color: '#999' }}>Last Month</div>
+                    </ChartFooter>
+                    <ChartLine>
+                        <LineChart width={220} height={90} data={revenueData}>
+                            <Tooltip content={<CustomTooltip />} />
+                            <Line type="monotone" dataKey="tickets" stroke="#000000" activeDot={{ r: 8 }} />
+                        </LineChart>
                     </ChartLine>
                 </ChartItem>
                 
                 <ChartItem style={{ backgroundColor: '#ddddfc' }}>
                     <ChartItemContainer>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <ChartTitle>Visitors</ChartTitle>
-                            <NumberStyle>100K</NumberStyle>
+                            <ChartTitle>Number Of Bill Created</ChartTitle>
+                            <NumberStyle>{revenueCurrentMonth.numOfBill}</NumberStyle>
                         </div>
                         <div>
                             <UserIcon />
                         </div>
                     </ChartItemContainer>
                     <ChartFooter>
-                        <Percent increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors}>
-                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
-                            <div>10%</div>
+                        <Percent increase={revenueCurrentMonth.numOfBill > revenueData[revenueData.length - 2]?.numOfBill}>
+                            {revenueCurrentMonth.numOfBill > revenueData[revenueData.length - 2]?.numOfBill ? <RiseOutlined /> : <FallOutlined />}
+                            <div>{((revenueCurrentMonth.numOfBill - revenueData[revenueData.length - 2]?.numOfBill) / revenueData[revenueData.length - 2]?.numOfBill * 100).toFixed(2)}%</div>
                         </Percent>
                         <div style={{ color: '#999' }}>Last Month</div>
                     </ChartFooter>
                     <ChartLine>
-                        <LineChart width={220} height={90} data={data}>
+                        <LineChart width={220} height={90} data={revenueData}>
                             <Tooltip content={<CustomTooltip />} />
-                            <Line type="monotone" dataKey="Visitors" stroke="#000000" activeDot={{ r: 8 }} />
+                            <Line type="monotone" dataKey="numOfBill" stroke="#000000" activeDot={{ r: 8 }} />
                         </LineChart>
                     </ChartLine>
                 </ChartItem>
@@ -729,55 +733,59 @@ const Dashboard = () => {
                 <ChartItem style={{ backgroundColor: '#ffc6ff' }}>
                     <ChartItemContainer>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <ChartTitle>Revenue</ChartTitle>
-                            <NumberStyle>100K</NumberStyle>
+                            <ChartTitle>Total Revenue</ChartTitle>
+                            <NumberStyle>{revenueCurrentMonth.totalRevenue?.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</NumberStyle>
                         </div>
                         <div>
                             <DollarIcon />
                         </div>
                     </ChartItemContainer>
                     <ChartFooter>
-                        <Percent increase={data[data.length - 1].Revenue > data[data.length - 2].Revenue}>
-                            {data[data.length - 1].Revenue > data[data.length - 2].Revenue ? <RiseOutlined /> : <FallOutlined />}
-                            <div>10%</div>
+                        <Percent increase={revenueCurrentMonth.totalRevenue > revenueData[revenueData.length - 2]?.totalRevenue}>
+                            {revenueCurrentMonth.totalRevenue > revenueData[revenueData.length - 2]?.totalRevenue ? <RiseOutlined /> : <FallOutlined />}
+                            <div>{((revenueCurrentMonth.totalRevenue - revenueData[revenueData.length - 2]?.totalRevenue) / revenueData[revenueData.length - 2]?.totalRevenue * 100).toFixed(2)}%</div>
                         </Percent>
                         <div style={{ color: '#999' }}>Last Month</div>
                     </ChartFooter>
                     <ChartLine>
-                        <LineChart width={220} height={90} data={data}>
+                        <LineChart width={220} height={90} data={revenueData}>
                             <Tooltip content={<CustomTooltip />} />
-                            <Line type="monotone" dataKey="Revenue" stroke="#000000" activeDot={{ r: 8 }} />
+                            <Line type="monotone" dataKey="totalRevenue" stroke="#000000" activeDot={{ r: 8 }} />
                         </LineChart>
                     </ChartLine>
                 </ChartItem>
             </ChartContainer>
 
-    
             <RevenueContainer>
                 <RevenueContainerLeft>
                     <DashboardContainer>
                         <div style={{ fontSize: '20px', fontWeight: '600' }}>Revenue Overview</div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <RetweetOutlined />
-                            <DateStyle>Last 5 Months    </DateStyle>
+                            <DateStyle>Last 5 Months</DateStyle>
                         </div>
                     </DashboardContainer>
                     <div style={{ marginTop: '30px', paddingTop: '30px', borderTop: '1px solid #e5e5e5' }}>
                         <Revenue>
-                            <LineChart width={900} height={350} data={RevenueData}>
+                            <LineChart width={900} height={350} data={revenueData.map(data => ({
+                                ...data,
+                                rooms: data.rooms / 1000,
+                                tickets: data.tickets / 1000,
+                                totalRevenue: data.totalRevenue / 1000,
+                            }))}>
                                 <CartesianGrid stroke="#f5f5f5" />
                                 <XAxis dataKey="month" />
                                 <YAxis />
-                                <Tooltip />
+                                <Tooltip formatter={(value) => `${value}k VND`} />
                                 <Legend />
-                                <Line type="monotone" dataKey="Bookings" stroke="#8884d8" name=" Bookings" />
-                                <Line type="monotone" dataKey="Revenue" stroke="#82ca9d" name=" Revenue" />
-                                <Line type="monotone" dataKey="Expense" stroke="#ffc658" name=" Expense" />
-                                <Line type="monotone" dataKey="Profit" stroke="#ff7300" name=" Profit" />
+                                <Line type="monotone" dataKey="rooms" stroke="#8884d8" name="Hotel Room" />
+                                <Line type="monotone" dataKey="tickets" stroke="#82ca9d" name="Tickets" />
+                                <Line type="monotone" dataKey="totalRevenue" stroke="#ff7300" name="Total Revenue" />
                             </LineChart>
                         </Revenue>
                     </div>
                 </RevenueContainerLeft>
+
                 <RevenueContainerRight>
                     <DashboardContainer>
                         <div style={{ fontSize: '20px', fontWeight: '600' }}>Top Service</div>
@@ -788,12 +796,9 @@ const Dashboard = () => {
                                         Date
                                     </PopoverItem>
                                     <div>
-                                        <PopoverItem>Yesterday</PopoverItem>
-                                        <PopoverItem>Last 7 days</PopoverItem>
-                                        <PopoverItem>Last 30 days</PopoverItem>
-                                        <PopoverItem>This month</PopoverItem>
-                                        <PopoverItem>Last month</PopoverItem>
-                                        <PopoverItem>Custom range</PopoverItem>
+                                        <PopoverItem onClick={() => fetchRevenueService(30,0)}>Last 30 days</PopoverItem>
+                                        <PopoverItem onClick={() => fetchRevenueService(60,30)}>Last month</PopoverItem>
+                                        <PopoverItem onClick={() => fetchRevenueService(365,0)}>Last year</PopoverItem>
                                     </div>
                                 </div>
                             } trigger="click" placement='left'
@@ -809,7 +814,7 @@ const Dashboard = () => {
                                 <ViewStyle
                                 onClick={() => showModal(
                                     <Table
-                                        dataSource={viewServiceDataSource}
+                                        dataSource={revenueService.data}
                                         columns={viewServiceColumns}
                                         pagination={{
                                             pageSize: 6,
@@ -821,54 +826,22 @@ const Dashboard = () => {
                                     View →
                                 </ViewStyle>
                             </div>
-                            <div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
-                                    <div style={{ display: 'flex' }}>
-                                        <ImgService src={('../../Assets/Images/service1.png')} />
-                                        <div>
-                                            <div style={{ marginRight: '10px' }}>Name Service1</div>
-                                            <div style={{ color: '#999', fontSize: '13px' }}> ServiceType1</div>
+                            
+                            {revenueService?.data?.map((data) => (
+                                <div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
+                                        <div style={{ display: 'flex' }}>
+                                            <ImgService src={`/img/service/${data.serviceEntity.image}`} />
+                                            <div>
+                                                <div style={{ marginRight: '10px' }}>{data.serviceEntity?.name}</div>
+                                                <div style={{ color: '#999', fontSize: '13px' }}> {data.serviceType?.name}</div>
+                                            </div>
                                         </div>
-                                        
-                                        <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
-                                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
-                                            <div>10%</div>
-                                        </Percent1>
+                                        <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><div>{data.revenue.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div></div>
                                     </div>
-                                    <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><DollarOutlined /><div>10</div></div>
+                                    <ProgressBar value={data.revenue / revenueService.data[0].revenue * 100}  />
                                 </div>
-                                <ProgressBar value={100} />
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
-                                    <div style={{ display: 'flex' }}>
-                                    <ImgService src={('../../Assets/Images/service1.png')} />
-                                        <div>
-                                            <div style={{ marginRight: '10px' }}>Name Service2</div>
-                                            <div style={{ color: '#999', fontSize: '13px' }}> ServiceType2</div>
-                                        </div>
-                                        <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
-                                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
-                                            <div>10%</div>
-                                        </Percent1>
-                                    </div>
-                                    <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><DollarOutlined /><div>10</div></div>
-                                </div>
-                                <ProgressBar value={50} />
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
-                                    <div style={{ display: 'flex' }}>
-                                        <ImgService src={('../../Assets/Images/service1.png')} />
-                                        <div>
-                                            <div style={{ marginRight: '10px' }}>Name Service3</div>
-                                            <div style={{ color: '#999', fontSize: '13px' }}> ServiceType3</div>
-                                        </div>
-                                        <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
-                                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
-                                            <div>10%</div>
-                                        </Percent1>
-                                    </div>
-                                    <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><DollarOutlined /><div>10</div></div>
-                                </div>
-                                <ProgressBar value={10} />
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </RevenueContainerRight>
@@ -964,12 +937,9 @@ const Dashboard = () => {
                                         Date
                                     </PopoverItem>
                                     <div>
-                                        <PopoverItem>Yesterday</PopoverItem>
-                                        <PopoverItem>Last 7 days</PopoverItem>
-                                        <PopoverItem>Last 30 days</PopoverItem>
-                                        <PopoverItem>This month</PopoverItem>
-                                        <PopoverItem>Last month</PopoverItem>
-                                        <PopoverItem>Custom range</PopoverItem>
+                                        <PopoverItem onClick={() => fetchRevenueRoomType(30,0)}>Last 30 days</PopoverItem>
+                                        <PopoverItem onClick={() => fetchRevenueRoomType(60,30)}>Last month</PopoverItem>
+                                        <PopoverItem onClick={() => fetchRevenueRoomType(365,0)}>Last year</PopoverItem>
                                     </div>
                                 </div>
                             } trigger="click" placement='left'
@@ -985,11 +955,8 @@ const Dashboard = () => {
                                 <ViewStyle
                                 onClick={() => showModal(
                                     <Table
-                                        dataSource={viewRoomDataSource}
+                                        dataSource={revenueRoomType.data}
                                         columns={viewRoomColumns}
-                                        pagination={{
-                                            pageSize: 6,
-                                        }}
                                     />,
                                     { width: 1200, height: 600 }
                                 )}
@@ -997,54 +964,20 @@ const Dashboard = () => {
                                     View →
                                 </ViewStyle>
                             </div>
-                            <div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
-                                    <div style={{ display: 'flex' }}>
-                                        <ImgService src={('../../Assets/Images/service1.png')} />
-                                        <div>
-                                            <div style={{ marginRight: '10px' }}>Name Room1</div>
-                                            <div style={{ color: '#999', fontSize: '13px' }}> RoomType1</div>
+                            {revenueRoomType?.data?.map((data) => (
+                                <div>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
+                                        <div style={{ display: 'flex' }}>
+                                            <ImgService src={`/img/hotels/room_type/${data.roomType.image}`} />
+                                            <div>
+                                                <div style={{ marginRight: '10px' }}>{data.roomType?.name}</div>
+                                            </div>
                                         </div>
-                                        
-                                        <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
-                                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
-                                            <div>10%</div>
-                                        </Percent1>
+                                        <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><div>{data.revenue.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div></div>
                                     </div>
-                                    <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><DollarOutlined /><div>10</div></div>
+                                    <ProgressBar value={data.revenue / revenueRoomType.data[0].revenue * 100}  />
                                 </div>
-                                <ProgressBar value={100} />
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
-                                    <div style={{ display: 'flex' }}>
-                                    <ImgService src={('../../Assets/Images/service1.png')} />
-                                        <div>
-                                            <div style={{ marginRight: '10px' }}>Name Room2</div>
-                                            <div style={{ color: '#999', fontSize: '13px' }}> RoomType2</div>
-                                        </div>
-                                        <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
-                                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
-                                            <div>10%</div>
-                                        </Percent1>
-                                    </div>
-                                    <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><DollarOutlined /><div>10</div></div>
-                                </div>
-                                <ProgressBar value={50} />
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
-                                    <div style={{ display: 'flex' }}>
-                                        <ImgService src={('../../Assets/Images/service1.png')} />
-                                        <div>
-                                            <div style={{ marginRight: '10px' }}>Name Room3</div>
-                                            <div style={{ color: '#999', fontSize: '13px' }}> RoomType3</div>
-                                        </div>
-                                        <Percent1 increase={data[data.length - 1].Visitors > data[data.length - 2].Visitors} >
-                                            {data[data.length - 1].Visitors > data[data.length - 2].Visitors ? <RiseOutlined /> : <FallOutlined />}
-                                            <div>10%</div>
-                                        </Percent1>
-                                    </div>
-                                    <div style={{ gap: '5px', display: 'flex', alignItems: 'center' }}><DollarOutlined /><div>10</div></div>
-                                </div>
-                                <ProgressBar value={10} />
-                            </div>
+                            ))}
                         </div>
                     </div>
                 </RevenueContainerRight>

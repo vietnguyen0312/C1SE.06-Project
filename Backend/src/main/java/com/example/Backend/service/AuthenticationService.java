@@ -220,8 +220,8 @@ public class AuthenticationService {
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         if (!(userRepository.findByEmail(signedJWT.getJWTClaimsSet().getSubject())
-                .orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)).getStatus().equals("Đang hoạt động")))
-            throw new AppException(ErrorCode.UNAUTHENTICATED);
+                .orElseThrow(()-> new AppException(ErrorCode.UNAUTHENTICATED)).getStatus().equals("Đang hoạt động")))
+            throw new AppException(ErrorCode.LOCKED);
 
         String jid = signedJWT.getJWTClaimsSet().getJWTID();
 
