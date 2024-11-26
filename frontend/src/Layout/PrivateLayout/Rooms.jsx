@@ -42,7 +42,7 @@ const NameRoom = styled.div`
     font-weight: 600;
 `;
 const TypeRoom = styled.div`
-    font-size: 11px;
+    font-size: 13px;
     color: #888;
 `;
 const StatusRoomBooked = styled.div`
@@ -59,7 +59,14 @@ const StatusRoomAvailable = styled.div`
     border-radius: 10px;
 `;
 
-
+const SelectedRoom = styled.select`
+    width: 70%;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 0 10px;
+    cursor: pointer;
+`
 
 class Rooms extends Component {
     constructor(props) {
@@ -433,10 +440,10 @@ class Rooms extends Component {
                         <Item>Rooms</Item>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', width: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <ButtonCPN text="hoạt động" onClick={() => { this.handleStatusChangeFilter("Đang hoạt động") }} style={{ width: 'auto', height: 'auto', fontSize: '13px', backgroundColor: '#5f5f5f', color: 'white' }} />
-                                <ButtonCPN text="đã đặt" onClick={() => { this.handleStatusChangeFilter("đã đặt") }} style={{ width: 'auto', height: 'auto', fontSize: '13px', backgroundColor: '#5f5f5f', color: 'white' }} />
-                                <ButtonCPN text="quá hạng" onClick={() => { this.handleStatusChangeFilter("quá hạn") }} style={{ width: 'auto', height: 'auto', fontSize: '13px', backgroundColor: '#5f5f5f', color: 'white' }} />
-                                <ButtonCPN text="bảo trì, sửa chữa" onClick={() => { this.handleStatusChangeFilter("bảo trì, sửa chữa") }} style={{ width: 'auto', height: 'auto', fontSize: '13px', backgroundColor: '#5f5f5f', color: 'white' }} />
+                                <ButtonCPN text="Hoạt động" onClick={() => { this.handleStatusChangeFilter("Đang hoạt động") }} style={{ width: 'auto', height: 'auto', fontSize: '13px'}} />
+                                <ButtonCPN text="Đã đặt" onClick={() => { this.handleStatusChangeFilter("đã đặt") }} style={{ width: 'auto', height: 'auto', fontSize: '13px'}} />
+                                <ButtonCPN text="Quá hạn" onClick={() => { this.handleStatusChangeFilter("quá hạn") }} style={{ width: 'auto', height: 'auto', fontSize: '13px'}} />
+                                <ButtonCPN text="Bảo trì, sửa chữa" onClick={() => { this.handleStatusChangeFilter("bảo trì, sửa chữa") }} style={{ width: 'auto', height: 'auto', fontSize: '13px'}} />
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -529,7 +536,7 @@ class Rooms extends Component {
                                                                 )}
                                                             </div>
                                                             {booking && (
-                                                                <>
+                                                                <div style={{display:'flex',flexDirection:'column', gap: '10px'}}>
                                                                     <div style={{ fontSize: "13px" }}>
                                                                         Check-in:{" "}
                                                                         {new Date(booking.bookingRoom.checkInDate)
@@ -551,7 +558,7 @@ class Rooms extends Component {
                                                                     <div style={{ fontSize: "14px" }}>
                                                                         Người đặt: {booking.bookingRoom.user.username}
                                                                     </div>
-                                                                </>
+                                                                </div>
                                                             )}
                                                         </div>
                                                     </div>
@@ -691,9 +698,9 @@ class Rooms extends Component {
                         <ModalTitle>Lựa chọn</ModalTitle>
                     </ModalHeader>
                     <ModalBody>
-                        <div style={{ display: this.state.addRoom ? 'none' : 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <select onChange={(event) => this.handleRoomSelect(event.target.value)} value={selectedRoomUpdate ? JSON.stringify(selectedRoomUpdate) : ""}>
+                        <div style={{ display: this.state.addRoom ? 'none' : 'flex', flexDirection: 'column', gap: '15px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <SelectedRoom onChange={(event) => this.handleRoomSelect(event.target.value)} value={selectedRoomUpdate ? JSON.stringify(selectedRoomUpdate) : ""} >
                                     <option value="" disabled>Chọn phòng</option>
                                     {Object.keys(this.state.rooms.grouped).map(floor => (
                                         this.state.rooms.grouped[floor].map(room => (
@@ -702,39 +709,38 @@ class Rooms extends Component {
                                             </option>
                                         ))
                                     ))}
-                                </select>
+                                </SelectedRoom>
                             </div>
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <select value={roomTypeSelected} onChange={this.handleRoomTypeChange}>
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <SelectedRoom value={roomTypeSelected} onChange={this.handleRoomTypeChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
                                     <option value="" disabled>Chọn loại phòng</option>
                                     {roomType.map(roomType => (
                                         <option key={roomType.id} value={roomType.id}>
                                             {roomType.name}
                                         </option>
                                     ))}
-                                </select>
+                                </SelectedRoom>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <select value={statusSelected} onChange={this.handleStatusChange}>
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <SelectedRoom value={statusSelected} onChange={this.handleStatusChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
                                     <option value="" disabled>Chọn trạng thái</option>
                                     <option value="sửa chữa">sửa chữa</option>
                                     <option value="bảo trì">bảo trì</option>
                                     <option value="Đang hoạt động">Đang hoạt động</option>
-                                </select>
+                                </SelectedRoom>
                             </div>
 
-
-                            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                <input type="number" placeholder="Nhập số ngày" />
+                            <div style={{ display: 'flex', gap: '15px'}}>
+                                <input type="number" placeholder="Nhập số ngày" style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc',width: '70%',cursor:'pointer' }} />
                             </div>
                         </div>
-                        <div style={{ display: this.state.addRoom ? 'flex' : 'none', flexDirection: 'column', gap: '10px' }}>
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <input type="number" placeholder="Nhập số phòng" onChange={(event) => this.setState({ roomNumberAdd: event.target.value })} />
+                        <div style={{ display: this.state.addRoom ? 'flex' : 'none', flexDirection: 'column', gap: '15px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <input type="number" placeholder="Nhập số phòng" onChange={(event) => this.setState({ roomNumberAdd: event.target.value })} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
                             </div>
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <select onChange={(event) => this.setState({ roomTypeAdd: event.target.value })}>
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <select onChange={(event) => this.setState({ roomTypeAdd: event.target.value })} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
                                     <option value={this.state.selectedRoomUpdate?.roomType.id ?? ''} disabled selected>{this.state.selectedRoomUpdate?.roomType.name ?? 'chọn loại phòng'}</option>
                                     {this.state.roomType.map(roomType => (
                                         <option key={roomType.id} value={roomType.id} >
@@ -744,8 +750,8 @@ class Rooms extends Component {
                                 </select>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '10px' }}>
-                                <select onChange={(event) => this.setState({ statusAdd: event.target.value })} >
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <select onChange={(event) => this.setState({ statusAdd: event.target.value })} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
                                     <option value={this.state.selectedRoomUpdate?.status ?? ''} disabled selected>{this.state.selectedRoomUpdate?.status ?? 'chọn trạng thái'}</option>
                                     <option value="sửa chữa">sửa chữa</option>
                                     <option value="bảo trì">bảo trì</option>
@@ -753,17 +759,15 @@ class Rooms extends Component {
                                 </select>
                             </div>
 
-
-                            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                                <input type="number" placeholder="Nhập số ngày" />
+                            <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+                                <input type="number" placeholder="Nhập số ngày" style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
                             </div>
                         </div>
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            <ButtonCPN text="thêm" onClick={() => { this.handleAddRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', backgroundColor: '#5f5f5f', color: 'white' }} />
-                            <ButtonCPN text="sửa" onClick={() => { this.handleUpdateRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', backgroundColor: '#5f5f5f', color: 'white' }} />
-                            <ButtonCPN text="xóa" onClick={() => { this.handleDeleteRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', backgroundColor: '#5f5f5f', color: 'white' }} />
+                        <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+                            <ButtonCPN text="thêm" onClick={() => { this.handleAddRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#4CAF50', color: 'white' }} />
+                            <ButtonCPN text="sửa" onClick={() => { this.handleUpdateRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#2196F3', color: 'white' }} />
+                            <ButtonCPN text="xóa" onClick={() => { this.handleDeleteRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#f44336', color: 'white' }} />
                         </div>
-
                     </ModalBody>
                 </ModalWrapper>
             </ProfileContainer>
