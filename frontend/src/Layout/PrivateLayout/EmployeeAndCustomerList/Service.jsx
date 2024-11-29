@@ -1,9 +1,13 @@
 import React from "react";
 import styled from "styled-components";
+import { Modal } from 'antd';
+import axios from '../../../Configuration/AxiosConfig'; 
+import { useEffect, useState } from "react";
 
 const ServiceContainer = styled.div`
     padding: 20px;
     background-color: #f5f5f5;
+    cursor: pointer;
 `;
 
 const ServiceTypeContainer = styled.div`
@@ -28,8 +32,8 @@ const ServiceItemWrapper = styled.div`
 
 const ServiceItem = styled.div`
     background-color: #fff;
-    height: 200px;
-    width: 270px;
+    height: 250px;
+    width: 300px;
     border-radius: 10px;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
     padding: 15px;
@@ -58,6 +62,10 @@ const Description = styled.div`
     font-size: 16px;
     font-weight: 400;
     margin-top: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #989595;
 `;
 
 const Status = styled.div`
@@ -71,52 +79,69 @@ const Status = styled.div`
     align-items: center;
 `;
 
-const ServiceData = [
-    ...Array(5)
-        .fill()
-        .map((_, typeIndex) =>
-            Array(10)
-                .fill()
-                .map((_, serviceIndex) => ({
-                    name: `Service Name ${typeIndex + 1}-${serviceIndex + 1}`,
-                    type: `Service Type ${typeIndex + 1}`,
-                    image: "https://via.placeholder.com/150",
-                    description: `Description for Service ${typeIndex + 1}-${serviceIndex + 1}`,
-                    status: serviceIndex % 2 === 0 ? "Còn vé" : "Hết vé",
-                }))
-        )
-        .flat(),
-];
-
 const Service = () => {
+    const [serviceData, setServiceData] = useState([]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [modalContent, setModalContent] = useState(null);
+    const [modalSize, setModalSize] = useState({ width: 900, height: 500 });
 
-    const groupedData = ServiceData.reduce((acc, item) => {
-        acc[item.type] = acc[item.type] || [];
-        acc[item.type].push(item);
-        return acc;
-    }, {});
+    const fetchData = async () => {
+        const response = await axios.get('/services');
+        setServiceData(response.result.data);
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const serviceTypes = Array.from(
+        new Set(serviceData.map(item => item.serviceType.name))
+    );
+
+    const handleOk = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalVisible(false);
+    };
+
+    const handleServiceItemClick = (item) => {
+        setModalContent(
+            <div>
+                <div style={{display: "flex", flexDirection: "column", alignItems: "center",borderBottom: "1px solid #ddd",padding: "20px 0"}}>
+                    <img src={item.image} alt={item.name} style={{ width: '500px', height: '300px', borderRadius: '10px',display: "flex", justifyContent: "center", alignItems: "center" }} />
+                    <h2>{item.name}</h2>
+                    <p style={{marginTop: "10px",color: "#989595"}}>{item.description}</p>
+                </div>
+                
+                <div style={{marginTop: "20px", fontSize: "18px", fontWeight: "600", color: "#1b60d8"}}>Số lượng vé còn lại</div>
+                <div style={{ display: 'table', width: '50%', borderCollapse: 'collapse' }}>
+                    <div style={{ display: 'table-row', borderBottom: '1px solid #ddd' }}>
+                        <div style={{ display: 'table-cell', width: '50%', textAlign: 'right', padding: '8px', whiteSpace: 'nowrap', borderRight: '1px solid #ddd' }}>
+                            Vé người lớn
+                            </div>
+                            <div style={{ display: 'table-cell', width: '50%', textAlign: 'left', padding: '8px' }}>
+                                10
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+        );
+        setIsModalVisible(true);
+    };
 
     return (
         <ServiceContainer>
-            {Object.entries(groupedData).map(([type, services]) => (
-                <ServiceTypeContainer key={type}>
+            {serviceTypes.map((type, index) => (
+                <ServiceTypeContainer key={index}>
                     <ServiceTypeTitle>{type}</ServiceTypeTitle>
                     <ServiceItemWrapper>
-                        {services.map((item, index) => (
-                            <ServiceItem key={index}>
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                    }}
-                                >
-                                    <ServiceImage
-                                        src={item.image}
-                                        alt={item.name}
-                                    />
-                                    <Status style={{backgroundColor: item.status === "Còn vé" ? "#ccffcc" : "#ffcccc"}}>
-                                        {item.status}
-                                    </Status>
+                        {serviceData.filter(item => item.serviceType.name === type).map((item, index) => (
+                            <ServiceItem key={index} onClick={() => handleServiceItemClick(item)}>
+                                <div style={{display: "flex", justifyContent: "space-between",}}>
+                                    <ServiceImage src={item.image} alt={item.name} />
                                 </div>
                                 <ServiceName>{item.name}</ServiceName>
                                 <Description>{item.description}</Description>
@@ -125,6 +150,17 @@ const Service = () => {
                     </ServiceItemWrapper>
                 </ServiceTypeContainer>
             ))}
+            <Modal
+                visible={isModalVisible}
+                onOk={handleOk}
+                onCancel={handleCancel}
+                footer={null}
+                centered
+                width={modalSize.width}
+                style={{ top: 20, borderRadius: '10px', overflow: 'hidden' }}
+            >
+                {modalContent}
+            </Modal>
         </ServiceContainer>
     );
 };
