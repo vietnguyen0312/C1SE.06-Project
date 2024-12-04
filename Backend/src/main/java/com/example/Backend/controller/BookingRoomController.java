@@ -1,5 +1,6 @@
 package com.example.Backend.controller;
 
+import com.example.Backend.dto.request.Booking.BookingRoomCreationByStaffRequest;
 import com.example.Backend.dto.request.Booking.BookingRoomCreationRequest;
 import com.example.Backend.dto.request.Booking.BookingRoomUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
@@ -28,6 +29,13 @@ public class BookingRoomController {
     public ApiResponse<BookingRoomResponse> createBookingRoom(@RequestBody @Valid BookingRoomCreationRequest request) {
         return ApiResponse.<BookingRoomResponse>builder()
                 .result(bookingRoomService.createBookingRoom(request))
+                .build();
+    }
+
+    @PostMapping("/create_by_staff")
+    public ApiResponse<BookingRoomResponse> createBookingRoomByStaff(@RequestBody @Valid BookingRoomCreationByStaffRequest request) {
+        return ApiResponse.<BookingRoomResponse>builder()
+                .result(bookingRoomService.createBookingRoomByStaff(request))
                 .build();
     }
 

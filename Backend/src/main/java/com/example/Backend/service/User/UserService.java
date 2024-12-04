@@ -115,6 +115,12 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
+    public UserResponse getUserByGmail(String email) {
+        return userRepository.findByEmail(email)
+                .map(userMapper::toUserResponse)
+                .orElse(null); // Trả về null nếu không tìm thấy
+    }
+
     @PostAuthorize("returnObject.email == authentication.name or hasRole('MANAGER')")
     public UserResponse updateUser(String id, UserUpdateRequest request) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));

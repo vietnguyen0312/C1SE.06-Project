@@ -124,4 +124,26 @@ public class RoomController {
                         .build();
         }
 
+        @GetMapping("/findByRoomType/{data_check_in}/{check_out}/{roomTypeId}")
+        public ApiResponse<PageResponse<RoomResponse>> getRoomByRoomType(
+                @PathVariable("roomTypeId") String roomTypeId,
+                @PathVariable("data_check_in") String dataCheckIn,
+                @PathVariable("check_out") String checkOut,
+                @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+
+                // Tìm loại phòng theo roomTypeId
+                RoomType roomType = roomTypeRepository.findById(roomTypeId)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
+                // Lấy các phòng có sẵn từ service, truyền vào checkIn và checkOut
+                var availableRooms = roomService.getAvailableRoomsByRoomType(roomType, dataCheckIn, checkOut, page, size);
+
+                // Trả về kết quả dưới dạng ApiResponse
+                return ApiResponse.<PageResponse<RoomResponse>>builder()
+                        .result(availableRooms)
+                        .build();
+        }
+
+
 }

@@ -50,4 +50,6 @@ public interface BookingRoomDetailsRepository extends JpaRepository<BookingRoomD
 
         List<BookingRoomDetails> findByRoom_Id(String roomId, Sort sort);
 
+        List<BookingRoomDetails> findByBookingRoom_id(String bookingRoomId);
+
 }

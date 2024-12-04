@@ -61,6 +61,16 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/email/{email}")
+    ApiResponse<UserResponse> getUserByEmail(@PathVariable("email") String email) {
+        return ApiResponse
+                .<UserResponse>builder()
+                .result(userService.getUserByGmail(email))
+                .build();
+    }
+
+
+
     @PutMapping("/{id}")
     ApiResponse<UserResponse> updateUser(@PathVariable("id") String id, @RequestBody @Valid UserUpdateRequest request) {
         return ApiResponse

@@ -7,6 +7,8 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import { ModalTitle, ModalWrapper, ModalHeader, ModalBody } from '../PublicLayout/HistoryBill/style';
 import ButtonCPN from '../../components/Button/Button';
 import { toast } from 'react-toastify';
+import SockJS from "sockjs-client/dist/sockjs";
+import { Client } from "@stomp/stompjs";
 
 const ProfileContainer = styled.div`
     padding: 20px;
@@ -73,14 +75,13 @@ class Rooms extends Component {
         super(props);
         this.state = {
             rooms: { grouped: {} },
-            bookings: {},
+            bookings: [],
             page: 1,
             totalPages: 1,
             totalRoom: 0,
             hasMore: true,
             selectedRoom: [],
             showModal: false,
-
             bookingRoomSelected: null,
             bookingRoomSelectedModel: [],
             bookingRoomDetailByRoomId: [],
@@ -95,15 +96,106 @@ class Rooms extends Component {
             roomTypeSelected: '',
             statusSelected: '',
             statusSelectedFilter: null,
+            messages: [],
         };
         this.roomRefs = [];
+        this.stompClient = null;
     }
 
     componentDidMount() {
         AOS.init({ duration: 2000 });
         this.fetchRooms();
         this.fetchBookingRoomsDetail();
+
+        // Kết nối WebSocket qua SockJS
+        const socket = new SockJS("http://localhost:8080/ws");
+
+        // Khởi tạo stompClient
+        this.stompClient = new Client({
+            webSocketFactory: () => socket,
+            reconnectDelay: 5000,
+        });
+
+
+        this.stompClient.onConnect = () => {
+
+
+            this.stompClient.subscribe("/topic/room-updates", (message) => {
+
+                this.getBookingRoomDetail(message.body);
+            });
+        };
+
+        // this.stompClient.onStompError = (frame) => {
+        //     console.error("STOMP error: ", frame.headers["message"]);
+        // };
+
+        // Kích hoạt kết nối STOMP
+        this.stompClient.activate();
     }
+
+    componentWillUnmount() {
+        if (this.stompClient) {
+            this.stompClient.deactivate();
+        }
+    }
+
+    getBookingRoomDetail = async (bookingRoomId) => {
+
+        const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff/${bookingRoomId}`);
+
+
+        if (!response || !response.result) {
+            return;
+        }
+
+        const bookingRooms = response.result;
+
+        const bookings = bookingRooms.reduce((acc, bookingDetail) => {
+            if (bookingDetail.room && bookingDetail.room.id) {
+                acc[bookingDetail.room.id] = bookingDetail;
+            }
+            return acc;
+        }, {});
+
+        let updatedBookings = { ...this.state.bookings };  // Initialize as a copy of the current bookings
+        let updatedBookingRoomDetailByRoomId = { ...this.state.bookingRoomDetailByRoomId };
+
+        // Process bookingRooms
+        bookingRooms.forEach(room => {
+            const checkInDate = room.bookingRoom?.checkInDate;
+            const roomId = room.room?.id;
+
+            if (roomId && new Date(checkInDate) < new Date(new Date().setHours(23, 59, 59, 999))) {
+                updatedBookings = { ...updatedBookings, ...bookings };  // Merge the new bookings into the existing object
+            } else if (roomId) {
+                const updatedBookingRoomDetails = {
+                    [roomId]: bookingRooms.map(item => ({
+                        ...item,
+                        idRoom: item?.id
+                    }))
+                };
+
+                updatedBookingRoomDetailByRoomId = {
+                    ...updatedBookingRoomDetailByRoomId,
+                    ...updatedBookingRoomDetails
+                };
+            }
+        });
+
+        // Update state after all processing
+        this.setState({
+            bookings: updatedBookings,
+            bookingRoomDetailByRoomId: updatedBookingRoomDetailByRoomId
+        });
+
+
+        return bookingRooms;
+
+    };
+
+
+
 
     fetchBookingRoomsDetail = async () => {
 

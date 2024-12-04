@@ -1,5 +1,6 @@
 package com.example.Backend.service.Booking;
 
+import com.example.Backend.dto.request.Booking.BookingRoomCreationByStaffRequest;
 import com.example.Backend.dto.request.Booking.BookingRoomCreationRequest;
 import com.example.Backend.dto.request.Booking.BookingRoomUpdateRequest;
 import com.example.Backend.dto.response.Bill.BillTicketResponse;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,6 +42,7 @@ public class BookingRoomService {
     BookingRoomRepository bookingRoomRepository;
     BookingRoomMapper bookingRoomMapper;
     UserRepository userRepository;
+    SimpMessagingTemplate messagingTemplate;
 
     public BookingRoomResponse createBookingRoom(BookingRoomCreationRequest request) {
         BookingRoom bookingRoom = bookingRoomMapper.toBookingRoom(request);
@@ -47,6 +50,35 @@ public class BookingRoomService {
         String email = context.getAuthentication().getName();
         User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         bookingRoom.setUser(user);
+        return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
+    }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    public BookingRoomResponse createBookingRoomByStaff(BookingRoomCreationByStaffRequest request) {
+
+        BookingRoomCreationRequest creationRequest = BookingRoomCreationRequest.builder()
+                .checkInDate(request.getCheckInDate())
+                .checkOutDate(request.getCheckOutDate())
+                .total(request.getTotal())
+                .datePay(request.getDatePay())
+                .status(request.getStatus())
+                .build();
+
+        BookingRoom bookingRoom = bookingRoomMapper.toBookingRoom(creationRequest);
+
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+
+        // Tìm nhân viên theo email
+        User staff = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        bookingRoom.setStaffBooker(staff);
+
+        String userId = request.getUser();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        bookingRoom.setUser(user);
+
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
 
@@ -86,11 +118,19 @@ public class BookingRoomService {
 
     @PostAuthorize("returnObject.user.email == authentication.name or hasRole('EMPLOYEE')")
     public BookingRoomResponse updateBookingRoom(String id, BookingRoomUpdateRequest request) {
+
         BookingRoom bookingRoom = bookingRoomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
         bookingRoomMapper.updateBookingRoom(bookingRoom, request);
+
+        if(request.getStatus().equals("đã thanh toán")) {
+            messagingTemplate.convertAndSend("/topic/room-updates", id);
+        }
+
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
+
 
     @PreAuthorize("hasRole('MANAGER')")
     public void deleteBookingRoom(String id) {

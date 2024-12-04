@@ -122,5 +122,13 @@ public class BookingRoomDetailsController {
                 .build();
     }
 
+    @GetMapping("/byBookingRoom/byStaff/{bookingRoomId}")
+    public ApiResponse<List<BookingRoomDetails>> getActiveBookingRoomDetailsByBookingRoomIdByStaff(
+            @PathVariable String bookingRoomId) {
+        List<BookingRoomDetails> activeBookingRoomDetails = bookingRoomDetailsService.getBookingRoomDetailsByBookingRoomStaff(bookingRoomId);
+        return ApiResponse.<List<BookingRoomDetails>>builder()
+                .result(activeBookingRoomDetails)
+                .build();
+    }
 
 }
