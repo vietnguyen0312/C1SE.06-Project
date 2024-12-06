@@ -665,7 +665,7 @@ const HistoryBookingRoom = () => {
                                             <InfoRight>
                                                 <div><FaCircle style={{ color: "#84b0ca" }} /> Ngày đặt: {new Date(subItem.key.checkInDate).toLocaleDateString()}</div>
                                                 <div><FaCircle style={{ color: "#84b0ca" }} /> Ngày trả: {new Date(subItem.key.checkOutDate).toLocaleDateString()}</div>
-                                                <div><FaCircle style={{ color: "#84b0ca" }} /> Số ngày thuê: {subItem.key.soNgayThue}</div>
+                                                <div><FaCircle style={{ color: "#84b0ca" }} /> Số ngày thuê: {calculateDays(subItem.key.checkInDate, subItem.key.checkOutDate)} Ngày</div>
                                                 <div><FaCircle style={{ color: "#84b0ca" }} /> Trạng thái: <Status>{subItem.key.status}</Status></div>
                                             </InfoRight>
                                         </Infomation>

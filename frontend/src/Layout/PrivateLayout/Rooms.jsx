@@ -532,10 +532,10 @@ class Rooms extends Component {
                         <Item>Rooms</Item>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', width: '100%' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <ButtonCPN text="Hoạt động" onClick={() => { this.handleStatusChangeFilter("Đang hoạt động") }} style={{ width: 'auto', height: 'auto', fontSize: '13px'}} />
-                                <ButtonCPN text="Đã đặt" onClick={() => { this.handleStatusChangeFilter("đã đặt") }} style={{ width: 'auto', height: 'auto', fontSize: '13px'}} />
-                                <ButtonCPN text="Quá hạn" onClick={() => { this.handleStatusChangeFilter("quá hạn") }} style={{ width: 'auto', height: 'auto', fontSize: '13px'}} />
-                                <ButtonCPN text="Bảo trì, sửa chữa" onClick={() => { this.handleStatusChangeFilter("bảo trì, sửa chữa") }} style={{ width: 'auto', height: 'auto', fontSize: '13px'}} />
+                                <ButtonCPN text="Hoạt động" onClick={() => { this.handleStatusChangeFilter("Đang hoạt động") }} style={{ width: 'auto', height: 'auto', fontSize: '13px' }} />
+                                <ButtonCPN text="Đã đặt" onClick={() => { this.handleStatusChangeFilter("đã đặt") }} style={{ width: 'auto', height: 'auto', fontSize: '13px' }} />
+                                <ButtonCPN text="Quá hạn" onClick={() => { this.handleStatusChangeFilter("quá hạn") }} style={{ width: 'auto', height: 'auto', fontSize: '13px' }} />
+                                <ButtonCPN text="Bảo trì, sửa chữa" onClick={() => { this.handleStatusChangeFilter("bảo trì, sửa chữa") }} style={{ width: 'auto', height: 'auto', fontSize: '13px' }} />
                             </div>
 
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -628,7 +628,7 @@ class Rooms extends Component {
                                                                 )}
                                                             </div>
                                                             {booking && (
-                                                                <div style={{display:'flex',flexDirection:'column', gap: '10px'}}>
+                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                                                     <div style={{ fontSize: "13px" }}>
                                                                         Check-in:{" "}
                                                                         {new Date(booking.bookingRoom.checkInDate)
@@ -821,10 +821,6 @@ class Rooms extends Component {
                                     <option value="bảo trì">bảo trì</option>
                                     <option value="Đang hoạt động">Đang hoạt động</option>
                                 </SelectedRoom>
-                            </div>
-
-                            <div style={{ display: 'flex', gap: '15px'}}>
-                                <input type="number" placeholder="Nhập số ngày" style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc',width: '70%',cursor:'pointer' }} />
                             </div>
                         </div>
                         <div style={{ display: this.state.addRoom ? 'flex' : 'none', flexDirection: 'column', gap: '15px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>

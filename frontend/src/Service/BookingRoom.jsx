@@ -1087,21 +1087,6 @@ class BookingRoom extends Component {
                                         />
                                     </div>
 
-                                    <button
-                                        style={{
-                                            padding: '10px 20px',
-                                            fontSize: '14px',
-                                            fontWeight: 'bold',
-                                            backgroundColor: '#4CAF50',
-                                            color: '#fff',
-                                            border: 'none',
-                                            borderRadius: '5px',
-                                            cursor: 'pointer',
-                                            alignSelf: 'flex-end',
-                                        }}
-                                    >
-                                        Gửi thông tin
-                                    </button>
                                 </div>
                             </>
                         )

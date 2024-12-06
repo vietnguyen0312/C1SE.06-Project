@@ -7,6 +7,7 @@ import BookingRoom from '../../Service/BookingRoom';
 import HistoryBookingRoom from '../../Layout/PublicLayout/HistoryBill/HistoryBookingRoom';
 import HistoryTicketBill from '../../Service/HistoryTicketBill';
 import Ticket from '../../components/Ticket';
+import CustomerCheckInCheckOut from './CustomerCheckInCheckOut/CustomerCheckInCheckOut';
 
 const ProfileContainer = styled.div`
     padding: 20px;
@@ -54,10 +55,11 @@ const BookingRoomContainer = styled.div`
 `;
 const Bookings = () => {
     const [showBookingRoom, setShowBookingRoom] = useState(false);
-    const [showHistoryBookingRoom, setShowHistoryBookingRoom] = useState(false);
+    const [showHistoryBookingRoom, setShowHistoryBookingRoom] = useState(true);
     const [showHistoryTicketBill, setShowHistoryTicketBill] = useState(false);
     const [showTicket, setShowTicket] = useState(true);
     const [showSearch, setShowSearch] = useState(false);
+
 
     return (
         <ProfileContainer>
@@ -95,14 +97,50 @@ const Bookings = () => {
                 </div>
             </DashboardContainer>
             {showBookingRoom && (
-                <BookingRoomContainer>
-                    <BookingRoom showBanner={false} />
-                </BookingRoomContainer>
+                <div style={{ backgroundColor: '#fff', padding: '20px', borderRadius: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <ButtonContainer>
+                            <ButtonCPN
+                                text="Đặt phòng"
+                                onClick={() => { setShowHistoryBookingRoom(true) }}
+                                style={{
+                                    width: 'auto',
+                                    height: 'auto',
+                                    fontSize: '13px',
+                                    backgroundColor: showHistoryBookingRoom ? 'green' : '#f8b600', // Đổi màu dựa trên điều kiện
+                                    color: 'white'
+                                }}
+                            />
+                        </ButtonContainer>
+                        <ButtonContainer>
+                            <ButtonCPN
+                                text="Check-in/Check-out"
+                                onClick={() => { setShowHistoryBookingRoom(false) }}
+                                style={{
+                                    width: 'auto',
+                                    height: 'auto',
+                                    fontSize: '13px',
+                                    backgroundColor: showHistoryBookingRoom ? '#f8b600' : 'green', // Đổi màu dựa trên điều kiện
+                                    color: 'white'
+                                }}
+                            />
+                        </ButtonContainer>
+                    </div>
+                    {showHistoryBookingRoom && (
+                        <BookingRoomContainer>
+                            <BookingRoom showBanner={false} />
+                        </BookingRoomContainer>
+                    )}
+
+                    {showHistoryBookingRoom == false && (
+                        <CustomerCheckInCheckOut />
+                    )}
+                </div>
             )}
             <div style={{ marginTop: '20px' }}>
                 {showTicket && <Ticket style={{ padding: '0' }} />}
             </div>
-            {showSearch && (
+            {showSearch && showTicket && (
                 <InputContainer>
                     <SearchInput type="text" placeholder="Tìm kiếm ..." />
                 </InputContainer>
