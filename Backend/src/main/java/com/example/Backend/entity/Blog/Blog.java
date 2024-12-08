@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(name = "blog")
@@ -42,6 +43,12 @@ public class Blog {
 
     @Column(length = 50)
     String status;
+
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<BlogComment> comments;
+
+    @OneToMany(mappedBy = "blog", cascade = CascadeType.ALL, orphanRemoval = true)
+    List<BlogImages> images;
 
     @PrePersist
     public void prePersist() {

@@ -18,5 +18,6 @@ public class BlogCommentCreateRequest {
 
     @NotBlank(message = "NOT_BLANK")
     @Size(max = 255,message = "COMMENT_SIZE")
+
     String comment;
 }

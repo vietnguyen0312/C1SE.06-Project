@@ -1,32 +1,34 @@
 package com.example.Backend.service.Blog;
 
+import java.time.Instant;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import com.example.Backend.components.DateTimeFormatter;
 import com.example.Backend.dto.request.Blog.BlogCreateRequest;
 import com.example.Backend.dto.request.Blog.BlogUpdateRequest;
 import com.example.Backend.dto.response.Blog.BlogResponse;
 import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.entity.Blog.Blog;
-import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
+import com.example.Backend.exception.AppException;
 import com.example.Backend.mapper.Blog.BlogMapper;
 import com.example.Backend.repository.Blog.BlogRepository;
 import com.example.Backend.repository.Blog.BlogTypeRepository;
 import com.example.Backend.repository.User.UserRepository;
-import com.example.Backend.components.DateTimeFormatter;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import org.springframework.data.domain.Sort;
-import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -59,20 +61,19 @@ public class BlogService {
                 .build();
     }
 
-
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     public BlogResponse createBlog(BlogCreateRequest request) {
-            Blog blog = blogMapper.toBlog(request);
+        Blog blog = blogMapper.toBlog(request);
 
-            blog.setDateTimeEdit(Instant.now());
+        blog.setDateTimeEdit(Instant.now());
 
-            blog.setBlogType(blogTypeRepository.findById(request.getBlogTypeId())
-                    .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+        blog.setBlogType(blogTypeRepository.findById(request.getBlogTypeId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
 
-            blog.setUser(userRepository.findById(request.getUserId())
-                    .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+        blog.setUser(userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
 
-            return blogMapper.toBlogResponse(blogRepository.save(blog));
+        return blogMapper.toBlogResponse(blogRepository.save(blog));
     }
 
     @PostAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
@@ -87,50 +88,47 @@ public class BlogService {
         return blogMapper.toBlogResponse(blogRepository.save(blog));
     }
 
-
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
     public void deleteBlog(String id) {
-        blogRepository.deleteById(id);
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        blogRepository.delete(blog);
     }
 
-    public PageResponse<BlogResponse> getAllBlog(int page , int size , String search) {
+    public PageResponse<BlogResponse> getAllBlog(int page, int size, String search) {
         Sort sort = Sort.by(Sort.Direction.DESC, "dateTimeEdit").descending();
 
-        Pageable pageable = PageRequest.of(page-1, size, sort);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Page<Blog> pageData;
 
-        if(StringUtils.hasLength(search)){
-           pageData = blogRepository.findByTitleOrBodyOrContentOpenContaining(search,search,search,pageable);
-        }else {
+        if (StringUtils.hasLength(search)) {
+            pageData = blogRepository.findByTitleOrBodyOrContentOpenContaining(search, search, search, pageable);
+        } else {
             pageData = blogRepository.findAll(pageable);
         }
 
         return createPageResponse(pageData, page, size);
     }
 
-
-
     public BlogResponse getBlogById(String id) {
-
 
         return formatBlogResponse(blogRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
 
-    public PageResponse<BlogResponse> getBlogByBlogType(List<String> idBlogType, int page , int size, String search) {
+    public PageResponse<BlogResponse> getBlogByBlogType(List<String> idBlogType, int page, int size, String search) {
         Sort sort = Sort.by(Sort.Direction.DESC, "dateTimeEdit").descending();
 
-        Pageable pageable = PageRequest.of(page-1, size, sort);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
         Page<Blog> pageData;
 
-        if(StringUtils.hasLength(search)){
-            pageData = blogRepository.findByBlogTypeInAndTitleOrBodyOrContentOpenContaining(blogTypeRepository.findAllById(idBlogType), search,search,search,pageable);
-        }
-        else
-        {
-            pageData = blogRepository.findByBlogTypeIn(blogTypeRepository.findAllById(idBlogType),pageable);
+        if (StringUtils.hasLength(search)) {
+            pageData = blogRepository.findByBlogTypeInAndTitleOrBodyOrContentOpenContaining(
+                    blogTypeRepository.findAllById(idBlogType), search, search, search, pageable);
+        } else {
+            pageData = blogRepository.findByBlogTypeIn(blogTypeRepository.findAllById(idBlogType), pageable);
         }
         return createPageResponse(pageData, page, size);
     }
