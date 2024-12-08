@@ -42,7 +42,9 @@ public class BookingRoom {
     @Column
     String status;
 
-
+    @ManyToOne
+    @JoinColumn(name = "staff_booker_id") // Nhân viên tạo booking
+    User staffBooker;
 
     @PrePersist
     public void prePersist() {

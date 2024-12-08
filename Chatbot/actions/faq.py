@@ -33,7 +33,7 @@ class ActionGetReturnFAQ(Action):
             print(combined_data)
             
         except requests.exceptions.RequestException as e:
-            dispatcher.utter_message(template="utter_error")
+            dispatcher.utter_message(response="utter_error")
             return [ActionExecutionRejected(self.name())]
     
         return [SlotSet("combined_data", combined_data)]

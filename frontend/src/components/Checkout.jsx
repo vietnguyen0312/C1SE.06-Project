@@ -66,6 +66,19 @@ const Checkout = () => {
     const [billData, setBillData] = useState({});
     const [checkCategory, setCheckCategory] = useState('');
 
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+
+        const day = date.getUTCDate();
+        const month = date.getUTCMonth() + 1; // Months are zero-indexed
+        const year = date.getUTCFullYear();
+        const hours = date.getUTCHours();
+        const minutes = date.getUTCMinutes();
+        const seconds = date.getUTCSeconds();
+
+        return ` 🕒 ${hours.toString().padStart(2, '0')}h:${minutes.toString().padStart(2, '0')}m:${seconds.toString().padStart(2, '0')}s   📅 ${day} / ${month} / ${year}`;
+    };
+
     useEffect(() => {
         const fetchBillData = async () => {
             const category = orderInfo.charAt(0);
@@ -81,10 +94,17 @@ const Checkout = () => {
                         billDetails: detailsRes.result
                     });
                 } else if (category === 'r') {
-                    const res = await axios.put(`/booking_room/${id}`, { status: 'đã thanh toán' });
+                    const bookingRoomIds = orderInfo.slice(1).split('%2C');
+                    const updatePromises = bookingRoomIds.map(bookingRoomId =>
+                        axios.put(`/booking_room/${bookingRoomId}`, { status: 'đã thanh toán' })
+                    );
+
+
+                    const updateResponses = await Promise.all(updatePromises);
                     const detailsRes = await axios.get(`/booking_room_details/byBookingRoom/${id}`);
+
                     setBillData({
-                        billInfo: res.result,
+                        billInfo: updateResponses.map(res => res.result),
                         billDetails: detailsRes.result
                     });
                 }
@@ -122,10 +142,29 @@ const Checkout = () => {
                     <Title className='Allison'>Checkout for room</Title>
                     <OrderContainer>
                         <SectionTitle>Thông tin đơn hàng</SectionTitle>
-                        <InfoText>Mã đơn hàng: {billData.billInfo?.id}</InfoText>
-                        <InfoText>Ngày đặt: {billData.billInfo?.datePay}</InfoText>
-                        <InfoText>Tổng tiền: {billData.billInfo?.total.toLocaleString()} VNĐ</InfoText>
-                        <InfoText>Trạng thái: <Status status={billData.billInfo?.status}>{billData.billInfo?.status}</Status></InfoText>
+                        {Array.isArray(billData.billInfo) ? (
+                            <>
+                                {billData.billInfo.slice(0, 2).map((order, index) => (
+                                    <div key={index}>
+                                        <InfoText>Mã đơn hàng {index + 1} : {order.id}</InfoText>
+                                    </div>
+                                ))}
+                                <InfoText>Tổng tiền: {billData.billInfo.reduce((sum, order) => sum + order.total, 0).toLocaleString()} VNĐ</InfoText>
+                                {billData.billInfo.length > 0 && (
+                                    <div>
+                                        <InfoText>Ngày đặt: {formatDate(billData.billInfo[0].datePay)}</InfoText>
+                                        <InfoText>Trạng thái: <Status status={billData.billInfo[0].status}>{billData.billInfo[0].status}</Status></InfoText>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div>
+                                <InfoText>Mã đơn hàng: {billData.billInfo?.id}</InfoText>
+                                <InfoText>Ngày đặt: {billData.billInfo?.datePay}</InfoText>
+                                <InfoText>Tổng tiền: {billData.billInfo?.total.toLocaleString()} VNĐ</InfoText>
+                                <InfoText>Trạng thái: <Status status={billData.billInfo?.status}>{billData.billInfo?.status}</Status></InfoText>
+                            </div>
+                        )}
                     </OrderContainer>
                     <ButtonCPN text="Quay lại trang chủ" />
                 </>

@@ -12,22 +12,11 @@ import {
     CalendarOutlined, 
     FileDoneOutlined 
 } from '@ant-design/icons';
-import DropdownMenu from '../../components/Dropdown/dropdown';  
-
+import { useNavigate } from 'react-router-dom';
 const SidebarContainer = styled.div`
     width: 250px;
     height: 100vh;
     border-right: 1px solid #e5e5e5;
-`;
-
-const SidebarHeader = styled.div`
-    font-size: 60px;
-    font-weight: 600;
-    color: #f8b600;
-    border-bottom: 1px solid #e5e5e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 `;
 
 const SidebarContent = styled.div`
@@ -40,6 +29,7 @@ const Hotel = styled.div`
     flex-direction: column;
     gap: 10px;
     margin-top: 20px;
+    border-bottom: 1px solid #e5e5e5;
 `;
 
 const Item = styled.div`
@@ -67,6 +57,7 @@ const Sidebar = () => {
     const toggleDropdown = (dropdownName) => {
         setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
     };
+    const navigate = useNavigate(); // Khởi tạo useNavigate
 
     const menuItems = (
         <>
@@ -78,38 +69,19 @@ const Sidebar = () => {
 
     const dashboard = (
         <>
-            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}} href='/dashboard'><FileTextOutlined />Report</div>
+            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={() => navigate('/manager')}><FileTextOutlined />Report</div>
         </>
     );
 
     return (
         <SidebarContainer>
-            <SidebarHeader className='Allison'>Healings</SidebarHeader>
             <SidebarContent>
-                <DropdownMenu
-                    icon={<DashboardOutlined />}
-                    label="Dashboard"
-                    content={dashboard}
-                    isActive={activeDropdown === 'dashboard'}
-                    onClick={() => toggleDropdown('dashboard')}
-                    icon2={<RightOutlined />}
-                />
-                <DropdownMenu
-                    icon={<TeamOutlined />}
-                    label="Staff"
-                    content={menuItems}
-                    isActive={activeDropdown === 'staff'}
-                    onClick={() => toggleDropdown('staff')}
-                    icon2={<RightOutlined />}
-                />
-                <DropdownMenu
-                    icon={<KeyOutlined />}
-                    label="Authentication"
-                    content={menuItems}
-                    isActive={activeDropdown === 'authentication'}
-                    onClick={() => toggleDropdown('authentication')}
-                    icon2={<RightOutlined />}
-                />
+                <div style={{ padding: '15px 0', borderBottom: '1px solid #e5e5e5' }} onClick={() => navigate('/manager')}>
+                    <Item>
+                        <DashboardOutlined />
+                        <div>Dashboard</div>
+                    </Item>
+                </div>
                 <Hotel>
                     <Content>HOTEL | ROOM</Content>
                     <Item>
@@ -120,17 +92,35 @@ const Sidebar = () => {
                         <ProfileOutlined />
                         <div>Guest Details</div>
                     </Item>
-                    <Item>
+                    <Item onClick={() => navigate('/manager/rooms')}>
                         <HomeOutlined />
                         <div>Rooms</div>
                     </Item>
-                    <Item>
+                    <Item onClick={() => navigate('/manager/bookings')}>
                         <CalendarOutlined />
                         <div>Bookings</div>
                     </Item>
                     <Item>
                         <FileDoneOutlined />
                         <div>Invoice</div>
+                    </Item>
+                </Hotel>
+                <Hotel>
+                    <Content>EMPLOYEE | CUSTOMER</Content>
+                    <Item onClick={() => navigate('/manager/employee')}>
+                        <TeamOutlined />
+                        <div>Employee</div>
+                    </Item>
+                    <Item onClick={() => navigate('/manager/customer')}>
+                        <TeamOutlined />
+                        <div>Customer</div>
+                    </Item>
+                </Hotel>
+                <Hotel>
+                    <Content>SERVICE</Content>
+                    <Item onClick={() => navigate('/manager/service')}>
+                        <KeyOutlined />
+                        <div>Service</div>
                     </Item>
                 </Hotel>
             </SidebarContent>

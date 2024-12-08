@@ -20,4 +20,5 @@ public class BookingRoomResponse {
     double total;
     String status;
     Instant datePay;
+    User staffBooker;
 }

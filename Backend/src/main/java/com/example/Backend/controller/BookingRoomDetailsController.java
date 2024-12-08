@@ -105,5 +105,30 @@ public class BookingRoomDetailsController {
                 .build();
     }
 
+    @GetMapping("/active")
+    public ApiResponse<List<BookingRoomDetails>> getActiveBookingRoomDetails() {
+        List<BookingRoomDetails> activeBookingRoomDetails = bookingRoomDetailsService.getActiveBookingRoomDetails();
+        return ApiResponse.<List<BookingRoomDetails>>builder()
+                .result(activeBookingRoomDetails)
+                .build();
+    }
+
+    @GetMapping("/active/{roomId}")
+    public ApiResponse<List<BookingRoomDetails>> getActiveBookingRoomDetailsByRoomId(
+            @PathVariable String roomId) {
+        List<BookingRoomDetails> activeBookingRoomDetails = bookingRoomDetailsService.getBookingRoomDetailsByRoomId(roomId);
+        return ApiResponse.<List<BookingRoomDetails>>builder()
+                .result(activeBookingRoomDetails)
+                .build();
+    }
+
+    @GetMapping("/byBookingRoom/byStaff/{bookingRoomId}")
+    public ApiResponse<List<BookingRoomDetails>> getActiveBookingRoomDetailsByBookingRoomIdByStaff(
+            @PathVariable String bookingRoomId) {
+        List<BookingRoomDetails> activeBookingRoomDetails = bookingRoomDetailsService.getBookingRoomDetailsByBookingRoomStaff(bookingRoomId);
+        return ApiResponse.<List<BookingRoomDetails>>builder()
+                .result(activeBookingRoomDetails)
+                .build();
+    }
 
 }

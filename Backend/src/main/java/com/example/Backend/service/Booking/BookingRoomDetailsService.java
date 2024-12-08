@@ -319,7 +319,6 @@ public class BookingRoomDetailsService {
                         );
                 }
 
-                // Phân trang kết quả
                 int totalElements = bookingRoomDetailsMap.size();
                 int totalPages = (int) Math.ceil((double) totalElements / size);
                 int fromIndex = Math.min((page - 1) * size, totalElements);
@@ -339,5 +338,22 @@ public class BookingRoomDetailsService {
 
 
 
-//List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
+
+        @PreAuthorize("hasRole('MANAGER')")
+        public List<BookingRoomDetails> getActiveBookingRoomDetails() {
+                return bookingRoomDetailsRepository.findActiveBookingRoomDetails();
+        }
+
+        @PreAuthorize("hasRole('MANAGER')")
+        public List<BookingRoomDetails> getBookingRoomDetailsByRoomId(String roomId) {
+                // Sắp xếp theo checkInDate của BookingRoom
+                Sort sort = Sort.by(Sort.Order.asc("bookingRoom.checkInDate"));
+                return bookingRoomDetailsRepository.findByRoom_Id(roomId, sort);
+        }
+
+        @PreAuthorize("hasRole('MANAGER')")
+        public List<BookingRoomDetails> getBookingRoomDetailsByBookingRoomStaff(String bookingRoomId) {
+                return bookingRoomDetailsRepository.findByBookingRoom_id(bookingRoomId);
+        }
+
 }

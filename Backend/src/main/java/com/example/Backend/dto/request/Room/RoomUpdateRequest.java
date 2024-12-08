@@ -10,7 +10,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomUpdateRequest {
+
     @NotBlank(message = "NOT_NULL")
     String status;
+    
+    @NotBlank(message = "NOT_NULL")
     String roomTypeId;
 }

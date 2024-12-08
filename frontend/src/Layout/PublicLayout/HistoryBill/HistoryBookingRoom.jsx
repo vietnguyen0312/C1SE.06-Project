@@ -269,15 +269,15 @@ const HistoryBookingRoom = () => {
     const setupObserver = useCallback(() => {
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && hasMore) {
-                // this.fetchRoom(this.startDate, this.state.roomId);
+
                 GetHistoryBookingRoom();
-                // console.log("Phần tử cuối đã xuất hiện, tải thêm dữ liệu..."); // Kiểm tra log khi phần tử cuối cùng xuất hiện
+
             }
         });
 
         if (lastPostElementRef.current) {
             observer.observe(lastPostElementRef.current); // Quan sát phần tử cuối cùng
-            // console.log("Đã thiết lập quan sát cho phần tử cuối cùng");
+
         }
     },);
 
@@ -326,15 +326,14 @@ const HistoryBookingRoom = () => {
         const response = await axios.get('/users/myInfo');
 
         setUser(response.result)
-        console.log(response.result)
-        console.log("dsadsadsadsads")
-        // const Id = response.result.id
+
+
         const response1 = await axios.get(`/booking_room_details/byUser/page`, { params })
-        console.log(response1)
+
         const hasMore = response1.result.currentPage < response1.result.totalPages; // Điều kiện kiểm tra trang
-        console.log(`Current Page: ${response1.result.currentPage}, Total Pages: ${response1.result.totalPages}, Has More: ${hasMore}`);
-        const nextPage = hasMore ? page + 1 : page;
-        console.log(nextPage)
+
+        // const nextPage = hasMore ? page + 1 : page;
+        // console.log(nextPage)
         setListBookingRoom([...ListBookingRoom, ...response1.result.data]);
         setTotalElements(response1.result.totalElements);
         setTotalPages(Math.ceil(response1.result.totalElements / pageSize));
@@ -651,7 +650,7 @@ const HistoryBookingRoom = () => {
                                         )}
                                     </Gender>
                                     <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                                        Thành viên: <div style={{ color: "#5d9fc5" }}>{user.customerType.name}</div>
+                                        Thành viên: <div style={{ color: "#5d9fc5" }}>{user.customerType?.name}</div>
                                     </div>
                                     <div><FaPhone /> {user.phoneNumber ? user.phoneNumber : "Không có thông tin"}</div>
                                 </InfomationLeft>
@@ -666,7 +665,7 @@ const HistoryBookingRoom = () => {
                                             <InfoRight>
                                                 <div><FaCircle style={{ color: "#84b0ca" }} /> Ngày đặt: {new Date(subItem.key.checkInDate).toLocaleDateString()}</div>
                                                 <div><FaCircle style={{ color: "#84b0ca" }} /> Ngày trả: {new Date(subItem.key.checkOutDate).toLocaleDateString()}</div>
-                                                <div><FaCircle style={{ color: "#84b0ca" }} /> Số ngày thuê: {subItem.key.soNgayThue}</div>
+                                                <div><FaCircle style={{ color: "#84b0ca" }} /> Số ngày thuê: {calculateDays(subItem.key.checkInDate, subItem.key.checkOutDate)} Ngày</div>
                                                 <div><FaCircle style={{ color: "#84b0ca" }} /> Trạng thái: <Status>{subItem.key.status}</Status></div>
                                             </InfoRight>
                                         </Infomation>
@@ -793,7 +792,7 @@ const HistoryBookingRoom = () => {
 
                                         {(() => {
                                             if (!subItem || !subItem.key) {
-                                                console.error("subItem hoặc subItem.key là undefined");
+
                                                 return null;
                                             }
 

@@ -4,6 +4,7 @@ import com.example.Backend.dto.request.User.UserChangePasswordRequest;
 import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
+import com.example.Backend.dto.response.PageResponse;
 import com.example.Backend.dto.response.User.UserResponse;
 import com.example.Backend.service.User.UserService;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
@@ -39,12 +41,15 @@ public class UserController {
     }
 
     @GetMapping
-    ApiResponse<List<UserResponse>> getUsers() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
+    ApiResponse<PageResponse<UserResponse>> getUsers(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size,
+            @RequestParam(value = "search", required = false, defaultValue = "") String search,
+            @RequestParam(value = "role", required = false, defaultValue = "CUSTOMER")String role
+    ) {
         return ApiResponse
-                .<List<UserResponse>>builder()
-                .result(userService.getUsers())
+                .<PageResponse<UserResponse>>builder()
+                .result(userService.getUsers(page, size, search, role))
                 .build();
     }
 
@@ -55,6 +60,16 @@ public class UserController {
                 .result(userService.getUser(id))
                 .build();
     }
+
+    @GetMapping("/email/{email}")
+    ApiResponse<UserResponse> getUserByEmail(@PathVariable("email") String email) {
+        return ApiResponse
+                .<UserResponse>builder()
+                .result(userService.getUserByGmail(email))
+                .build();
+    }
+
+
 
     @PutMapping("/{id}")
     ApiResponse<UserResponse> updateUser(@PathVariable("id") String id, @RequestBody @Valid UserUpdateRequest request) {

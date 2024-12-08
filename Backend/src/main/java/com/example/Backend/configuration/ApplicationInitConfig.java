@@ -53,19 +53,19 @@ public class ApplicationInitConfig {
                 }
             }
 
-            if (userRepository.findByEmail("manager@gmail.com").isEmpty()) {
-                log.info("Add Manager account");
+            if (userRepository.findByEmail("employer@gmail.com").isEmpty()) {
+                log.info("Add Employer account");
                 Set<Role> roles = new HashSet<>(roleRepository.findAll());
 
                 User user = User.builder()
-                        .email("manager@gmail.com")
-                        .username("manager")
-                        .password(passwordEncoder.encode("manager"))
+                        .email("employer@gmail.com")
+                        .username("employer")
+                        .password(passwordEncoder.encode("employer"))
                         .roles(roles)
                         .build();
 
                 userRepository.save(user);
-                log.warn("Manager user has been created with default password: manager, please change it.");
+                log.warn("Manager user has been created with default password: employer, please change it.");
             }
         };
     }
