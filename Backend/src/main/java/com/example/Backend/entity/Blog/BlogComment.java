@@ -32,4 +32,5 @@ public class BlogComment {
 
     @Column(nullable = false)
     Instant dateUpdate;
+
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../../../Configuration/AxiosConfig";
+import axios from "../../Configuration/AxiosConfig";
 import { Table, Popover, Spin } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 import styled from "styled-components";

@@ -242,23 +242,8 @@ const ImgService = styled.img`
     border-radius: 50%;
     margin-right: 10px;
 `
-const data = [
-    { date: 'June', Visitors: 400, Bookings: 300, Revenue: 800, Rooms: 600 },
-    { date: 'July', Visitors: 300, Bookings: 200, Revenue: 400, Rooms: 500 },
-    { date: 'August', Visitors: 500, Bookings: 400, Revenue: 600, Rooms: 700 },
-    { date: 'September', Visitors: 600, Bookings: 500, Revenue: 500, Rooms: 800 },
-    { date: 'October', Visitors: 700, Bookings: 600, Revenue: 400, Rooms: 900 },
-];
 
-const RevenueData = [
-    { month: 'June', Bookings: 1000, Revenue: 666, Expense: 500, Profit: 166 },
-    { month: 'July', Bookings: 1200, Revenue: 750, Expense: 550, Profit: 200 },
-    { month: 'August', Bookings: 1300, Revenue: 820, Expense: 600, Profit: 220 },
-    { month: 'September', Bookings: 1100, Revenue: 700, Expense: 520, Profit: 180 },
-    { month: 'October', Bookings: 1400, Revenue: 850, Expense: 650, Profit: 200 },
-];
-
-const CustomTooltip = ({ active, payload, label }) => {
+const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
         return (
             <TooltipContainer>
@@ -270,128 +255,47 @@ const CustomTooltip = ({ active, payload, label }) => {
     return null;
 };
 
-
-const columnsTicket = [
-    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
-    {
-        title: "Thông tin khách hàng",
-        key: "userInfo",
-        render: (record) => (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <img
-              src={record.image}
-              alt="Avatar"
-              style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
-            />
-            <span>{record.name}</span>
-          </div>
-        ),
-    },
-    { title: 'Giới tính', dataIndex: 'gender', key: 'gender' },
-    { title: 'Loại khách hàng', dataIndex: 'type', key: 'type' },
-    { title: 'Ngày đặt', dataIndex: 'bookingDate', key: 'bookingDate' },
-    { title: 'Số điện thoại', dataIndex: 'phoneNumber', key: 'phoneNumber' },
-    { 
-        title: 'Chi tiết', 
-        dataIndex: 'action', 
-        key: 'action',
-        render: () => (
-                <div style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center',display: 'flex' }}>
-                    <EyeOutlined />
-                </div>
-        ),
-    },
-];
-
-const dataSourceTicket = [{ id: 1, name: 'Nguyễn Văn A', gender: 'Nam', type: 'âcsc', bookingDate: '2024-11-10', phoneNumber: '0123456789' }, { id: 2, name: 'Trần Thị B', gender: 'Nữ', type: 'Vip', bookingDate: '2024-11-12', phoneNumber: '0987654321' }, { id: 3, name: 'Lê Văn C', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-14', phoneNumber: '0912345678' }, { id: 4, name: 'Phạm Thị D', gender: 'Nữ', type: 'Vip', bookingDate: '2024-11-15', phoneNumber: '0901234567' }, { id: 5, name: 'Hoàng Văn E', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-16', phoneNumber: '0923456789' }];
-
-
-const roomColumns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
-    {
-        title: "Thông tin khách hàng",
-        key: "userInfo",
-        render: (record) => (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <img
-              src={record.image}
-              alt="Avatar"
-              style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
-            />
-            <span>{record.name}</span>
-          </div>
-        ),
-    },
-    { title: 'Giới tính', dataIndex: 'gender', key: 'gender' },
-    { title: 'Loại khách hàng', dataIndex: 'type', key: 'type' },
-    { title: 'Ngày đặt', dataIndex: 'bookingDate', key: 'bookingDate' },
-    { title: 'Số điện thoại', dataIndex: 'phoneNumber', key: 'phoneNumber' },
-    { 
-        title: 'Chi tiết', 
-        dataIndex: 'action', 
-        key: 'action',
-        render: () => (
-                <div style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center',display: 'flex' }}>
-                    <EyeOutlined />
-                </div>
-        ),
-    },
-];
-const roomDataSource = [{ id: 1, name: 'Nguyễn Văn A', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-10', phoneNumber: '0123456789' }, { id: 2, name: 'Trần Thị B', gender: 'Nữ', type: 'Vip', bookingDate: '2024-11-12', phoneNumber: '0987654321' }, { id: 3, name: 'Lê Văn C', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-14', phoneNumber: '0912345678' }, { id: 4, name: 'Phạm Thị D', gender: 'Nữ', type: 'Vip', bookingDate: '2024-11-15', phoneNumber: '0901234567' }, { id: 5, name: 'Hoàng Văn E', gender: 'Nam', type: 'Vip', bookingDate: '2024-11-16', phoneNumber: '0923456789' }];
-
 const ServiceDetailColumns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
+    { title: "ID",render: (record) => `${record.ticket.serviceEntity.id.slice(0, 6)}...`},
     {
         title: "Thông tin dịch vụ",
-        key: "serviceInfo",
         render: (record) => (
           <div style={{ display: "flex", alignItems: "center" }}>
             <img
-              src={record.image}
+              src={record.ticket.serviceEntity.image}
               alt="Avatar"
               style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
             />
-            <span>{record.name}</span>
+            <div>{record.ticket.serviceEntity.name}</div>
           </div>
         ),
     },
-    { title: 'Loại vé', dataIndex: 'type', key: 'type' },
-    { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity' },
-    { title: 'Đơn giá', dataIndex: 'price', key: 'price',
-        render :(price)=>{
-            return <div>{price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</div>
+    { title: 'Loại vé',
+        render: (record)=>{
+            return <div>{record.ticket.ticketType.name}</div>
+        }
+    },
+    { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', 
+        render: (quantity)=>{
+            return <div>{quantity}</div>
+        }
+    },
+    { title: 'Đơn giá',
+        render: (record)=>{
+            return <div>{record.ticket.price.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
         }
     },
     { title: 'Thành tiền', dataIndex: 'total', key: 'total', sorter: (a, b) => a.total - b.total,
         render: (total)=>{
-            return <div>{total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
+            return <div>{total ? total.toLocaleString('vi-VN',{style:'currency',currency:'VND'}) : 0}</div>
         }
      },
 ];
 
-const ServiceDetailDataSource = [
-    {
-        id: 1,
-        image: <img src="https://via.placeholder.com/80" alt="Service 1" style={{ borderRadius: '8px' }} />,
-        name: 'Dịch vụ Massage',
-        type: 'Người lớn',
-        quantity: 2,
-        price: 300000,
-        total: 600000,
-    },
-    {
-        id: 2,
-        image: <img src="https://via.placeholder.com/80" alt="Service 2" style={{ borderRadius: '8px' }} />,
-        name: 'Hồ bơi vô cực',
-        type: 'Trẻ em',
-        quantity: 3,
-        price: 100000,
-        total: 300000,
-    },
-];
+
 
 const RoomDetailColumns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
+    { title: 'ID', render: (record) => `${record.id.slice(0, 6)}...`},
     {
         title: "Thông tin phòng",
         key: "roomInfo",
@@ -402,38 +306,17 @@ const RoomDetailColumns = [
               alt="Avatar"
               style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
             />
-            <span>{record.name}</span>
+            <span>{record.room.roomType.name}</span>
           </div>
         ),
     },
-    { title: 'Loại phòng', dataIndex: 'type', key: 'type' },
-    { title: 'Phòng số', dataIndex: 'roomNumber', key: 'roomNumber' },
-    { title: 'Số lượng người', dataIndex: 'quantity', key: 'quantity' },
-    { title: 'Thành tiền', dataIndex: 'total', key: 'total', sorter: (a, b) => a.total - b.total,
-        render: (total)=>{
-            return <div>{total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
-        }
+    { title: 'Phòng số',render:(record)=>record.room.roomNumber},
+    { title: 'Số lượng người', render:(record)=>record.room.roomType.maxOfPeople},
+    { title: 'Ngày đặt', render:(record)=>new Date(record.bookingRoom.checkInDate).toLocaleDateString()},
+    {title:'Ngày trả',render:(record)=>new Date(record.bookingRoom.checkOutDate).toLocaleDateString()},
+    { title: 'Thành tiền', sorter: (a, b) => a.total - b.total,
+        render: (record)=>record.room.roomType.price.toLocaleString('vi-VN',{style:'currency',currency:'VND'})
      },
-];
-const RoomDetailDataSource = [
-    {
-        id: 1,
-        image: <img src="https://via.placeholder.com/80" alt="Room 1" style={{ borderRadius: '8px' }} />,
-        name: 'Ph��ng Deluxe',
-        type: 'Deluxe',
-        roomNumber: 101,
-        quantity: 2,
-        total: 2000000,
-    },
-    {
-        id: 2,
-        image: <img src="https://via.placeholder.com/80" alt="Room 2" style={{ borderRadius: '8px' }} />,
-        name: 'Phòng Suite',
-        type: 'Suite',
-        roomNumber: 202,
-        quantity: 3,
-        total: 4500000,
-    },
 ];
 
 const viewServiceColumns = [
@@ -461,99 +344,7 @@ const viewServiceColumns = [
         }
     },
 ]
-const viewServiceDataSource = [
-    {
-      id: 1,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ A - Tư vấn du lịch",
-      type: "Loại 1 - Du lịch trong nước",
-      quantity: 150,
-      total: 500000,
-      description: "Dịch vụ tư vấn du lịch trong nước, giúp khách hàng lên kế hoạch chuyến đi phù hợp."
-    },
-    {
-      id: 2,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ B - Hướng dẫn viên",
-      type: "Loại 2 - Hướng dẫn viên du lịch",
-      quantity: 120,
-      total: 400000,
-      description: "Dịch vụ cung cấp hướng dẫn viên chuyên nghiệp cho các tour du lịch trong và ngoài nước."
-    },
-    {
-      id: 3,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ C - Khám phá ẩm thực",
-      type: "Loại 3 - Tour ẩm thực",
-      quantity: 200,
-      total: 700000,
-      description: "Tour khám phá các món ăn đặc sản, mang đến trải nghiệm ẩm thực đặc sắc cho du khách."
-    },
-    {
-      id: 4,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ D - Khách sạn 5 sao",
-      type: "Loại 1 - Chỗ ở cao cấp",
-      quantity: 180,
-      total: 600000,
-      description: "Dịch vụ đặt phòng khách sạn cao cấp với đầy đủ tiện nghi, phục vụ 24/7."
-    },
-    {
-      id: 5,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ E - Tour sinh thái",
-      type: "Loại 2 - Du lịch sinh thái",
-      quantity: 220,
-      total: 800000,
-      description: "Tour khám phá thiên nhiên hoang dã, trải nghiệm các hoạt động sinh thái tại các khu vực bảo tồn."
-    },
-    {
-      id: 6,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ F - Du lịch biển",
-      type: "Loại 1 - Du lịch biển",
-      quantity: 140,
-      total: 450000,
-      description: "Dịch vụ tour biển, đưa khách đến các bãi biển nổi tiếng và các khu nghỉ dưỡng biển tuyệt vời."
-    },
-    {
-      id: 7,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ G - Tour văn hóa",
-      type: "Loại 2 - Du lịch văn hóa",
-      quantity: 110,
-      total: 350000,
-      description: "Dịch vụ khám phá các di tích văn hóa và các địa điểm lịch sử, mang lại cái nhìn sâu sắc về văn hóa bản địa."
-    },
-    {
-      id: 8,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ H - Nghỉ dưỡng spa",
-      type: "Loại 3 - Chăm sóc sức khỏe",
-      quantity: 180,
-      total: 700000,
-      description: "Dịch vụ nghỉ dưỡng kết hợp với các liệu trình spa cao cấp, mang đến sự thư giãn tuyệt đối cho khách hàng."
-    },
-    {
-      id: 9,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ I - Du lịch mạo hiểm",
-      type: "Loại 1 - Du lịch mạo hiểm",
-      quantity: 160,
-      total: 500000,
-      description: "Dịch vụ du lịch mạo hiểm, phù hợp cho những ai yêu thích thử thách và khám phá những địa điểm hoang sơ."
-    },
-    {
-      id: 10,
-      image: "https://via.placeholder.com/40",
-      name: "Dịch vụ J - Du lịch tâm linh",
-      type: "Loại 2 - Du lịch tâm linh",
-      quantity: 190,
-      total: 650000,
-      description: "Dịch vụ du lịch tìm hiểu về các địa điểm linh thiêng, tâm linh nổi tiếng ở các vùng miền."
-    },
-  ];
-  
+
 const viewRoomColumns = [
     {
         title: 'TOP', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id
@@ -588,6 +379,7 @@ const Dashboard = () => {
     const [revenueCurrentMonth, setRevenueCurrentMonth] = useState([]);
     const [revenueService, setRevenueService] = useState([]);
     const [revenueRoomType, setRevenueRoomType] = useState([]);
+    const [paginationVisible, setPaginationVisible] = useState(true);
 
     useEffect(() => {
         const fetchRevenueData = async () => {
@@ -601,6 +393,8 @@ const Dashboard = () => {
     useEffect(() => {
         fetchRevenueService(30,0);
         fetchRevenueRoomType(30,0);
+        fetchBillTicket();
+        fetchBillRoom();
     }, []);
 
     //truyền ngày startDate để lọc cho tới hiện tại
@@ -622,6 +416,110 @@ const Dashboard = () => {
         setRevenueRoomType(response.result);
     };
 
+    const [billTicket, setBillTicket] = useState([]);
+    const [billRoom, setBillRoom] = useState([]);
+
+    const fetchBillTicket = async () =>{
+        const billTicket = await axios.get('/bill-ticket ');
+        setBillTicket(billTicket.result.data);
+    }
+    const fetchSelectedBillTicketDetail = async (bill) => {
+        const response = await axios.get(`/bill-ticket-detail/get-by-bill-simple/${bill.id}`);
+        return response.result;
+    }
+    
+    const columnsTicket = [
+        { title: "ID",render: (record) => `${record.id.slice(0, 6)}...`},
+        { title: "Thông tin khách hàng",render: (record) =>
+             <div style={{ display: "flex", alignItems: "center" }}>
+                <img src={record.user?.avatar} alt="Avatar" style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }} />
+                <span>{record.user?.username}</span>
+            </div> 
+        },
+        { title: "Giới tính", render: (record) => record.user.gender },
+        { title: "Loại khách hàng", render: (record) => Array.isArray(record.user.customerType) ? record.user.customerType.map((type) => type.name).join(", ") : record.user.customerType?.name || "N/A" },
+        { title: "Ngày đặt", render: (record) => new Date(record.dateCreated).toLocaleDateString() },
+        { title: "Số điện thoại", render: (record) => record.user.phoneNumber },
+        {title:'Tổng tiền',render:(record)=>record.total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})},
+        { 
+            title: 'Chi tiết',
+            render: (record) => (
+                <div 
+                    style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center', display: 'flex' }}
+                >
+                    <EyeOutlined 
+                        onClick={async () => {
+                            const response = await fetchSelectedBillTicketDetail(record);
+                            if (response) {
+                                showModal(
+                                <Table
+                                    dataSource={response}
+                                    columns={ServiceDetailColumns}
+                                    pagination={false}
+                                />,
+                                { width: 1200, height: 600 }
+                                );
+                            }
+                        }}/>
+                </div>
+            ),
+        },
+    ];
+    const fetchBillRoom = async () =>{
+        const billRoom = await axios.get('/booking_room');
+        setBillRoom(billRoom.result.data);
+        console.log('asdasdasd',billRoom.result.data);
+    }
+    const fetchSelectedBillRoomDetail = async (bookingRoom) => {
+        const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff/${bookingRoom.id}`);
+        console.log('fetchSelectedBillRoomDetail',response.result);
+        return response.result;
+        
+    }
+    const columnsRoom = [
+        { title: 'ID', render: (record) => `${record.id.slice(0, 6)}...`},
+        {
+            title: "Thông tin khách hàng",
+            render: (record) => (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <img
+                  src={record.user.avatar}
+                  alt="Avatar"
+                  style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
+                />
+                <span>{record.user.username}</span>
+              </div>
+            ),
+        },
+        { title: 'Giới tính', render: (record) => record.user.gender },
+        { title: 'Loại khách hàng', render:(record)=>record.user.customerType.name},
+        { title: 'Ngày đặt', render:(record) => new Date(record.checkInDate).toLocaleDateString()},
+        { title: 'Số điện thoại', render:(record) => record.user.phoneNumber},
+        {title:'Tổng tiền',render:(record)=>record.total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})},
+        { 
+            title: 'Chi tiết', 
+            render: (record) => (
+                <div 
+                    style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center', display: 'flex' }}
+                >
+                    <EyeOutlined 
+                        onClick={async () => {
+                            const response = await fetchSelectedBillRoomDetail(record);
+                            if (response) {
+                                showModal(
+                                <Table
+                                    dataSource={response}
+                                    columns={RoomDetailColumns}
+                                    pagination={false}
+                                />,
+                                { width: 1200, height: 600 }
+                                );
+                            }
+                        }}/>
+                </div>
+            ),
+        },
+    ];
     const handlePageSizeChange = value => {
         setPageSize(Number(value));
     };
@@ -851,7 +749,7 @@ const Dashboard = () => {
                 <BookingContainer>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                         <div style={{ padding: '20px 20px 0 20px' }}>
-                            <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Lịch sử hoá đơn</div>
+                            <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>{showHistoryTicket ? 'Lịch sử đặt vé' : <div>Lịch sử đặt phòng</div>}</div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                                 <ButtonCPN 
                                     text='Ticket' 
@@ -873,56 +771,13 @@ const Dashboard = () => {
                         </div>
                         <div style={{ padding: '20px' }}>
                             {showHistoryTicket && <Table
-                                dataSource={dataSourceTicket}
-                                columns={columnsTicket.map(column => ({
-                                    ...column,
-                                    render: column.dataIndex === 'action' ? () => (
-                                        <div 
-                                            style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center', display: 'flex' }}
-                                            onClick={() => showModal(
-                                            <Table
-                                                dataSource={ServiceDetailDataSource}
-                                                columns={ServiceDetailColumns}
-                                                pagination={{
-                                                    pageSize: 6,
-                                                }}
-                                            />,
-                                            { width: 1200, height: 600 }
-                                            )}
-                                        >
-                                            <EyeOutlined />
-                                        </div>
-                                    ) : column.render
-                                }))}
-                                pagination={{
-                                    pageSize: 6,
-                                }}
+                                dataSource={billTicket}
+                                columns={columnsTicket}
+                                
                             />}
                             {showHistoryRoom && <Table
-                                dataSource={roomDataSource}
-                                columns={roomColumns.map(column => ({
-                                    ...column,
-                                    render: column.dataIndex === 'action' ? () => (
-                                        <div 
-                                            style={{ cursor: 'pointer', fontSize: '20px', color: '#f42929', justifyContent: 'center', display: 'flex' }}
-                                            onClick={() => showModal(
-                                            <Table
-                                                dataSource={RoomDetailDataSource}
-                                                columns={RoomDetailColumns}
-                                                pagination={{
-                                                    pageSize: 6,
-                                                }}
-                                            />,
-                                            { width: 1200, height: 600 }
-                                            )}
-                                        >
-                                            <EyeOutlined />
-                                        </div>
-                                    ) : column.render
-                                }))}
-                                pagination={{
-                                    pageSize: 6,
-                                }}
+                                dataSource={billRoom}
+                                columns={columnsRoom}
                             />}
                         </div>
                     </div>

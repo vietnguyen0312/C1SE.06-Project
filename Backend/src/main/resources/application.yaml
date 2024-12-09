@@ -48,4 +48,10 @@ payment:
     command: "pay"
     orderType: "other"
 
+cloudinary:
+  cloud:
+    name:  dgff7kkuu
+  api:
+    key: 658624322674343
+    secret: i1066_D0Ly7OoZetD_brOEMpRIU
 

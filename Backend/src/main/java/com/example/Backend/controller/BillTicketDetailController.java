@@ -41,4 +41,13 @@ public class BillTicketDetailController {
                 .result(billTicketDetailsService.getBillTicketDetailsByBillTicket(id))
                 .build();
     }
+
+    @GetMapping("/get-by-bill-simple/{id}")
+    ApiResponse<List<BillTicketDetailsResponse>> getBillTicketDetailsByBillSimple(
+            @PathVariable("id")String id) {
+        billTicketService.getBill(id);
+        return ApiResponse.<List<BillTicketDetailsResponse>>builder()
+                .result(billTicketDetailsService.getBillTicketDetailsByBillTicketSimple(id))
+                .build();
+    }
 }

@@ -31,6 +31,8 @@ public class BlogImagesService {
     public BlogImagesResponse createBlogImages(BlogImagesCreateRequest request) {
            BlogImages blogImages = blogImagesMapper.toBlogImages(request);
 
+           blogImages.setBlog(blogRepository.findById(request.getBlogId()).orElse(null));
+
            if(blogImagesRepository.existsByImage(blogImages.getImage())) {
                throw new AppException(ErrorCode.EXISTED);
            }
