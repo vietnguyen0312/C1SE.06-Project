@@ -86,10 +86,10 @@ const Employee = () => {
         pageSize: 6,
         total:0,
     });
-    const fetchData = async (page =1 ,pageSize=6)=>{
+    const fetchData = async (page =1 ,pageSize=6, role="employee")=>{
         setLoading(false);
         const response = await axios.get('/users',{
-            params:{page,pageSize}
+            params:{page,pageSize,role, role}
         })            
         SetDsNhanVien(response.result.data)
         setPagination({

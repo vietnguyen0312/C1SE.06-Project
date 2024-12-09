@@ -33,10 +33,6 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
     MailService mailService;
 
-    @NonFinal
-    @Value("${endpoint.afterConfirmEmailRegis}")
-    String END_POINT;
-
     @PostMapping("/outbound/authentication")
     ApiResponse<AuthenticationResponse> outboundAuthenticate(@RequestParam("code") String code) {
         var result = authenticationService.outboundAuthenticate(code);
@@ -81,7 +77,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/confirm-reset-password")
-    public ApiResponse<String> confirmResetPassword(@RequestParam("resetToken") String resetToken) throws ParseException, JOSEException {
+    public ApiResponse<String> confirmResetPassword(@RequestParam("code") String resetToken) throws ParseException, JOSEException {
         return ApiResponse.<String>builder()
                 .result(authenticationService.confirmResetPassword(resetToken))
                 .build();

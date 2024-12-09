@@ -48,6 +48,4 @@ payment:
     command: "pay"
     orderType: "other"
 
-endpoint:
-  afterConfirmEmailRegis: "http://localhost:3000/authentication"
 
