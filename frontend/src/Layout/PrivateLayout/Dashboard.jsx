@@ -5,6 +5,7 @@ import { LineChart, Line, Tooltip, BarChart, Bar, CartesianGrid, XAxis, YAxis, L
 import { Select, Input, Table, Popover, Modal } from 'antd';
 import ButtonCPN from '../../components/Button/Button';
 import axios from '../../Configuration/AxiosConfig';
+import { style } from '@mui/system';
 
 const Container = styled.div`
     padding: 20px;
@@ -319,56 +320,36 @@ const RoomDetailColumns = [
      },
 ];
 
-const viewServiceColumns = [
-    {
-        title: 'TOP', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id
-    },
-    {
-        title: "Thông tin dịch vụ",
-        key: "serviceInfo",
-        render: (record) => (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <img
-              src={record.image}
-              alt="Avatar"
-              style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
-            />
-            <span>{record.name}</span>
-          </div>
-        ),
-    },
-    {title:'Số lương vé bán',dataIndex:'quantity',key:'quantity'},
-    {title:'Tổng tiền',dataIndex:'total',key:'total',sorter: (a, b) => a.total - b.total,
-        render: (total)=>{
-            return <div>{total?.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
-        }
-    },
-]
+
 
 const viewRoomColumns = [
     {
-        title: 'TOP', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id
+        title: 'TOP',
+        render: (_, __, index) => index + 1,
     },
-    {title:'Loại phòng',dataIndex:'type',key:'type'},
     {
         title: "Thông tin phòng",
         key: "roomType.detail",
         render: (record) => (
           <div style={{ display: "flex", alignItems: "center" }}>
             <img
-              src={`/img/hotels/room_type/${record.image}`}
+              src={`/img/hotels/room_type/${record.roomType.image}`}
               alt="Avatar"
               style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
             />
+            <div>
+                {record.roomType.name}
+            </div>
           </div>
         ),
     },
-    {title:'Tổng tiền',dataIndex:'total',key:'revenue',sorter: (a, b) => a.total - b.total,
-        render: (total)=>{
-            return <div>{total?.toLocaleString('vi-VN',{style:'currency',currency:'VND'})}</div>
-        }
+    {title:'Tổng doanh thu',sorter: (a, b) => a.total - b.total,
+        render:(record)=>record.revenue.toLocaleString('vi-VN',{style:'currency',currency:'VND'})
     },  
 ]
+
+
+
 const Dashboard = () => {
     const [showHistoryTicket, setShowHistoryTicket] = useState(true);
     const [showHistoryRoom, setShowHistoryRoom] = useState(false);
@@ -379,7 +360,37 @@ const Dashboard = () => {
     const [revenueCurrentMonth, setRevenueCurrentMonth] = useState([]);
     const [revenueService, setRevenueService] = useState([]);
     const [revenueRoomType, setRevenueRoomType] = useState([]);
-    const [paginationVisible, setPaginationVisible] = useState(true);
+    const [selectedTimeRange, setSelectedTimeRange] = useState({
+        startDate: 30,
+        endDate: 0
+    });
+    const [revenueService1, setRevenueService1] = useState([]);
+    const [pagination, setPagination] = useState([]);
+    const [revenueRoomType1,setRevenueRoomType1]=useState([]);
+    const [modalType, setModalType] = useState(null);
+
+    const viewServiceColumns = [
+        {
+            title: 'TOP',
+            render: (_, __, index) => {
+                const { current , pageSize } = pagination;
+                return ((current - 1) * pageSize) + index + 1;
+            },
+        },
+        {
+            title: "Thông tin dịch vụ",
+            key: "serviceInfo",
+            render: (record) => (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <ImgService src={`/img/service/${record.serviceEntity.image}`} />
+                <span>{record.serviceEntity.name}</span>
+              </div>
+            ),
+        },
+        {title:'Tổng doanh thu',
+            render: (record) => record.revenue.toLocaleString('vi-VN',{style:'currency',currency:'VND'})
+        },
+    ]
 
     useEffect(() => {
         const fetchRevenueData = async () => {
@@ -395,25 +406,80 @@ const Dashboard = () => {
         fetchRevenueRoomType(30,0);
         fetchBillTicket();
         fetchBillRoom();
+        fetchRevenueService1(30,0,pagination.current,pagination.pageSize);
+        fetchRevenueRoomType1(30,0)
     }, []);
+    const [tableContent, setTableContent] = useState(null);
+    
+    useEffect(() => {
+        if (isModalVisible && modalType === 'service' && tableContent) {
+            setModalContent(
+                <Table
+                    dataSource={revenueService1.data}
+                    columns={viewServiceColumns}
+                    pagination={{
+                        pageSize: pagination.pageSize,
+                        current: pagination.current,
+                        total: pagination.total,
+                    }}
+                    rowKey='id'
+                    onChange={handleTableChange}
+                />
+            );
+        }
+    }, [revenueService1, pagination, isModalVisible, modalType]);
 
     //truyền ngày startDate để lọc cho tới hiện tại
     const fetchRevenueService = async (startDate, endDate) => {
         const response = await axios.get('/revenue/service-revenue', {params: {
             startDate: new Date(new Date().setDate(new Date().getDate() - startDate)).toLocaleDateString('vi-VN'),
             endDate: new Date(new Date().setDate(new Date().getDate() - endDate)).toLocaleDateString('vi-VN'),
-            size: 4
+            size: 3
         }});
         setRevenueService(response.result);
     };
+  
+    const fetchRevenueService1 = async (startDate, endDate, page, pageSize) => {
+        const response = await axios.get('/revenue/service-revenue', {
+            params: {
+                startDate: new Date(new Date().setDate(new Date().getDate() - startDate)).toLocaleDateString('vi-VN'),
+                endDate: new Date(new Date().setDate(new Date().getDate() - endDate)).toLocaleDateString('vi-VN'),
+                page,
+                pageSize,
+            }
+        });
+        setRevenueService1(response.result);
+        setPagination({
+            current: response.result.currentPage,
+            pageSize: response.result.pageSize,
+            total: response.result.totalElements,
+        });
+    };
 
+    const handleTableChange = (pagination) => {
+        fetchRevenueService1(
+            selectedTimeRange.startDate,
+            selectedTimeRange.endDate,
+            pagination.current,
+            pagination.pageSize
+        );
+    };
+    
     const fetchRevenueRoomType = async (startDate, endDate) => {
         const response = await axios.get('/revenue/room-type-revenue', {params: {
             startDate: new Date(new Date().setDate(new Date().getDate() - startDate)).toLocaleDateString('vi-VN'),
             endDate: new Date(new Date().setDate(new Date().getDate() - endDate)).toLocaleDateString('vi-VN'),
-            size: 4
+            size: 3
         }});
         setRevenueRoomType(response.result);
+    };
+   
+    const fetchRevenueRoomType1 = async (startDate, endDate) => {
+        const response = await axios.get('/revenue/room-type-revenue', {params: {
+            startDate: new Date(new Date().setDate(new Date().getDate() - startDate)).toLocaleDateString('vi-VN'),
+            endDate: new Date(new Date().setDate(new Date().getDate() - endDate)).toLocaleDateString('vi-VN'),
+        }});
+        setRevenueRoomType1(response.result);
     };
 
     const [billTicket, setBillTicket] = useState([]);
@@ -468,11 +534,9 @@ const Dashboard = () => {
     const fetchBillRoom = async () =>{
         const billRoom = await axios.get('/booking_room');
         setBillRoom(billRoom.result.data);
-        console.log('asdasdasd',billRoom.result.data);
     }
     const fetchSelectedBillRoomDetail = async (bookingRoom) => {
         const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff/${bookingRoom.id}`);
-        console.log('fetchSelectedBillRoomDetail',response.result);
         return response.result;
         
     }
@@ -520,12 +584,11 @@ const Dashboard = () => {
             ),
         },
     ];
-    const handlePageSizeChange = value => {
-        setPageSize(Number(value));
-    };
 
-    const showModal = (content, size = {}) => {
+    const showModal = (content, size = {}, type = null) => {
+        setTableContent(content);
         setModalContent(content);
+        setModalType(type);
         setIsModalVisible(true);
         setModalSize(size);
     };
@@ -537,6 +600,9 @@ const Dashboard = () => {
     const handleCancel = () => {
         setIsModalVisible(false);
     };
+
+    
+    
     return (
         <Container>
             <DashboardContainer>
@@ -694,9 +760,21 @@ const Dashboard = () => {
                                         Date
                                     </PopoverItem>
                                     <div>
-                                        <PopoverItem onClick={() => fetchRevenueService(30,0)}>Last 30 days</PopoverItem>
-                                        <PopoverItem onClick={() => fetchRevenueService(60,30)}>Last month</PopoverItem>
-                                        <PopoverItem onClick={() => fetchRevenueService(365,0)}>Last year</PopoverItem>
+                                        <PopoverItem onClick={() => {
+                                            setSelectedTimeRange({ startDate: 30, endDate: 0 });
+                                            fetchRevenueService(30, 0);
+                                            fetchRevenueService1(30, 0, 1, pagination.pageSize);
+                                        }}>Last 30 days</PopoverItem>
+                                        <PopoverItem onClick={() => {
+                                            setSelectedTimeRange({ startDate: 60, endDate: 30 });
+                                            fetchRevenueService(60, 30);
+                                            fetchRevenueService1(60, 30, 1, pagination.pageSize);
+                                        }}>Last month</PopoverItem>
+                                        <PopoverItem onClick={() => {
+                                            setSelectedTimeRange({ startDate: 365, endDate: 0 });
+                                            fetchRevenueService(365, 0);
+                                            fetchRevenueService1(365, 0, 1, pagination.pageSize);
+                                        }}>Last year</PopoverItem>
                                     </div>
                                 </div>
                             } trigger="click" placement='left'
@@ -710,17 +788,23 @@ const Dashboard = () => {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e5e5e5', paddingBottom: '15px' }}>
                                 <div>Revenue</div>
                                 <ViewStyle
-                                onClick={() => showModal(
-                                    <Table
-                                        dataSource={revenueService.data}
-                                        columns={viewServiceColumns}
-                                        pagination={{
-                                            pageSize: 6,
-                                        }}
-                                    />,
-                                    { width: 1200, height: 600 }
-                                )}
-                                >       
+                                    onClick={() => 
+                                        showModal(
+                                        <Table
+                                            dataSource={revenueService1.data} 
+                                            columns={viewServiceColumns}
+                                            pagination={{
+                                                pageSize: pagination.pageSize,
+                                                current: pagination.current,
+                                                total: pagination.total,
+                                            }}
+                                            rowKey='id' 
+                                            onChange={handleTableChange}
+                                        />,
+                                        { width: 1000, height: 650 },
+                                        'service'
+                                    )}
+                                >
                                     View →
                                 </ViewStyle>
                             </div>
@@ -792,9 +876,18 @@ const Dashboard = () => {
                                         Date
                                     </PopoverItem>
                                     <div>
-                                        <PopoverItem onClick={() => fetchRevenueRoomType(30,0)}>Last 30 days</PopoverItem>
-                                        <PopoverItem onClick={() => fetchRevenueRoomType(60,30)}>Last month</PopoverItem>
-                                        <PopoverItem onClick={() => fetchRevenueRoomType(365,0)}>Last year</PopoverItem>
+                                        <PopoverItem onClick={() => {
+                                            fetchRevenueRoomType(30,0);
+                                            fetchRevenueRoomType1(30,0);
+                                        }}>Last 30 days</PopoverItem>
+                                        <PopoverItem onClick={() => {
+                                            fetchRevenueRoomType(60,30);
+                                            fetchRevenueRoomType1(60,30);
+                                        }}>Last month</PopoverItem>
+                                        <PopoverItem onClick={() => {
+                                            fetchRevenueRoomType(365,0);
+                                            fetchRevenueRoomType1(365,0);
+                                        }}>Last year</PopoverItem>
                                     </div>
                                 </div>
                             } trigger="click" placement='left'
@@ -810,10 +903,11 @@ const Dashboard = () => {
                                 <ViewStyle
                                 onClick={() => showModal(
                                     <Table
-                                        dataSource={revenueRoomType.data}
+                                        dataSource={revenueRoomType1.data}
                                         columns={viewRoomColumns}
                                     />,
-                                    { width: 1200, height: 600 }
+                                    { width: 1200, height: 600 },
+                                    'room'
                                 )}
                                 >       
                                     View →
