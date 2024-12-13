@@ -9,6 +9,7 @@ import ButtonCPN from '../../components/Button/Button';
 import { toast } from 'react-toastify';
 import SockJS from "sockjs-client/dist/sockjs";
 import { Client } from "@stomp/stompjs";
+import { attempt } from 'lodash';
 
 const ProfileContainer = styled.div`
     padding: 20px;
@@ -97,6 +98,16 @@ class Rooms extends Component {
             statusSelected: '',
             statusSelectedFilter: null,
             messages: [],
+            showRoomVSRoomType: true,
+            roomTypeSelectedUpdate: null,
+            maxPeopleAdd: null,
+            detailAdd: '',
+            priceAdd: null,
+            addRoomType: false,
+            addRoomTypeDetail: '',
+            imageAdd: null,
+            imageName: '',
+            selectedRoomImage: '',
         };
         this.roomRefs = [];
         this.stompClient = null;
@@ -106,11 +117,7 @@ class Rooms extends Component {
         AOS.init({ duration: 2000 });
         this.fetchRooms();
         this.fetchBookingRoomsDetail();
-
-        // Kết nối WebSocket qua SockJS
         const socket = new SockJS("http://localhost:8080/ws");
-
-        // Khởi tạo stompClient
         this.stompClient = new Client({
             webSocketFactory: () => socket,
             reconnectDelay: 5000,
@@ -141,7 +148,7 @@ class Rooms extends Component {
     }
 
     getBookingRoomDetail = async (bookingRoomId) => {
-
+        toast.info("có phòng mới được đặt");
         const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff/${bookingRoomId}`);
 
 
@@ -366,13 +373,26 @@ class Rooms extends Component {
         this.setState({
             selectedRoomUpdate: room,
             roomTypeSelected: room.roomType.id,
-            statusSelected: room.status
+            statusSelected: room.status,
+            roomTypeSelectedUpdate: room.roomType
         });
     }
 
-    handleRoomTypeChange = (event) => {
-        this.setState({ roomTypeSelected: event.target.value });
-    }
+    handleRoomTypeChange = async (event) => {
+        const selectedId = event.target.value;
+        const response = await axios.get(`/room_type/${selectedId}`); // Fetch the latest room type data
+
+        if (response && response.result) {
+            const selectedRoomType = response.result;
+            this.setState({
+                roomTypeSelected: selectedId,
+                maxPeopleAdd: selectedRoomType.maxOfPeople,
+                detailAdd: selectedRoomType.detail,
+                priceAdd: selectedRoomType.price,
+                selectedRoomImage: selectedRoomType.image, // Update the image with the latest from the database
+            });
+        }
+    };
 
     handleStatusChange = (event) => {
         this.setState({ statusSelected: event.target.value });
@@ -515,6 +535,180 @@ class Rooms extends Component {
             this.setState({ statusSelectedFilter: status });
         }
     }
+
+    getRoomTypeDetail = (selectedId) => {
+        const selectedRoomType = this.state.roomType.find(roomType => roomType.id === selectedId);
+        return selectedRoomType ? selectedRoomType.detail : '';
+    }
+
+    getMaxPeopleForSelectedRoomType = (selectedId) => {
+        const selectedRoomType = this.state.roomType.find(roomType => roomType.id === selectedId);
+        return selectedRoomType ? selectedRoomType.maxOfPeople : 0;
+    }
+
+    getRoomTypePrice = (selectedId) => {
+        const selectedRoomType = this.state.roomType.find(roomType => roomType.id === selectedId);
+        return selectedRoomType ? selectedRoomType.price : 0;
+    }
+
+    handleAddRoomType = async () => {
+        console.log(this.state.roomTypeSelected);
+        console.log(this.state.detailAdd);
+        console.log(this.state.priceAdd);
+        console.log(this.state.maxPeopleAdd);
+
+        if (this.state.addRoomType == false) {
+            this.setState({
+                addRoomType: false,
+                addRoomTypeDetail: '',
+                detailAdd: '',
+                priceAdd: '',
+                maxPeopleAdd: '',
+            });
+            this.setState({ addRoomType: true });
+            return;
+
+        }
+
+        if (this.state.addRoomTypeDetail == null || this.state.detailAdd == null || this.state.priceAdd == null || this.state.maxPeopleAdd == null) {
+            toast.error("Chưa điền đẩy đủ thông tin");
+            return;
+        }
+        const image = await this.uploadImage();
+        const response = await axios.post(`/room_type`, {
+            name: this.state.addRoomTypeDetail,
+            detail: this.state.detailAdd,
+            price: this.state.priceAdd,
+            maxOfPeople: this.state.maxPeopleAdd,
+            image: image,
+        });
+        this.setState({ roomType: [...this.state.roomType, response.result] });
+        toast.success("Thêm phòng thành công");
+        this.setState({
+            addRoomType: false,
+            addRoomTypeDetail: '',
+            detailAdd: '',
+            priceAdd: '',
+            maxPeopleAdd: '',
+        });
+    }
+
+    handleUpdateRoomType = async () => {
+        console.log(this.state.roomTypeSelected);
+        console.log(this.state.detailAdd);
+        console.log(this.state.priceAdd);
+        console.log(this.state.maxPeopleAdd);
+        console.log(this.state.addRoomType);
+        const name = this.state.roomType?.find(type => type.id === this.state.roomTypeSelected)?.name || "";
+        console.log(name);
+
+        if (this.state.addRoomType == true) {
+            this.setState({ addRoomType: false });
+            return;
+        }
+        if (this.state.roomTypeSelected == null) {
+            toast.error("Chưa chọn loại phòng");
+            return;
+        }
+        const image = await this.uploadImage();
+        const response = await axios.put(`/room_type/${this.state.roomTypeSelected}`, {
+            name: name,
+            detail: this.state.detailAdd,
+            price: this.state.priceAdd,
+            maxOfPeople: this.state.maxPeopleAdd,
+            image: image,
+        });
+        this.setState({
+            roomType: this.state.roomType.map(roomType => roomType.id === this.state.roomTypeSelected.id ? response.result : roomType),
+            selectedRoomImage: response.result.image,
+        });
+        toast.success("Sửa phòng thành công");
+        this.setState({ selectedRoomTypeUpdate: null });
+    }
+
+    handleDeleteRoomType = async () => {
+        console.log(this.state.roomTypeSelected);
+        if (this.state.addRoomType == true) {
+            this.setState({ addRoomType: false });
+            return;
+        }
+        if (this.state.roomTypeSelected == '') {
+            toast.error("Chưa chọn loại phòng");
+            return;
+        }
+        try {
+            const response = await axios.delete(`/room_type/${this.state.roomTypeSelected}`);
+            if (response.code === 1000) {
+                toast.success("Xóa loại phòng thành công");
+                this.setState({ roomType: this.state.roomType.filter(roomType => roomType.id !== this.state.roomTypeSelected) });
+                this.setState({
+                    roomTypeSelected: null,
+                    selectedRoomTypeUpdate: null,
+                    detailAdd: '',
+                    priceAdd: '',
+                    maxPeopleAdd: '',
+                    imageAdd: '',
+                    imageName: '',
+                    selectedRoomImage: '',
+                });
+            } else {
+                toast.error("Xóa loại phòng thất bại");
+            }
+        } catch {
+            toast.error("vẫn còn room đang sử dụng roomtype này");
+        }
+
+    }
+
+    handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            // Check if the file is an image
+            if (!file.type.startsWith('image/')) {
+                toast.error("Chỉ được chọn ảnh"); // Display an error message
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                this.setState({
+                    imageAdd: file,
+                    imageName: file.name,
+                    selectedRoomImage: reader.result,
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    uploadImage = async () => {
+        try {
+            const token = localStorage.getItem('accessToken'); // Lấy token từ localStorage
+
+            const formData = new FormData(); // Tạo FormData để gửi file
+            formData.append('file', this.state.imageAdd);
+            formData.append('filename', this.state.imageName);
+
+            const response = await axios.post(`/upload/imgHotel`, formData, {
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Gắn token vào header
+                    'Content-Type': 'multipart/form-data', // Đảm bảo đúng kiểu dữ liệu
+                },
+            });
+            if (response.code === 1000) {
+                toast.success("Upload ảnh thành công");
+                return response.result;
+            } else {
+                toast.error("Upload ảnh thất bại");
+            }
+        } catch (error) {
+            toast.error('Error uploading image:', error.response?.data || error.message);
+        }
+    };
+
+    handleRemoveImage = () => {
+        this.setState({ selectedRoomImage: '' });
+    };
 
     render() {
         const { rooms, bookings, showModal, selectedRoom, bookingRoomDetailByRoomId, Option, selectedRoomUpdate, roomType, roomTypeSelected, statusSelected } = this.state;
@@ -789,74 +983,186 @@ class Rooms extends Component {
                     <ModalHeader closeButton>
                         <ModalTitle>Lựa chọn</ModalTitle>
                     </ModalHeader>
-                    <ModalBody>
-                        <div style={{ display: this.state.addRoom ? 'none' : 'flex', flexDirection: 'column', gap: '15px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-                            <div style={{ display: 'flex', gap: '15px' }}>
-                                <SelectedRoom onChange={(event) => this.handleRoomSelect(event.target.value)} value={selectedRoomUpdate ? JSON.stringify(selectedRoomUpdate) : ""} >
-                                    <option value="" disabled>Chọn phòng</option>
-                                    {Object.keys(this.state.rooms.grouped).map(floor => (
-                                        this.state.rooms.grouped[floor].map(room => (
-                                            <option key={room.id} value={JSON.stringify(room)}>
-                                                Phòng {room.roomNumber}
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'left', padding: '10px' }}>
+                        <ButtonCPN text="Room" onClick={() => { this.setState({ showRoomVSRoomType: true }) }} style={{ width: 'auto', height: 'auto', fontSize: '13px' }} />
+                        <ButtonCPN text="Room Type" onClick={() => { this.setState({ showRoomVSRoomType: false }) }} style={{ width: 'auto', height: 'auto', fontSize: '13px' }} />
+                    </div>
+                    {this.state.showRoomVSRoomType && (
+                        <ModalBody>
+                            <div style={{ display: this.state.addRoom ? 'none' : 'flex', flexDirection: 'column', gap: '15px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    <SelectedRoom onChange={(event) => this.handleRoomSelect(event.target.value)} value={selectedRoomUpdate ? JSON.stringify(selectedRoomUpdate) : ""} >
+                                        <option value="" disabled>Chọn phòng</option>
+                                        {Object.keys(this.state.rooms.grouped).map(floor => (
+                                            this.state.rooms.grouped[floor].map(room => (
+                                                <option key={room.id} value={JSON.stringify(room)}>
+                                                    Phòng {room.roomNumber}
+                                                </option>
+                                            ))
+                                        ))}
+                                    </SelectedRoom>
+                                </div>
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    <SelectedRoom value={roomTypeSelected} onChange={this.handleRoomTypeChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+                                        <option value="" disabled>Chọn loại phòng</option>
+                                        {roomType.map(roomType => (
+                                            <option key={roomType.id} value={roomType.id}>
+                                                {roomType.name}
                                             </option>
-                                        ))
-                                    ))}
-                                </SelectedRoom>
-                            </div>
-                            <div style={{ display: 'flex', gap: '15px' }}>
-                                <SelectedRoom value={roomTypeSelected} onChange={this.handleRoomTypeChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
-                                    <option value="" disabled>Chọn loại phòng</option>
-                                    {roomType.map(roomType => (
-                                        <option key={roomType.id} value={roomType.id}>
-                                            {roomType.name}
-                                        </option>
-                                    ))}
-                                </SelectedRoom>
-                            </div>
+                                        ))}
+                                    </SelectedRoom>
+                                </div>
 
-                            <div style={{ display: 'flex', gap: '15px' }}>
-                                <SelectedRoom value={statusSelected} onChange={this.handleStatusChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
-                                    <option value="" disabled>Chọn trạng thái</option>
-                                    <option value="sửa chữa">sửa chữa</option>
-                                    <option value="bảo trì">bảo trì</option>
-                                    <option value="Đang hoạt động">Đang hoạt động</option>
-                                </SelectedRoom>
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    <SelectedRoom value={statusSelected} onChange={this.handleStatusChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+                                        <option value="" disabled>Chọn trạng thái</option>
+                                        <option value="sửa chữa">sửa chữa</option>
+                                        <option value="bảo trì">bảo trì</option>
+                                        <option value="Đang hoạt động">Đang hoạt động</option>
+                                    </SelectedRoom>
+                                </div>
                             </div>
-                        </div>
-                        <div style={{ display: this.state.addRoom ? 'flex' : 'none', flexDirection: 'column', gap: '15px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-                            <div style={{ display: 'flex', gap: '15px' }}>
-                                <input type="number" placeholder="Nhập số phòng" onChange={(event) => this.setState({ roomNumberAdd: event.target.value })} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
-                            </div>
-                            <div style={{ display: 'flex', gap: '15px' }}>
-                                <select onChange={(event) => this.setState({ roomTypeAdd: event.target.value })} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
-                                    <option value={this.state.selectedRoomUpdate?.roomType.id ?? ''} disabled selected>{this.state.selectedRoomUpdate?.roomType.name ?? 'chọn loại phòng'}</option>
-                                    {this.state.roomType.map(roomType => (
-                                        <option key={roomType.id} value={roomType.id} >
-                                            {roomType.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
+                            <div style={{ display: this.state.addRoom ? 'flex' : 'none', flexDirection: 'column', gap: '15px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    <input type="number" placeholder="Nhập số phòng" onChange={(event) => this.setState({ roomNumberAdd: event.target.value })} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
+                                </div>
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    <select onChange={(event) => this.setState({ roomTypeAdd: event.target.value })} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+                                        <option value={this.state.selectedRoomUpdate?.roomType.id ?? ''} disabled selected>{this.state.selectedRoomUpdate?.roomType.name ?? 'chọn loại phòng'}</option>
+                                        {this.state.roomType.map(roomType => (
+                                            <option key={roomType.id} value={roomType.id} >
+                                                {roomType.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            <div style={{ display: 'flex', gap: '15px' }}>
-                                <select onChange={(event) => this.setState({ statusAdd: event.target.value })} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
-                                    <option value={this.state.selectedRoomUpdate?.status ?? ''} disabled selected>{this.state.selectedRoomUpdate?.status ?? 'chọn trạng thái'}</option>
-                                    <option value="sửa chữa">sửa chữa</option>
-                                    <option value="bảo trì">bảo trì</option>
-                                    <option value="Đang hoạt động">Đang hoạt động</option>
-                                </select>
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    <select onChange={(event) => this.setState({ statusAdd: event.target.value })} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+                                        <option value={this.state.selectedRoomUpdate?.status ?? ''} disabled selected>{this.state.selectedRoomUpdate?.status ?? 'chọn trạng thái'}</option>
+                                        <option value="sửa chữa">sửa chữa</option>
+                                        <option value="bảo trì">bảo trì</option>
+                                        <option value="Đang hoạt động">Đang hoạt động</option>
+                                    </select>
+                                </div>
+
+                                <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+                                    <input type="number" placeholder="Nhập số ngày" style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
+                                </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
+                                <ButtonCPN text="thêm" onClick={() => { this.handleAddRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#4CAF50', color: 'white' }} />
+                                <ButtonCPN text="sửa" onClick={() => { this.handleUpdateRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#2196F3', color: 'white' }} />
+                                <ButtonCPN text="xóa" onClick={() => { this.handleDeleteRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#f44336', color: 'white' }} />
+                            </div>
+                        </ModalBody>
+                    )}
+                    {this.state.showRoomVSRoomType == false && (
+                        <ModalBody>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                                <div style={{ display: this.state.addRoomType ? 'none' : 'flex', gap: '15px' }}>
+                                    <SelectedRoom value={roomTypeSelected} onChange={this.handleRoomTypeChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+                                        <option value="" disabled>Chọn loại phòng</option>
+                                        {roomType.map(roomType => (
+                                            <option key={roomType.id} value={roomType.id}>
+                                                {roomType.name}
+                                            </option>
+                                        ))}
+                                    </SelectedRoom>
+                                </div>
+                                <div style={{ display: this.state.addRoomType ? 'flex' : 'none', gap: '15px' }}>
+                                    <input
+                                        type="text"
+                                        placeholder="nhập tên phòng"
+                                        value={this.state.addRoomTypeDetail}
+                                        onChange={(event) => this.setState({ addRoomTypeDetail: event.target.value })}
+                                        style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                                    />
+                                </div>
+                                <input
+                                    type="number"
+                                    placeholder="giá / 1 ngày"
+                                    value={this.state.priceAdd}
+                                    onChange={(event) => this.setState({ priceAdd: parseInt(event.target.value, 10) || 0 })}
+                                    style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                                />
+                                <input
+                                    type="number"
+                                    placeholder="người tối đa"
+                                    value={this.state.maxPeopleAdd}
+                                    onChange={(event) => this.setState({ maxPeopleAdd: parseInt(event.target.value, 10) || 0 })}
+                                    style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                                />
+
+                                <textarea
+                                    placeholder="mô tả"
+                                    value={this.state.detailAdd}
+                                    onChange={(event) => this.setState({ detailAdd: event.target.value })}
+                                    style={{ padding: '10px', height: '200px', borderRadius: '5px', border: '1px solid #ccc' }}
+                                />
+                                {this.state.selectedRoomImage === "" && (
+                                    <>
+                                        <input type="file" accept="image/*" onChange={this.handleFileChange} placeholder="người tối đa" />
+                                        {this.state.imageName && <p>File Name: {this.state.imageName}</p>}
+                                    </>
+                                )}
+
+                                <h1>{this.state.selectedRoomUpdate ? this.state.selectedRoomUpdate.image : ''}</h1>
+                                <div
+                                    style={{
+                                        position: 'relative',
+                                        display: this.state.selectedRoomImage ? 'inline-block' : 'none',
+                                        width: '100px',
+                                        height: '100px',
+                                        padding: '0',
+                                        margin: '0',
+                                    }}
+                                >
+                                    <img
+                                        src={this.state.selectedRoomImage}
+                                        alt="Selected Room Type"
+                                        style={{
+                                            width: '100%',
+                                            height: '100%',
+                                            objectFit: 'cover',
+                                            display: 'block',
+                                        }}
+                                    />
+                                    <button
+                                        onClick={this.handleRemoveImage}
+                                        style={{
+                                            position: 'absolute',
+                                            top: '0',
+                                            right: '0',
+                                            backgroundColor: 'red',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '50%',
+                                            width: '20px',
+                                            height: '20px',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            padding: '0',
+                                            margin: '0',
+                                            boxShadow: '0 2px 5px rgba(0, 0, 0, 0.3)',
+                                            zIndex: '10',
+                                        }}
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+
                             </div>
 
                             <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
-                                <input type="number" placeholder="Nhập số ngày" style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
+                                <ButtonCPN text="thêm" onClick={() => { this.handleAddRoomType() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#4CAF50', color: 'white' }} />
+                                <ButtonCPN text="sửa" onClick={() => { this.handleUpdateRoomType() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#2196F3', color: 'white' }} />
+                                <ButtonCPN text="xóa" onClick={() => { this.handleDeleteRoomType() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#f44336', color: 'white' }} />
                             </div>
-                        </div>
-                        <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
-                            <ButtonCPN text="thêm" onClick={() => { this.handleAddRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#4CAF50', color: 'white' }} />
-                            <ButtonCPN text="sửa" onClick={() => { this.handleUpdateRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#2196F3', color: 'white' }} />
-                            <ButtonCPN text="xóa" onClick={() => { this.handleDeleteRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#f44336', color: 'white' }} />
-                        </div>
-                    </ModalBody>
+                        </ModalBody>
+                    )}
                 </ModalWrapper>
             </ProfileContainer>
         );

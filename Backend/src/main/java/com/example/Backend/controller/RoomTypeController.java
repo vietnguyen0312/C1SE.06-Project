@@ -50,4 +50,11 @@ public class RoomTypeController {
                 .build(); // Không có kết quả trả về
     }
 
+    @PutMapping("/{id}")
+    ApiResponse<RoomTypeResponse> UpdateRoomTypeById(@PathVariable String id, @RequestBody @Valid RoomTypeRequest request) {
+        return ApiResponse.<RoomTypeResponse>builder()
+                .result(roomTypeService.updateRoomType(id, request))
+                .build();
+    }
+
 }

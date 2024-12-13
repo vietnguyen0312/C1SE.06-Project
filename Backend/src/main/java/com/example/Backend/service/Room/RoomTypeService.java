@@ -49,4 +49,19 @@ public class RoomTypeService {
         return roomTypeMapper.toRoomTypeResponse(roomTypeRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    public RoomTypeResponse updateRoomType(String id, RoomTypeRequest request) {
+        RoomType existingRoomType = roomTypeRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
+        existingRoomType.setDetail(request.getDetail());
+        existingRoomType.setPrice(request.getPrice());
+        existingRoomType.setName(request.getName());
+        existingRoomType.setMaxOfPeople(request.getMaxOfPeople());
+        existingRoomType.setImage(request.getImage());
+
+        RoomType updatedRoomType = roomTypeRepository.save(existingRoomType);
+        return roomTypeMapper.toRoomTypeResponse(updatedRoomType);
+    }
 }

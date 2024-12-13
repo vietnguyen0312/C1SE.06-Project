@@ -11,6 +11,8 @@ import RoomCard from '../components/RoomCard';
 import moment from 'moment-timezone';
 import { toast } from 'react-toastify';
 import { ClipLoader } from 'react-spinners';
+import InfiniteScroll from 'react-infinite-scroll-component';
+
 const Overlay = styled.div`
   position: absolute;
   top: 0;
@@ -1119,7 +1121,7 @@ class BookingRoom extends Component {
                             this.state.sampleImages.map((image, index) => (
                                 <RoomImage
                                     key={image.id}
-                                    imageUrl={"/img/hotels/room_type/" + image.image}
+                                    imageUrl={image.image}
                                     name={image.name}
                                     onClick={() => this.handleImageSelect(image.id, index)}
                                     isSelected={this.state.selectedImage === image.id}
@@ -1172,6 +1174,29 @@ class BookingRoom extends Component {
                                             />
                                         );
                                     })}
+
+                                    {/* <InfiniteScroll
+                                        dataLength={this.state.roomsByType[roomType.name]?.length || 0} // Adjusted to use state
+                                        next={() => this.handleRoomTypeSelect(index)} // Use the existing method to fetch more data
+                                        hasMore={this.state.hasMore} // Use the state to determine if more data is available
+                                        loader={<h4>Loading...</h4>}
+                                        style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}
+                                    >
+                                        {this.state.roomsByType[roomType.name]?.map((room,) => {
+
+
+
+                                            return (
+                                                <RoomCard
+                                                    key={room.roomNumber}
+                                                    room={room}
+                                                    isSelected={this.checkIsSelected(room)}
+                                                    onPriceClick={() => this.handlePriceClick(room)}  // Call function on click
+                                                    index={index}
+                                                />
+                                            );
+                                        })}
+                                    </InfiniteScroll> */}
 
                                 </div>
                                 {currentRoomDetails.length > 0 && (
