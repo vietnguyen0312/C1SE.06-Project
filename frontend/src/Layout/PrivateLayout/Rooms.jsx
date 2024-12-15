@@ -21,7 +21,7 @@ const Item = styled.div`
     font-weight: 600;
 `;
 
-const RoomItem = styled.div`
+export const RoomItem = styled.div`
     cursor: pointer;
     display: flex;
     justify-content: space-between;
@@ -40,22 +40,22 @@ const RoomContainer = styled.div`
     justify-items: center;
     margin-top: 20px;
 `;
-const NameRoom = styled.div`
+export const NameRoom = styled.div`
     font-size: 20px;
     font-weight: 600;
 `;
-const TypeRoom = styled.div`
+export const TypeRoom = styled.div`
     font-size: 13px;
     color: #888;
 `;
-const StatusRoomBooked = styled.div`
+export const StatusRoomBooked = styled.div`
     font-size: 14px;
     background-color: #ffcccc; 
     padding: 10px;
     border-radius: 10px;
 `;
 
-const StatusRoomAvailable = styled.div`
+export const StatusRoomAvailable = styled.div`
     font-size: 14px;
     background-color: #ccffcc; 
     padding: 10px;
