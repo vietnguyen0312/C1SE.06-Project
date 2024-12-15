@@ -463,6 +463,14 @@ const Dashboard = () => {
             pagination.current,
             pagination.pageSize
         );
+        fetchBillTicket(
+            pagination.current,
+            pagination.pageSize
+        )
+        fetchBillRoom(
+            pagination.current,
+            pagination.pageSize
+        )
     };
     
     const fetchRevenueRoomType = async (startDate, endDate) => {
@@ -485,9 +493,19 @@ const Dashboard = () => {
     const [billTicket, setBillTicket] = useState([]);
     const [billRoom, setBillRoom] = useState([]);
 
-    const fetchBillTicket = async () =>{
-        const billTicket = await axios.get('/bill-ticket ');
+    const fetchBillTicket = async (page,pageSize) =>{
+        const billTicket = await axios.get('/bill-ticket',{
+            params:{
+                page,
+                pageSize,
+            }
+        })
         setBillTicket(billTicket.result.data);
+        setPagination({
+            current: billTicket.result.currentPage,
+            pageSize: billTicket.result.pageSize,
+            total: billTicket.result.totalElements
+        })
     }
     const fetchSelectedBillTicketDetail = async (bill) => {
         const response = await axios.get(`/bill-ticket-detail/get-by-bill-simple/${bill.id}`);
@@ -531,9 +549,18 @@ const Dashboard = () => {
             ),
         },
     ];
-    const fetchBillRoom = async () =>{
-        const billRoom = await axios.get('/booking_room');
+    const fetchBillRoom = async (page,pageSize) =>{
+        const billRoom = await axios.get('/booking_room',{
+            params:{
+                page,pageSize
+            }
+        });
         setBillRoom(billRoom.result.data);
+        setPagination({
+            current: billRoom.result.currentPage,
+            pageSize: billRoom.result.pageSize,
+            total: billRoom.result.totalElements
+        })
     }
     const fetchSelectedBillRoomDetail = async (bookingRoom) => {
         const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff/${bookingRoom.id}`);
@@ -857,11 +884,25 @@ const Dashboard = () => {
                             {showHistoryTicket && <Table
                                 dataSource={billTicket}
                                 columns={columnsTicket}
+                                pagination={{
+                                    pageSize: pagination.pageSize,
+                                    current: pagination.current,
+                                    total: pagination.total
+                                }}
+                                rowKey='id'
+                                onChange={handleTableChange}
                                 
                             />}
                             {showHistoryRoom && <Table
                                 dataSource={billRoom}
                                 columns={columnsRoom}
+                                pagination={{
+                                    pageSize: pagination.pageSize,
+                                    current: pagination.current,
+                                    total: pagination.total
+                                }}
+                                rowKey='id'
+                                onChange={handleTableChange}
                             />}
                         </div>
                     </div>
