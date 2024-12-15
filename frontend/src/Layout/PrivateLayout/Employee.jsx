@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../Configuration/AxiosConfig';
-import { Table, Popover, Spin } from 'antd';
-import { SettingOutlined } from '@ant-design/icons';
+import { Table, Popover, Spin, Form, Input, Select, Upload } from 'antd';
+import { SettingOutlined, PlusOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
+import ButtonCPN from '../../components/Button/Button'
+
 
 const PopoverItem = styled.div`
     padding: 10px;
@@ -81,6 +83,7 @@ const handleDelete = (record) => {
 const Employee = () => {
     const [DsNhanVien, SetDsNhanVien] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showAddEmployee, setShowAddEmployee] = useState(false);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 6,
@@ -111,8 +114,95 @@ const Employee = () => {
         return <Spin size="large" style={{ display: 'block', margin: '50px auto' }} />;
     }
 
+    const FormContainer = styled.div`
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+    const handleAddCustomer = (values) => {
+        console.log('New Customer:', values);
+    };
     return (
         <EmployeeContainer>
+            <ButtonCPN text="Thêm nhân viên" style={{marginBottom:'20px'}} onClick={()=> setShowAddEmployee(true)}/>
+            {showAddEmployee && (
+                <FormContainer>
+            <div style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px' }}>Thêm mới nhân viên</div>
+                <Form layout="vertical" onFinish={handleAddCustomer}>
+                <Form.Item
+                    label="Ảnh đại diện"
+                    name="avatar"
+                    rules={[{ required: true, message: 'Vui lòng tải lên ảnh đại diện!' }]}
+                >
+                    <Upload
+                        listType="picture-card"
+                        maxCount={1}
+                        accept="image/*"
+                        beforeUpload={(file) => {
+                            const isImage = file.type.startsWith("image/");
+                            if (!isImage) {
+                                message.error("Vui lòng tải lên tệp hình ảnh!");
+                            }
+                            return isImage || Upload.LIST_IGNORE;
+                        }}
+                        onChange={(info) => {
+                            if (info.file.status === "done") {
+                                message.success(`${info.file.name} đã tải lên thành công.`);
+                            } else if (info.file.status === "error") {
+                                message.error(`${info.file.name} tải lên thất bại.`);
+                            }
+                        }}
+                    >
+                        <div>
+                            <PlusOutlined />
+                            <div style={{ marginTop: 8 }}>Tải ảnh</div>
+                        </div>
+                    </Upload>
+                </Form.Item>
+                    <Form.Item
+                        label="Họ tên"
+                        name="name"
+                        rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
+                    >
+                    <Input placeholder="Nhập họ tên" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ!' }]}
+                    >
+                    <Input placeholder="Nhập email" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Số điện thoại"
+                        name="phoneNumber"
+                        rules={[{ required: true, message: 'Vui lòng nhập số điện thoại!' }]}
+                    >
+                    <Input placeholder="Nhập số điện thoại" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Giới tính"
+                        name="gender"
+                        rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
+                    >
+                    <Select placeholder="Chọn giới tính">
+                        <Option value="male">Nam</Option>
+                        <Option value="female">Nữ</Option>
+                        <Option value="maleFemale">Khác</Option>
+                    </Select>
+                    </Form.Item>
+                    <div style={{display:'flex', gap:'20px'}}>
+                        <ButtonCPN text="Thêm nhân viên" type="primary" htmlType="submit" style={{width:'170px', height:'50px',fontSize:'14px'}}/>
+                        <ButtonCPN text="Đóng" onClick={()=> {setShowAddEmployee(false)}} style={{width:'170px', height:'50px',fontSize:'14px', backgroundColor:'#ababaa'}}/>
+                    </div>
+                    
+                </Form>
+            </FormContainer>
+            )}
+            
             <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Danh sách nhân viên</div>
             <Table
                 dataSource={DsNhanVien}
