@@ -61,6 +61,13 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/verify-email")
+    ApiResponse<Boolean> verifyEmail(@RequestParam(value = "email", required = true)String email){
+        return ApiResponse.<Boolean>builder()
+                .result(userService.existedUserByEmail(email))
+                .build();
+    }
+
     @GetMapping("/email/{email}")
     ApiResponse<UserResponse> getUserByEmail(@PathVariable("email") String email) {
         return ApiResponse
@@ -68,8 +75,6 @@ public class UserController {
                 .result(userService.getUserByGmail(email))
                 .build();
     }
-
-
 
     @PutMapping("/{id}")
     ApiResponse<UserResponse> updateUser(@PathVariable("id") String id, @RequestBody @Valid UserUpdateRequest request) {

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import ButtonCPN from '../../../components/Button/Button';
+import ButtonCPN from '../Button/Button';
+import { useNavigate } from 'react-router-dom';
+import axios from '../../Configuration/AxiosConfig';
 
 const Container = styled.div`
     width: 70%;
@@ -89,12 +91,35 @@ const Title = styled.h1`
 const EmailInput = () => {
     const [isFocused, setIsFocused] = useState(false);
     const [inputValue, setInputValue] = useState('');
+    const navigate = useNavigate();
 
     const handleFocus = () => setIsFocused(true);
     const handleBlur = () => {
         if (!inputValue) setIsFocused(false);
     };
     const handleChange = (e) => setInputValue(e.target.value);
+
+    const handleBack = () => {
+        navigate("/authentication");
+    };
+
+    const handleContinue = async () => {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (inputValue) {
+            if (emailPattern.test(inputValue)) {
+                const response = await axios.get(`/users/verify-email`, { params: { email: inputValue } });
+                if (response.result === true) {
+                    navigate("/notify?email=" + inputValue);
+                } else {
+                    alert("Email không tồn tại");
+                }
+            } else {
+                alert("Địa chỉ Email không hợp lệ");
+            }
+        } else {
+            alert("Vui lòng nhập địa chỉ Email");
+        }
+    };
 
     return (
         <Container>
@@ -111,13 +136,14 @@ const EmailInput = () => {
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 value={inputValue}
+                                type="email"
                             />
                             <Label isFocused={isFocused || inputValue}>Email</Label>
                         </InputContainer>
                     </div>
                     <ButtonContainer>
-                        <ButtonCPN text={'Quay lại'} style={{ width: '130px', backgroundColor: '#7c7c7c' }} />
-                        <ButtonCPN text={'Tiếp tục'} style={{ width: '130px' }} />
+                        <ButtonCPN text={'Quay lại'} style={{ width: '130px', backgroundColor: '#7c7c7c' }} onClick={handleBack}/>
+                        <ButtonCPN text={'Tiếp tục'} style={{ width: '130px' }} onClick={handleContinue}/>
                     </ButtonContainer>
                 </div>
             </ContainerRight>

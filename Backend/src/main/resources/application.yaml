@@ -55,6 +55,3 @@ cloudinary:
     key: 658624322674343
     secret: i1066_D0Ly7OoZetD_brOEMpRIU
 
-endpoint:
-  afterConfirmEmailRegis: "http://localhost:3000/authentication"
-

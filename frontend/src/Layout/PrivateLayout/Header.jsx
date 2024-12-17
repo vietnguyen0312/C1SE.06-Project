@@ -137,7 +137,6 @@ const Header = () => {
               Healings
             </SidebarHeader>
           </HeaderLeftContent>
-          <StyledSearch placeholder="Search..." />
           <HeaderRightContent>
             <Flag
               src="/img/vietnam.png"

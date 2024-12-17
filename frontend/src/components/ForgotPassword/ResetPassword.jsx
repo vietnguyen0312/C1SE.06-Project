@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import ButtonCPN from '../../../components/Button/Button';
+import ButtonCPN from '../Button/Button';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import axios from '../../Configuration/AxiosConfig';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 const Container = styled.div`
     width: 50%;
@@ -97,18 +100,35 @@ const Message = styled.p`
     );
 };
 
-const ForgotPassword = () => {
+const ResetPassword = () => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isPasswordFocused, setPasswordFocused] = useState(false);
     const [isConfirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
     const [message, setMessage] = useState('');
+    const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const code = searchParams.get('code');
 
-    const handleSubmit = () =>{
+    useEffect(() => {
+        verifyCode();
+    }, [code]);
+
+    const verifyCode = async () => {
+        try {
+            await axios.post(`/auth/confirm-reset-password?code=${code}`);
+        } catch (error) {
+            navigate('/authentication');
+        }
+    }
+
+    const handleSubmit = async () =>{
         if(password !== confirmPassword){
             setMessage('Mật khẩu không khớp')
         }else{
-            setMessage('')
+            await axios.post(`/auth/reset-password`, {resetToken: code, newPassword: password});
+            navigate('/authentication');
         }
     }
 
@@ -141,4 +161,4 @@ const ForgotPassword = () => {
     );
 };
 
-export default ForgotPassword;
+export default ResetPassword;

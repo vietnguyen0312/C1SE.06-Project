@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import ButtonCPN from '../../../components/Button/Button';
+import ButtonCPN from '../Button/Button';
 import { FaSpinner } from 'react-icons/fa';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axios from '../../Configuration/AxiosConfig';
 
 const Container = styled.div`
     width: 70%;
@@ -68,6 +70,10 @@ const Spin = styled.div`
     gap: 10px;
 `
 const Notify = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const emailFromInput = searchParams.get('email');
 
     const formatEmail = (email) => {
         if (!email) return '';
@@ -76,11 +82,15 @@ const Notify = () => {
         return `${maskedName}@${domain}`;
     };
 
-    const maskedEmail = formatEmail("john.doe@email.com");
+    const maskedEmail = formatEmail(emailFromInput);
     const [loading, setLoading] = useState(false);
     const [countdown, setCountdown] = useState(5);
 
-    const handleResend = () => {
+    const handleResend = async () => {
+        if (!emailFromInput) {
+            navigate("/emailInput");
+            return;
+        }
         setLoading(true);
         let counter = 5;
         const interval = setInterval(() => {
@@ -92,11 +102,13 @@ const Notify = () => {
             }
             counter--;
         }, 1000);
+        await axios.post(`/auth/forgot-password?email=${emailFromInput}`)
     };
 
     useEffect(() => {
         handleResend();
     }, []);
+
     return (
         <Container>
             <ContainerLeft>

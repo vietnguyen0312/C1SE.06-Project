@@ -110,6 +110,9 @@ public class UserService {
         };
     }
 
+    public boolean existedUserByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 
     public UserResponse getUser(String id) {
         return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));

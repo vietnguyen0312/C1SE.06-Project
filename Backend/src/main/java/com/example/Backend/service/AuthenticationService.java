@@ -302,7 +302,7 @@ public class AuthenticationService {
 
         logout(LogoutRequest.builder().token(resetToken).build());
 
-        return String.format("http://localhost:8080/auth/confirm-reset-password?resetToken=%s", resetToken);
+        return String.format("http://localhost:3000/resetPassword?code=%s", resetToken);
     }
 
     public String confirmResetPassword(String resetToken) throws ParseException, JOSEException {

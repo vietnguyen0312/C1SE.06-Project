@@ -76,4 +76,9 @@ public class BillTicketDetailsService {
 
         return billTicketDetailsMap;
     }
+
+    public List<BillTicketDetailsResponse> getBillTicketDetailsByBillTicketSimple(String idBillTicket){
+        Sort sort = Sort.by(Sort.Direction.DESC, "ticket_price");
+        return billTicketDetailsRepository.findByBillTicket_Id(idBillTicket,sort).stream().map(billTicketDetailsMapper::toBillTicketDetailsResponse).toList();
+    }
 }

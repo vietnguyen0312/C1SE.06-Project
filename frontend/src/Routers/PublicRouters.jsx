@@ -13,9 +13,9 @@ import Hotel from '../components/Hotels';
 import Booking from '../components/Booking';
 import TicketLayout from '../Layout/PublicLayout/Ticket/TicketLayout';
 import Checkout from '../components/Checkout';
-import ForgotPassword from '../Layout/PublicLayout/ForgotPassword/forgotPassword';
-import EmailInput from '../Layout/PublicLayout/ForgotPassword/emailInput';
-import Notify from '../Layout/PublicLayout/ForgotPassword/notify';
+import EmailInput from '../components/ForgotPassword/emailInput';
+import Notify from '../components/ForgotPassword/notify';
+import ResetPassword from '../components/ForgotPassword/resetPassword';
 const UnthorizedRoute = () => {
     const isAuthenticated = localStorage.getItem('token');
     return isAuthenticated ? <Navigate to="/" /> : <Outlet />;
@@ -79,23 +79,23 @@ const PublicRouters = [
                 path: "/authentication",
                 element: <Authentication />
             },
+            {
+                path: "/emailInput",
+                element: <EmailInput />
+            },
+            {
+                path: "/notify",
+                element: <Notify />
+            },
+            {
+                path: "/resetPassword",
+                element: <ResetPassword />
+            },
         ],
     },
     {
         path: "/403",
         element: <Error403 />
-    },
-    {
-        path: "/emailInput",
-        element: <EmailInput />
-    },
-    {
-        path: "/notify",
-        element: <Notify />
-    },
-    {
-        path: "/forgotPassword",
-        element: <ForgotPassword />
     },
 ];
 

@@ -603,7 +603,7 @@ class RoomTypeList extends Component {
               {rooms.length > 0 ? (
                 rooms.map((room, index) => (
                   <RoomCard key={index} data-aos="fade-up">
-                    <RoomImage src={`/img/hotels/room_type/${room.image}`} alt={room.name} />
+                    <RoomImage src={room.image} alt={room.name} />
                     <RoomInfo>
                       <RoomName>{room.name}</RoomName>
                       <RoomPrice>{room.price.toLocaleString('vi-VN')} VNĐ / DAY</RoomPrice>
@@ -638,7 +638,7 @@ class RoomTypeList extends Component {
               <CloseButton onClick={this.handleModalClose}>×</CloseButton>
               <div style={{ overflowY: 'auto' }}>
                 <div style={{ width: '100%', maxHeight: '50vh', overflow: 'hidden' }}>
-                  <ModalImage src={`/img/hotels/room_type/${selectedRoom.image}`} alt={selectedRoom.name} />
+                  <ModalImage src={selectedRoom.image} alt={selectedRoom.name} />
                 </div>
                 <ModalTitle>{selectedRoom.name}</ModalTitle>
                 <ModalPrice>Giá: {selectedRoom.price.toLocaleString('vi-VN')} VNĐ</ModalPrice>
@@ -770,7 +770,7 @@ class RoomTypeList extends Component {
 
                 {selectedBookingRoomDetails.room && selectedBookingRoomDetails.room.roomType && (
                   <div style={{ display: 'flex', gap: '20px', fontSize: '25px', borderBottom: '1px solid #e0e0e0', paddingBottom: '20px' }}>
-                    <img src={"/img/hotels/room_type/" + selectedBookingRoomDetails.room.roomType.image} alt={selectedBookingRoomDetails.room.roomTypeName} style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
+                    <img src={selectedBookingRoomDetails.room.roomType.image} alt={selectedBookingRoomDetails.room.roomTypeName} style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
                     <div>
                       {selectedBookingRoomDetails.room.roomTypeName}
                       <div style={{ fontSize: '23px', color: '#7e8d9f' }}>số phòng:{selectedBookingRoomDetails.room.roomNumber}</div>
@@ -826,7 +826,6 @@ class RoomTypeList extends Component {
             />
             <ButtonCPN
               text="Lưu"
-
               onClick={() => this.updateRateRoom()}
               style={{ width: '105px', height: '36px', fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
 

@@ -174,7 +174,7 @@ const Authentication = () => {
     };
 
     const handleForgotPassword = () => {
-        alert("Forgot password clicked");
+        navigate("/emailInput");
     };
 
     return (
@@ -349,7 +349,7 @@ const Authentication = () => {
                         >
                             Đăng nhập bằng Google
                         </Button>
-                        <StyledLink href="#" onClick={handleForgotPassword}>
+                        <StyledLink onClick={handleForgotPassword}>
                             Forgot password?
                         </StyledLink>
                     </Box>

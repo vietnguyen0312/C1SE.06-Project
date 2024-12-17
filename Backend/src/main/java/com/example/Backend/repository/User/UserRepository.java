@@ -16,6 +16,8 @@ import java.util.Set;
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
     @Query("SELECT u FROM User u " +
             "WHERE SIZE(u.roles) = :priorityRole " +
             "AND (:search IS NULL OR u.username LIKE %:search% OR u.email LIKE %:search% OR u.phoneNumber LIKE %:search%)")
