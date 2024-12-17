@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { 
     DashboardOutlined, 
     RightOutlined, 
@@ -99,6 +100,10 @@ const Sidebar = () => {
                     <Item onClick={() => navigate('/manager/bookings')}>
                         <CalendarOutlined />
                         <div>Bookings</div>
+                    </Item>
+                    <Item>
+                        <FileDoneOutlined />
+                        <Link style={{textDecoration: "none", color: "inherit"}} to='/manager/blogs'>Blogs</Link>
                     </Item>
                     <Item>
                         <FileDoneOutlined />

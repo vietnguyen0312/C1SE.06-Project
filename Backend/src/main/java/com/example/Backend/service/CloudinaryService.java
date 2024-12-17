@@ -35,6 +35,17 @@ public class CloudinaryService {
         }
     }
 
+    public String deleteFile(String filename, String img) {
+        try {
+            cloudinary.uploader().destroy(filename, ObjectUtils.asMap("folder", img));
+            log.info("File deleted successfully: {}", filename);
+            return filename;
+        } catch (IOException e) {
+            log.error("Failed to delete file from Cloudinary in folder: {}", img, e);
+            throw new RuntimeException("Failed to delete file", e);
+        }
+    }
+
     public String uploadFileBlog(MultipartFile file, String filename) {
         return uploadFile(file, filename, "Blog");
     }
@@ -50,4 +61,6 @@ public class CloudinaryService {
     public String uploadFileHotel(MultipartFile file, String filename) {
         return uploadFile(file, filename, "Hotel");
     }
+
+
 }

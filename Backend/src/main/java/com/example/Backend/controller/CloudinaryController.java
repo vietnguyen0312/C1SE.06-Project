@@ -15,7 +15,7 @@ import java.util.function.BiFunction;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
-public class cloudinaryController {
+public class CloudinaryController {
 
     CloudinaryService cloudinaryService;
 
@@ -26,6 +26,19 @@ public class cloudinaryController {
         return processUpload(file, filename, "Upload image blog failure", cloudinaryService::uploadFileBlog);
     }
 
+    @DeleteMapping("/imgBlog/{filename}")
+    ApiResponse<String> deleteFileBlog(@PathVariable String filename) {
+        return processDelete(filename,"Blog", "Delete image blog failure", cloudinaryService::deleteFile);
+    }
+
+    @PutMapping("/imgBlog")
+    ApiResponse<String> updateFileBlog(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("filename") String filename) {
+        cloudinaryService.deleteFile(filename, "Blog");
+        return processUpload(file, filename, "Update image blog failure", cloudinaryService::uploadFileBlog);
+    }
+
     @PostMapping("/imgService")
     ApiResponse<String> uploadFileService(
             @RequestParam("file") MultipartFile file,
@@ -33,11 +46,17 @@ public class cloudinaryController {
         return processUpload(file, filename, "Upload image service failure", cloudinaryService::uploadFileService);
     }
 
-    @PostMapping("/imgInfo")
-    ApiResponse<String> uploadFileInfo(
+    @DeleteMapping("/imgService/{filename}")
+    ApiResponse<String> deleteFileService(@PathVariable String filename) {
+        return processDelete(filename, "Service","Delete image service failure", cloudinaryService::deleteFile);
+    }
+
+    @PutMapping("/imgService")
+    ApiResponse<String> updateFileService(
             @RequestParam("file") MultipartFile file,
             @RequestParam("filename") String filename) {
-        return processUpload(file, filename, "Upload image info failure", cloudinaryService::uploadFileInfo);
+        cloudinaryService.deleteFile(filename, "Service");
+        return processUpload(file, filename, "Update image service failure", cloudinaryService::uploadFileService);
     }
 
     @PostMapping("/imgHotel")
@@ -45,6 +64,19 @@ public class cloudinaryController {
             @RequestParam("file") MultipartFile file,
             @RequestParam("filename") String filename) {
         return processUpload(file, filename, "Upload image hotel failure", cloudinaryService::uploadFileHotel);
+    }
+
+    @DeleteMapping("/imgHotel/{filename}")
+    ApiResponse<String> deleteFileHotel(@PathVariable String filename) {
+        return processDelete(filename, "Hotel","Delete image hotel failure", cloudinaryService::deleteFile);
+    }
+
+    @PutMapping("/imgHotel")
+    ApiResponse<String> updateFileHotel(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("filename") String filename) {
+        cloudinaryService.deleteFile(filename, "Hotel");
+        return processUpload(file, filename, "Update image hotel failure", cloudinaryService::uploadFileHotel);
     }
 
     private ApiResponse<String> processUpload(
@@ -63,6 +95,22 @@ public class cloudinaryController {
             return ApiResponse.<String>builder()
                     .result(null)
                     .message("Upload failed: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    private ApiResponse<String> processDelete(String filename, String img, String errorMessage, BiFunction<String, String, String> deleteMethod) {
+        try {
+            deleteMethod.apply(filename, img);
+            return ApiResponse.<String>builder()
+                    .result(null)
+                    .message("File deleted successfully")
+                    .build();
+        } catch (RuntimeException e) {
+            log.error(errorMessage, e);
+            return ApiResponse.<String>builder()
+                    .result(null)
+                    .message("Delete failed: " + e.getMessage())
                     .build();
         }
     }
