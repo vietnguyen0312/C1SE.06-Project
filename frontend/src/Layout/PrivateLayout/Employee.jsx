@@ -46,7 +46,7 @@ const Employee = () => {
         setModalContent(content);
         setIsModalVisible(true);
       };
-    const fetchData = async (page =1 ,pageSize=6, role="customer")=>{
+    const fetchData = async (page =1 ,pageSize=6, role="employee")=>{
         setLoading(false);
         const response = await axios.get('/users',{
             params:{page,pageSize,role, role}
@@ -126,7 +126,7 @@ const Employee = () => {
                     content={
                         <div>
                             <PopoverItem onClick={() => handleEdit(record)}>Edit</PopoverItem>
-                            <PopoverItem onClick={() => handleDelete(record)}>Delete</PopoverItem>
+                            <PopoverItem onClick={() => handleDelete(record)}>Set ban</PopoverItem>
                         </div>
                     } 
                     trigger="click" 
