@@ -120,7 +120,7 @@ const Customer = () => {
           content={
             <div>
               <PopoverItem onClick={() => showModal(record)}>Edit</PopoverItem>
-              <PopoverItem onClick={() => handleDelete(record)}>Delete</PopoverItem>
+              <PopoverItem onClick={() => handleDelete(record)}>Set ban</PopoverItem>
             </div>
           }
           trigger="click"
