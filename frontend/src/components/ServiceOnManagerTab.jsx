@@ -96,23 +96,29 @@ const ServiceOnManagerTab = () => {
                     <p style={{marginTop: "10px",color: "#989595"}}>{item.description}</p>
                 </div>
                 
-                <div style={{marginTop: "20px", fontSize: "18px", fontWeight: "600", color: "#1b60d8"}}>Số lượng vé còn lại</div>
-                <div style={{ display: 'table', width: '50%', borderCollapse: 'collapse' }}>
-                    <div style={{ display: 'table-row', borderBottom: '1px solid #ddd' }}>
-                        {Array.isArray(tickets) && tickets.map((ticket) => (
-                            <React.Fragment key={ticket.ticketType.name}>
-                                <div style={{ display: 'table-row' }}>
-                                    <div style={{ display: 'table-cell', width: '50%', textAlign: 'right', padding: '8px', whiteSpace: 'nowrap', borderRight: '1px solid #ddd' }}>
-                                        Vé {ticket.ticketType.name}
-                                    </div>
-                                    <div style={{ display: 'table-cell', width: '50%', textAlign: 'left', padding: '8px' }}>
-                                        {ticket.quantity}
-                                    </div>
-                                </div>
-                            </React.Fragment>
-                        ))}
-                    </div>
-                </div>
+                {tickets.length > 0 ? (
+                    <>
+                        <div style={{marginTop: "20px", fontSize: "18px", fontWeight: "600", color: "#1b60d8"}}>Số lượng vé còn lại</div>
+                        <div style={{ display: 'table', width: '50%', borderCollapse: 'collapse' }}>
+                            <div style={{ display: 'table-row', borderBottom: '1px solid #ddd' }}>
+                                {Array.isArray(tickets) && tickets.map((ticket) => (
+                                    <React.Fragment key={ticket.ticketType.name}>
+                                        <div style={{ display: 'table-row' }}>
+                                            <div style={{ display: 'table-cell', width: '50%', textAlign: 'right', padding: '8px', whiteSpace: 'nowrap', borderRight: '1px solid #ddd' }}>
+                                                Vé {ticket.ticketType.name}
+                                            </div>
+                                            <div style={{ display: 'table-cell', width: '50%', textAlign: 'left', padding: '8px' }}>
+                                                {ticket.quantity}
+                                            </div>
+                                        </div>
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div style={{marginTop: "20px", fontSize: "18px", fontWeight: "600", color: "#1b60d8"}}>Hết vé</div>
+                )}
             </div>
         );
         setIsModalVisible(true);

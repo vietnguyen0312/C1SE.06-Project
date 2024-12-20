@@ -42,7 +42,7 @@ function Home() {
       <BookNow />
       <OtherIssues />
       <TestimonialArea />
-      <BlogArea />
+      {/* <BlogArea /> */}
     </>
   );
 }

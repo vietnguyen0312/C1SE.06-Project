@@ -43,18 +43,30 @@ public class UserService {
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
 
-    public UserResponse createUser(UserCreationRequest request) {
+    public UserResponse createUser(UserCreationRequest request, String role) {
 
         User user = userMapper.toUser(request);
         user.setCustomerType(customerTypeRepository.findByName(CustomerTypeEnum.BRONZE.getName()));
 
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        if (request.getPassword() != null)
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         HashSet<Role> roles = new HashSet<>();
-        roles.add(Role.builder()
-                .name(RoleEnum.ROLE_CUSTOMER.getName())
-                .description(RoleEnum.ROLE_CUSTOMER.getDescription())
-                .build());
+
+        switch (role.toLowerCase()){
+            case "manager": roles.add(Role.builder()
+                    .name(RoleEnum.ROLE_MANAGER.getName())
+                    .description(RoleEnum.ROLE_MANAGER.getDescription())
+                    .build());
+            case "employee": roles.add(Role.builder()
+                    .name(RoleEnum.ROLE_EMPLOYEE.getName())
+                    .description(RoleEnum.ROLE_EMPLOYEE.getDescription())
+                    .build());
+            case "customer": roles.add(Role.builder()
+                    .name(RoleEnum.ROLE_CUSTOMER.getName())
+                    .description(RoleEnum.ROLE_CUSTOMER.getDescription())
+                    .build());
+        }
 
         user.setRoles(roles);
 
@@ -77,7 +89,7 @@ public class UserService {
         return userMapper.toUserResponse(user);
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public PageResponse<UserResponse> getUsers(int page, int size, String search, String role) {
         Sort sort = Sort.by(Sort.Direction.ASC, "username").ascending();
 
@@ -124,7 +136,7 @@ public class UserService {
                 .orElse(null); // Trả về null nếu không tìm thấy
     }
 
-    @PostAuthorize("returnObject.email == authentication.name or hasRole('MANAGER')")
+    @PostAuthorize("returnObject.email == authentication.name or hasRole('EMPLOYEE')")
     public UserResponse updateUser(String id, UserUpdateRequest request) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
@@ -133,7 +145,7 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    @PostAuthorize("returnObject.email == authentication.name or hasRole('MANAGER')")
+    @PostAuthorize("returnObject.email == authentication.name or hasRole('EMPLOYEE')")
     public UserResponse changePassword(String id, UserChangePasswordRequest request) {
         User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 

@@ -238,7 +238,7 @@ public class AuthenticationService {
     }
 
     public AuthenticationResponse authenticated(AuthenticationRequest request) {
-        var user = userRepository.findByEmail(request.getEmail())
+        var user = userRepository.findByEmailOrPhoneNumber(request.getEmailOrPhoneNumber(), request.getEmailOrPhoneNumber())
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());

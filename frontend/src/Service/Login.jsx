@@ -18,8 +18,8 @@ export const getRedirectPath = (roles) => {
     return '/';
 };
 
-export const login = async (email, password) => {
-    const response = await axios.post('/auth/token', { email, password });
+export const login = async (emailOrPhone, password) => {
+    const response = await axios.post('/auth/token', { emailOrPhoneNumber: emailOrPhone, password: password });
     const token = response.result.token;
     localStorage.setItem('token', token);
     const roles = getRoles(token);

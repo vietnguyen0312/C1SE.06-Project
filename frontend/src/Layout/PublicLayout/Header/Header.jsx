@@ -72,14 +72,6 @@ function Header() {
                 <HeaderTopLi><HeaderTopLeftLink href="/ticket">Đặt vé</HeaderTopLeftLink></HeaderTopLi>
               </HeaderTopLeftUL>
             </HeaderTopLeft>
-            <HeaderTopRight>
-              <HeaderSocial>
-                <HeaderSocialLink href="#"><FontAwesomeIcon icon={faFacebook} /></HeaderSocialLink>
-                <HeaderSocialLink href="#"><FontAwesomeIcon icon={faTwitter} /></HeaderSocialLink>
-                <HeaderSocialLink href="#"><FontAwesomeIcon icon={faDribbble} /></HeaderSocialLink>
-                <HeaderSocialLink href="#"><FontAwesomeIcon icon={faBehance} /></HeaderSocialLink>
-              </HeaderSocial>
-            </HeaderTopRight>
           </WrapperAIC>
         </Container>
       </WrapperHeaderTop>

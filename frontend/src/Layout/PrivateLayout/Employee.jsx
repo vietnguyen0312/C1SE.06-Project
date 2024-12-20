@@ -53,7 +53,7 @@ const Employee = () => {
         })            
         SetDsNhanVien(response.result.data)
         setPagination({
-            current: response.result.currentPage,
+            current: response.result.currentPage,                                                       
             pageSize: response.result.pageSize,
             total: response.result.totalElements,
         })

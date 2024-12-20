@@ -74,6 +74,7 @@ const Authentication = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [emailOrPhone, setEmailOrPhone] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -98,11 +99,6 @@ const Authentication = () => {
         fetchGGLogin();
     }, []);
 
-    const validateEmail = (email) => {
-        const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return re.test(String(email).toLowerCase());
-    };
-
     const validatePhoneNumber = (phoneNumber) => {
         const re = /^\+?[0-9. ()-]{7,25}$/;
         return re.test(String(phoneNumber));
@@ -111,10 +107,6 @@ const Authentication = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = {};
-
-        if (!validateEmail(email)) {
-            newErrors.email = "Vui lòng nhập đúng định dạng email";
-        }
 
         if (!isLogin) {
             if (!username || username.length < 3 || username.length > 50) {
@@ -132,23 +124,29 @@ const Authentication = () => {
             if (!password || password.length < 8) {
                 newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự";
             }
+            if (!email) {
+                newErrors.email = "Email là bắt buộc";
+            }
         } else {
             if (!password) {
                 newErrors.password = "Mật khẩu là bắt buộc";
             }
         }
 
-        if (!email) {
-            newErrors.email = "Email là bắt buộc";
+        if (!emailOrPhone) {
+            newErrors.emailOrPhone = "Email hoặc số điện thoại là bắt buộc";
         }
 
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
+            console.log("cặc");
             if (isLogin) {
-                const redirectPath = await login(email, password);
+                console.log(emailOrPhone, password);
+                const redirectPath = await login(emailOrPhone, password);
                 navigate(redirectPath);
             } else {
+                console.log(email, phoneNumber, username, gender, password);
                 await axios.post('/users', { email, phoneNumber, username, gender, password });
                 const redirectPath = await login(email, password);
                 navigate(redirectPath);
@@ -183,16 +181,17 @@ const Authentication = () => {
                 <Typography variant="h4" align="center" gutterBottom>
                     {isLogin ? "Login" : "Register"}
                 </Typography>
-                <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            label="Email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            error={!!errors.email}
-                            helperText={errors.email}
+                <Grid container spacing={2}>  
+                    {isLogin && (
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                            label="Email hoặc số điện thoại"
+                            type="text"
+                            value={emailOrPhone}
+                            onChange={(e) => setEmailOrPhone(e.target.value)}
+                            error={!!errors.emailOrPhone}
+                            helperText={errors.emailOrPhone}
                             InputProps={{
                                 startAdornment: (
                                     <InputAdornment position="start">
@@ -200,10 +199,32 @@ const Authentication = () => {
                                     </InputAdornment>
                                 ),
                             }}
-                            autoComplete="email"
                             required
                         />
-                    </Grid>
+                        </Grid>
+                    )}
+                    {!isLogin && (
+                        <Grid item xs={12}>
+                            <TextField
+                                fullWidth
+                                label="Email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                error={!!errors.email}
+                                helperText={errors.email}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <MdEmail />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                autoComplete="email"
+                                required
+                            />
+                        </Grid>
+                    )}
                     <Grid item xs={12}>
                         <TextField
                             fullWidth
@@ -337,7 +358,7 @@ const Authentication = () => {
                     variant="contained"
                     color="primary"
                 >
-                    {isLogin ? "Login" : "Register"}
+                    {isLogin ? "Đăng nhập" : "Đăng ký"}
                 </StyledButton>
                 {isLogin && (
                     <Box mt={2} textAlign="center">
@@ -350,12 +371,12 @@ const Authentication = () => {
                             Đăng nhập bằng Google
                         </Button>
                         <StyledLink onClick={handleForgotPassword}>
-                            Forgot password?
+                            Quên mật khẩu?
                         </StyledLink>
                     </Box>
                 )}
                 <Button fullWidth onClick={toggleForm} sx={{ mt: 2 }}>
-                    {isLogin ? "Need an account? Register" : "Already have an account? Login"}
+                    {isLogin ? "Chưa có tài khoản? Đăng ký" : "Đã có tài khoản? Đăng nhập"}
                 </Button>
             </StyledForm>
         </StyledContainer>

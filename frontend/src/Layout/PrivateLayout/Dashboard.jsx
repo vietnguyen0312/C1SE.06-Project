@@ -522,7 +522,13 @@ const Dashboard = () => {
         },
         { title: "Giới tính", render: (record) => record.user.gender },
         { title: "Loại khách hàng", render: (record) => Array.isArray(record.user.customerType) ? record.user.customerType.map((type) => type.name).join(", ") : record.user.customerType?.name || "N/A" },
-        { title: "Ngày đặt", render: (record) => new Date(record.dateCreated).toLocaleDateString() },
+        { title: "Ngày đặt", render: (record) => {
+            const date = new Date(record.dateCreated);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }},
         { title: "Số điện thoại", render: (record) => record.user.phoneNumber },
         {title:'Tổng tiền',render:(record)=>record.total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})},
         { 
@@ -584,7 +590,13 @@ const Dashboard = () => {
         },
         { title: 'Giới tính', render: (record) => record.user.gender },
         { title: 'Loại khách hàng', render:(record)=>record.user.customerType.name},
-        { title: 'Ngày đặt', render:(record) => new Date(record.checkInDate).toLocaleDateString()},
+        { title: 'Ngày đặt', render:(record) => {
+            const date = new Date(record.checkInDate);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }},
         { title: 'Số điện thoại', render:(record) => record.user.phoneNumber},
         {title:'Tổng tiền',render:(record)=>record.total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})},
         { 

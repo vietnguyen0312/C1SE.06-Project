@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +30,23 @@ public class UserController {
     @PostMapping
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest request) {
         return ApiResponse.<UserResponse>builder()
-                .result(userService.createUser(request))
+                .result(userService.createUser(request, "customer"))
+                .build();
+    }
+
+    @PostMapping("/create-employee")
+    @PreAuthorize("hasRole('MANAGER')")
+    ApiResponse<UserResponse> createEmployee(@RequestBody @Valid UserCreationRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.createUser(request, "employee"))
+                .build();
+    }
+
+    @PostMapping("/create-manager")
+    @PreAuthorize("hasRole('EMPLOYER')")
+    ApiResponse<UserResponse> createManager(@RequestBody @Valid UserCreationRequest request) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.createUser(request, "manager"))
                 .build();
     }
 

@@ -8,6 +8,7 @@ import debounce from 'lodash/debounce';
 import ButtonCPN from '../components/Button/Button';
 import axios from '../Configuration/AxiosConfig';
 import { CloseOutlined } from '@ant-design/icons';
+import { getRoles } from '../Service/Login';
 
 const TicketContainer = styled.div`
   display: flex;
@@ -193,6 +194,17 @@ const Ticket = ({ style }) => {
     const [selectedService, setSelectedService] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [isUpdateCart, setIsUpdateCart] = useState(true);
+    const [isEmployee, setIsEmployee] = useState(false);
+    const [nameCustomer, setNameCustomer] = useState('');
+    const [phoneCustomer, setPhoneCustomer] = useState('');
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const roles = getRoles(token);
+        console.log(roles);
+        setIsEmployee(roles.includes('EMPLOYEE'));
+        console.log(isEmployee);
+    }, []);
 
     useEffect(() => {
         if (selectedTicket) {
@@ -297,9 +309,24 @@ const Ticket = ({ style }) => {
 
     };
 
+    const formatEmail = (email) => {
+        const emailParts = email.split('@');
+        const username = emailParts[0];
+        return `${username.charAt(0)}*****@gmail.com`;
+    }
+
     const handlePayment = async () => {
         const total = cartItems.reduce((acc, cartItem) => acc + cartItem.value.reduce((acc, ticketBooking) => acc + ticketBooking.total, 0), 0);
-        const bill = await axios.post('/bill-ticket', { total: total });
+
+        let bill;
+        if(isEmployee == true && nameCustomer != '' && phoneCustomer != ''){
+            console.log(formatEmail(nameCustomer));
+            const customer = await axios.post('/users', { username: nameCustomer, phoneNumber: phoneCustomer, email: formatEmail(nameCustomer) });
+
+            bill = await axios.post('/bill-ticket', { total: total, user: customer.result});
+        } else {
+            bill = await axios.post('/bill-ticket', { total: total });
+        }
 
         cartItems.forEach(cartItem => {
             cartItem.value.forEach(ticketBooking => {
@@ -325,7 +352,7 @@ const Ticket = ({ style }) => {
            orderInfo: `t${bill.result.id}`
          } 
        });
-       window.location.href = paymentUrl.result;
+    //    window.location.href = paymentUrl.result;
     }
     return (
         <>
@@ -341,7 +368,7 @@ const Ticket = ({ style }) => {
                             <SearchDropdown>
                                 {filteredTickets.map((ticket, index) => (
                                     <DropdownItem key={index} onClick={() => setSelectedService(ticket.key)}>
-                                        <ServiceImg src={`/img/service/${ticket.key.image}`} alt={ticket.key.name} style={{ width: '60px', height: '60px' }} />
+                                        <ServiceImg src={`${ticket.key.image}`} alt={ticket.key.name} style={{ width: '60px', height: '60px' }} />
                                         <div style={{ marginLeft: '10px' }}>
                                             <ServiceName>{ticket.key.name}</ServiceName>
                                             <ServiceType>{ticket.key.serviceType.name}</ServiceType>
@@ -353,34 +380,91 @@ const Ticket = ({ style }) => {
                     </SearchContainer>
 
                     <ContainerTicket>
-                        {selectedTicket && showService ? (
-                            <ServiceContainer data-aos="fade-in">
-                                <ServiceImg src={`/img/service/${selectedTicket.key.image}`} />
-                                <ContentTicket>
-                                    <ServiceName>Tên dịch vụ: {selectedTicket.key.name}</ServiceName>
-                                    <div style={{ display: 'flex', gap: '10px' }}>
-                                        Loại dịch vụ: <ServiceType>{selectedTicket.key.serviceType.name}</ServiceType>
+                        {isEmployee == true && (
+                            <>
+                                <div style={{ marginTop: '20px' }}>
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '15px',
+                                            border: '1px solid #ccc',
+                                            padding: '15px',
+                                            borderRadius: '10px',
+                                            maxWidth: '100%',
+                                            margin: '0 auto',
+                                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                                            backgroundColor: '#fff',
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
+                                                Họ và Tên:
+                                            </label>
+                                            <input
+                                                onChange={(e) => setNameCustomer(e.target.value)}
+                                                type="text"
+                                                placeholder="Nhập họ và tên"
+                                                style={{
+                                                    padding: '8px',
+                                                    fontSize: '14px',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '5px',
+                                                    minWidth: '150px',
+                                                }}
+                                            />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
+                                                Số điện thoại:
+                                            </label>
+                                            <input
+                                                onChange={(e) => setPhoneCustomer(e.target.value)}
+                                                type="text"
+                                                placeholder="Nhập số điện thoại"
+                                                style={{
+                                                    padding: '8px',
+                                                    fontSize: '14px',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '5px',
+                                                    minWidth: '150px',
+                                                }}
+                                            />
+                                        </div>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccc', borderRadius: '10px', padding: '10px', }}>
-                                            Giá vé
-                                        </div>
-                                        <div style={{ display: 'table', width: '100%', borderCollapse: 'collapse' }}>
-                                            {selectedTicket.value.map((ticketValue) => (
-                                                <div key={ticketValue.id} style={{ display: 'table-row', borderBottom: '1px solid #ddd' }}>
-                                                    <div style={{ display: 'table-cell', width: '50%', textAlign: 'right', padding: '8px', whiteSpace: 'nowrap', borderRight: '1px solid #ddd' }}>
-                                                        {ticketValue.ticketType.name}
-                                                    </div>
-                                                    <div style={{ display: 'table-cell', width: '50%', textAlign: 'left', padding: '8px' }}>
-                                                        {ticketValue.price.toLocaleString()} VND
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
+                                </div>
+                            </>
+                        )}
 
-                                    </div>
-                                </ContentTicket>
-                            </ServiceContainer>
+                        {selectedTicket && showService ? (
+                            <>
+                                <ServiceContainer data-aos="fade-in">
+                                    <ServiceImg src={`${selectedTicket.key.image}`} />
+                                    <ContentTicket>
+                                        <ServiceName>Tên dịch vụ: {selectedTicket.key.name}</ServiceName>
+                                        <div style={{ display: 'flex', gap: '10px' }}>
+                                            Loại dịch vụ: <ServiceType>{selectedTicket.key.serviceType.name}</ServiceType>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccc', borderRadius: '10px', padding: '10px', }}>
+                                                Giá vé
+                                            </div>
+                                            <div style={{ display: 'table', width: '100%', borderCollapse: 'collapse' }}>
+                                                {selectedTicket.value.map((ticketValue) => (
+                                                    <div key={ticketValue.id} style={{ display: 'table-row', borderBottom: '1px solid #ddd' }}>
+                                                        <div style={{ display: 'table-cell', width: '50%', textAlign: 'right', padding: '8px', whiteSpace: 'nowrap', borderRight: '1px solid #ddd' }}>
+                                                            {ticketValue.ticketType.name}
+                                                        </div>
+                                                        <div style={{ display: 'table-cell', width: '50%', textAlign: 'left', padding: '8px' }}>
+                                                            {ticketValue.price.toLocaleString()} VND
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </ContentTicket>
+                                </ServiceContainer>
+                            </>
                         ) : (
                             <div>
                                 <ContentTicket1 style={{ textAlign: 'center', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -436,7 +520,7 @@ const Ticket = ({ style }) => {
                                     <TicketItem key={cartItem.id}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                             <img
-                                                src={`/img/service/${cartItem.key.image}`}
+                                                src={`${cartItem.key.image}`}
                                                 alt={cartItem.key.name}
                                                 style={{ width: '50px', height: '50px', borderRadius: '5px' }}
                                                 onClick={() => setSelectedService(cartItem.key)}

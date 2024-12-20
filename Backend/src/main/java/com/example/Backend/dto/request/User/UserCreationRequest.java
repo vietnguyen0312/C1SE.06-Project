@@ -25,14 +25,12 @@ public class UserCreationRequest {
     @NotBlank(message = "NOT_BLANK")
     String email;
 
-    @NotBlank(message = "NOT_BLANK")
     @Size(min = 8, message = "MIN_SIZE")
     String password;
 
     @Pattern(regexp = "^\\+?[0-9. ()-]{7,25}$", message = "INVALID")
     String phoneNumber;
 
-    @NotBlank(message = "NOT_BLANK")
     @Pattern(regexp = "^(Male|Female|Other)$", message = "GENDER_INVALID")
     String gender;
 }
