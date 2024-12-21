@@ -13,7 +13,7 @@ import ButtonCPN from "../components/Button/Button";
 import { toast } from "react-toastify";
 
 const BannerSection = styled.section`
-  background-image: url("/img/blog/tintuc.jpg");
+  background-image: url("https://res.cloudinary.com/dgff7kkuu/image/upload/v1733666949/Blog/9b4471bb-efad-476b-911a-802e83f04735-1.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

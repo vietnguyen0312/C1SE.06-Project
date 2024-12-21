@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import styled from "styled-components";
 import LoadingIcons from "react-loading-icons";
-import ButtonCPN from "../../components/Button/Button";
+import ConfirmModal from '../../components/ConfirmModal';
 import axios from "../../Configuration/AxiosConfig";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from 'react-toastify';
 import {
   TrashButton,
   PreviewWrapper,
@@ -46,7 +46,15 @@ const EditBlog = () => {
   const [error, setError] = useState("");
   const [blogTypes, setBlogTypes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [indexImage, setIndexImage]=  useState([]);
+  const [isImageEdited, setIsImageEdited] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tempBlogData, setTempBlogData] = useState(null);
+  const [initialData, setInitialData] = useState({
+    title: "",
+    contentOpen: "",
+    blogType: { id: "", name: "" },
+    bodySections: []
+  });
 
   useEffect(() => {
     const fetchBlogDetails = async () => {
@@ -55,7 +63,6 @@ const EditBlog = () => {
         `/blogImage/findImagesByBlog/${id}`
       );
       const blogData = response.result;
-      console.log({id: blogData.blogType.id, name: blogData.blogType.name});
       setTitle(blogData.title);
       setBlogType({id : blogData.blogType.id , name : blogData.blogType.name});
       setSelectedId(blogData.blogType.id);
@@ -66,15 +73,11 @@ const EditBlog = () => {
       const sections = blogData.body.split("|");
       const newBodySections = []; // vì lỗi state nên mình tạo ra cái ni để khắc phục :))
       const urlImages = imagesResponse.result.map((img) => `${img.image}`);
-      console.log("urlImages", urlImages);
       let index = 0;
       // cái ni là để lấy dữ liệu của cái Blog cũ cần update á
       sections.forEach((section) => {
         section = section.trim();
-        if (section === "*image*") {
-          console.log("có ảnh", section);
-          console.log("images", images);
-          
+        if (section === "*image*") {          
           newBodySections.push({
             type: "image",
             file: null,
@@ -87,6 +90,13 @@ const EditBlog = () => {
       });
       setBodySections(newBodySections);
       setLoading(false);  
+
+      setInitialData({
+        title: blogData.title,
+        contentOpen: blogData.contentOpen,
+        blogType: {id: blogData.blogType.id, name: blogData.blogType.name},
+        bodySections: blogData.body
+      });
     };
 
     const fetchBlogTypes = async () => {
@@ -104,14 +114,70 @@ const EditBlog = () => {
     setBodySections(updatedSections);
   };
 
-  const handleUpdateBlog = async () => {
-    console.log("bodySections", bodySections);
+  const handleConfirm = async () => {
+    try {
+      const response = await axios.put(`/blogs/${id}`, tempBlogData);
+
+      const cloudinary = await axios.get(`/blogImage/findImagesByBlog/${id}`);
+      if (isImageEdited) {
+        await axios.delete(`/upload/deleteImagesWithSubstring?prefix=${id}&folder=Blog`);
+        await axios.delete(`/blogImage/${id}`);
+
+        let imageIndex = 0;
+        for (const section of bodySections) {
+          if (section.type === "image" && section.file) {
+            await uploadImage(section.file, id, imageIndex);
+            imageIndex++;
+          }
+        }
+      }
+      toast.success("Cập nhật thành công!");
+      setIsModalOpen(false);
+      navigate(-1);
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi cập nhật!");
+      setIsModalOpen(false);
+    }
+  };
+
+  const hasChanges = () => {
+    if (title !== initialData.title) return true;
+    if (contentOpen !== initialData.contentOpen) return true;
+    if (blogType.id !== initialData.blogType.id) return true;
+    if (isImageEdited) return true;
+    
+    let currentContent = "";
+    bodySections.forEach(section => {
+      if (typeof section === "string") {
+        currentContent += section + " ";
+      } else if (section.type === "image") {
+        currentContent += "|*image*| ";
+      }
+    });
+    
+    if (currentContent.trim() !== initialData.bodySections.trim()) return true;
+    
+    return false;
+  };
+
+  const handleUpdateBlog = () => {
+    if (!hasChanges()) {
+      toast.info("Không có thay đổi nào để cập nhật!");
+      return;
+    }
+
     if (
       !title.trim() ||
       !contentOpen.trim() ||
-      bodySections.every((section) => !section.file && !section.trim())
+      bodySections.every((section) => {
+        if (typeof section === "string") {
+          return !section.trim();
+        } else if (section.type === "image") {
+          return !section.file && !section.imgUrl;
+        }
+        return true;
+      })
     ) {
-      console.log("error");
       setError(
         "Tiêu đề, nội dung mở và ít nhất một phần nội dung không được để trống!"
       );
@@ -126,8 +192,6 @@ const EditBlog = () => {
       blogType: blogType,
     };
 
-    const images =0;
-
     bodySections.forEach(section => {
       if (typeof section === "string") {
         blogData.body += section + " "; 
@@ -135,18 +199,9 @@ const EditBlog = () => {
         blogData.body += "|*image*| "; 
       }
     });
-    console.log("drasdassdas" , blogData);
 
-    const response = await axios.put(`/blogs/${id}`, blogData);
-
-    const cloudinary = await axios.get(`/blogImage/findImagesByBlog/${id}`)
-    const totalImage = cloudinary.result.length;
-    
-    // for (let i = 0; i < totalImage; i++) {
-      
-    // }
-
-    
+    setTempBlogData(blogData);
+    setIsModalOpen(true);
   };
 
   const uploadImage = async (file, blogId,index) => {
@@ -155,8 +210,6 @@ const EditBlog = () => {
     formData.append('file', file);
     formData.append('filename', blogId+"_"+index);
     const response = await axios.post('/upload/imgBlog', formData);
-    console.log(response);
-    console.log(response.result);
     const params = {
       image: response.result,
       blogId: blogId
@@ -176,7 +229,6 @@ const EditBlog = () => {
   };
 
   const handleRemoveBodySection = (index) => {
-    console.log("index", index);
     setBodySections((prevSections) =>
       prevSections.filter((_, i) => i !== index)
     );
@@ -188,14 +240,12 @@ const EditBlog = () => {
     updatedSections[index].file = file;
     updatedSections[index].name = file.name;
     setBodySections(updatedSections);
+    setIsImageEdited(true);
   };
 
   const handleBack = () => {
     navigate(-1);
   };
-  useEffect(() => {
-    console.log("blogType", blogType);
-  }, [blogType]);
 
   if (loading) {
     return <LoadingIcons.SpinningCircles />;
@@ -217,8 +267,6 @@ const EditBlog = () => {
             );
             setSelectedId(selectedType.id);
             setBlogType({id : selectedType.id , name : selectedType.name});
-            console.log("id" + selectedType.id);
-            console.log("name" + selectedType.name);
           }}
           style={{
             width: "100%",
@@ -349,6 +397,15 @@ const EditBlog = () => {
         />
         <ButtonStyled text="Quay lại" onClick={handleBack} />
       </FixedButtonContainer>
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirm}
+        title="Xác nhận cập nhật"
+        message="Bạn có chắc chắn muốn cập nhật bài viết này?"
+        confirmText="Cập nhật"
+        cancelText="Hủy"
+      />
     </BlogEditorContainer>
   );
 };

@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import ButtonCPN from '../../components/Button/Button';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { debounce } from '@mui/material';
+import { toast } from 'react-toastify';
+import ConfirmModal from '../../components/ConfirmModal';
 
 const BlogListContainer = styled.div`
     padding: 20px;
@@ -20,6 +22,7 @@ const BlogCard = styled(Link)`
     text-decoration: none;
     color: inherit;
     cursor: pointer;
+    box-shadow: 5px 5px 5px rgba(0, 0.1, 0, 0.1);
 `;
 
 const BlogImage = styled.img`
@@ -78,6 +81,8 @@ const ManageBlog = () => {
     const [hasMore, setHasMore] = useState(true);
     const [totalPages, setTotalPages] = useState(0);
     const [blogTypesLoaded, setBlogTypesLoaded] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedBlogId, setSelectedBlogId] = useState(null);
 
     const fetchBlogTypes = async () => {
         const response = await axios.get('/blogTypes');
@@ -110,9 +115,6 @@ const ManageBlog = () => {
 
         setBlogImages((prevBlogs) => [...prevBlogs, ...newBlogImages]);
         setTotalPages(response.result.totalPages);
-        console.log("tổng trang: " + response.result.totalPages);
-        console.log("page: " + page);
-        console.log("totalPages: " + response.result.totalPages);
         setHasMore(page < response.result.totalPages); 
         setLoading(false);
     };
@@ -125,7 +127,6 @@ const ManageBlog = () => {
         const fetchData = async () => { 
             if (blogTypesLoaded) {
                 setPage(1);
-                console.log("page khi đã set về 1" + page);
                 setBlogImages([]);
                 fetchBlogs();
             }
@@ -144,21 +145,31 @@ const ManageBlog = () => {
     };
 
     const handleDeleteBlog = async (id) =>{
-        console.log("đã xóa blog"+ id);
-        // const response = await axios.delete(`/blogs/${id}`);
-        // console.log(response);
-        // if(response.code == 1000){
-        //     const responses = await axios.delete(`/blogImage/${id}`);
-        //     if(responses.code == 1000)
-        //     {
+        try {
             
-        //     }
-        // }
-        const cloudinary = await axios.get(`/blogImage/findImagesByBlog/${id}`)
-        const total = cloudinary.result.length;
-        console.log(total);
-        console.log(cloudinary);
+           const response = await axios.delete(`/blogs/${id}`);
+            await axios.delete(`/upload/deleteImagesWithSubstring?prefix=${id}&folder=Blog`);
+            const blogImageResponse = await axios.delete(`/blogImage/${id}`);      
+            setBlogImages((prevBlogs) => prevBlogs.filter(blog => blog.id !== id));
+            toast.success("Xóa thành công!");
+
+       } catch (error) {
+           toast.error("Có lỗi xảy ra khi xóa blog!");
+       }
     }
+
+    const handleDeleteClick = (id) => {
+        setSelectedBlogId(id);
+        setIsModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (selectedBlogId) {
+            await handleDeleteBlog(selectedBlogId);
+            setIsModalOpen(false);
+            setSelectedBlogId(null);
+        }
+    };
 
     return (
         <BlogListContainer>
@@ -214,15 +225,22 @@ const ManageBlog = () => {
                       <ButtonCPN style={{ width: "100px", padding: "10px" }} text="Edit" />
                       <ButtonCPN
                           style={{ width: "100px", padding: "10px", marginLeft: "20px" }}
-                          onClick={(e) => {
-                              handleDeleteBlog(blog.id);
-                          }}
-                          text="xóa"
+                          onClick={() => handleDeleteClick(blog.id)}
+                          text="Xóa"
                       />
                   </BlogCard>
                   
                 ))}
             </InfiniteScroll>
+            <ConfirmModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onConfirm={handleConfirmDelete}
+                title="Xác nhận xóa"
+                message="Bạn có chắc chắn muốn xóa bài viết này?"
+                confirmText="Xóa"
+                cancelText="Hủy"
+            />
         </BlogListContainer>
     );
 };

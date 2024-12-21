@@ -79,6 +79,28 @@ public class CloudinaryController {
         return processUpload(file, filename, "Update image hotel failure", cloudinaryService::uploadFileHotel);
     }
 
+    @DeleteMapping("/deleteImagesWithSubstring")
+     ApiResponse<String> deleteImagesWithSubstring(
+            @RequestParam("prefix") String prefix,
+            @RequestParam("folder") String folder) {
+        if (prefix.length() < 4) {
+            return ApiResponse.<String>builder()
+                    .result("Prefix must be at least 4 characters long.")
+                    .build();
+        }
+        try {
+            int deletedCount = cloudinaryService.deleteImagesWithDisplayName(prefix, folder);
+            return ApiResponse.<String>builder()
+                    .result(deletedCount + " images with prefix '" + prefix + "' have been deleted successfully.")
+                    .build();
+        } catch (Exception e) {
+            log.error("Failed to delete images with prefix '{}': {}", prefix, e.getMessage());
+            return ApiResponse.<String>builder()
+                    .result("Failed to delete images: " + e.getMessage())
+                    .build();
+        }
+    }
+
     private ApiResponse<String> processUpload(
             MultipartFile file,
             String filename,

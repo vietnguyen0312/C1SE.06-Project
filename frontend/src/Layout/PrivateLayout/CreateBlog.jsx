@@ -235,6 +235,7 @@ const CreateBlog = () => {
       await Promise.all(uploadPromises);
 
       toast.success("Lưu thành công!");
+      navigate(-1);
     } catch (error) {
       setError("Đã xảy ra lỗi khi lưu!");
     } finally {
@@ -245,12 +246,9 @@ const CreateBlog = () => {
 
   const uploadImage = async (file, blogId, number) => {
     const formData = new FormData();
-    console.log("Thêm ảnh với số thứ tự:", number);
     formData.append("file", file);
     formData.append("filename", `${blogId}_${number}`);
     const response = await axios.post("/upload/imgBlog", formData);
-    console.log(response);
-    console.log(response.result);
     const params = {
       image: response.result,
       blogId: blogId,
