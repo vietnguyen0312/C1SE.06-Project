@@ -49,7 +49,7 @@ const Employee = () => {
     const fetchData = async (page =1 ,pageSize=6, role="customer")=>{
         setLoading(false);
         const response = await axios.get('/users',{
-            params:{page,pageSize,role, role}
+            params:{page,pageSize,role}
         })            
         SetDsNhanVien(response.result.data)
         setPagination({
@@ -77,7 +77,7 @@ const Employee = () => {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
+    `;
 
     const handleAddCustomer = (values) => {
         console.log('New employee:', values);
