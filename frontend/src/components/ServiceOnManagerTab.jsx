@@ -1,11 +1,12 @@
 import InfiniteScroll from 'react-infinite-scroll-component';
 import LoadingIcons from 'react-loading-icons';
 import styled from "styled-components";
-import { Modal } from 'antd';
 import axios from '../Configuration/AxiosConfig'; 
 import { useEffect, useState } from "react";
 import React from 'react';
-
+import ButtonCPN from './Button/Button';
+import { Table, Popover, Spin, Form, Input, Select, Upload, Modal } from 'antd';
+import { SettingOutlined, PlusOutlined } from '@ant-design/icons';
 const ServiceItemWrapper = styled.div`
     display: flex;
     flex-wrap: wrap;
@@ -50,7 +51,13 @@ const Description = styled.div`
     text-overflow: ellipsis;
     color: #989595;
 `;
-
+const FormContainer = styled.div`
+    margin-bottom: 20px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
 const ServiceOnManagerTab = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [modalContent, setModalContent] = useState(null);
@@ -58,7 +65,7 @@ const ServiceOnManagerTab = () => {
     const [serviceData, setServiceData] = useState([]);
     const [hasMore, setHasMore] = useState(true);
     const [page, setPage] = useState(1);
-
+    const [showAddService, setShowAddService] = useState(false)
     useEffect(() => {
         fetchServices();
     }, []);
@@ -85,7 +92,9 @@ const ServiceOnManagerTab = () => {
     const handleCancel = () => {
         setIsModalVisible(false);
     };
-
+    const handleAddService = (values) => {
+        console.log('New employee:', values);
+    };
     const handleServiceItemClick = async (item) => {
         const tickets = await fetchTicketByServiceId(item.id);
         setModalContent(
@@ -134,6 +143,73 @@ return (
                 <LoadingIcons.TailSpin stroke="#000" />
             </div>}
         >
+        <ButtonCPN text="Thêm dịch vụ" style={{marginBottom:'20px'}} onClick={()=>setShowAddService(true)}></ButtonCPN>
+        {showAddService && (
+                <FormContainer>
+            <div style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px' }}>Thêm mới dịch vụ</div>
+                <Form layout="vertical" onFinish={handleAddService}>
+                <Form.Item
+                    label="Ảnh cho dịch vụ"
+                    name="avatar"
+                    rules={[{ required: true, message: 'Vui lòng tải lên ảnh' }]}
+                >
+                    <Upload
+                        listType="picture-card"
+                        maxCount={1}
+                        accept="image/*"
+                        beforeUpload={(file) => {
+                            const isImage = file.type.startsWith("image/");
+                            if (!isImage) {
+                                message.error("Vui lòng tải lên tệp hình ảnh!");
+                            }
+                            return isImage || Upload.LIST_IGNORE;
+                        }}
+                        onChange={(info) => {
+                            if (info.file.status === "done") {
+                                message.success(`${info.file.name} đã tải lên thành công.`);
+                            } else if (info.file.status === "error") {
+                                message.error(`${info.file.name} tải lên thất bại.`);
+                            }
+                        }}
+                    >
+                        <div>
+                            <PlusOutlined />
+                            <div style={{ marginTop: 8 }}>Tải ảnh</div>
+                        </div>
+                    </Upload>
+                </Form.Item>
+                    <Form.Item
+                        label="Tên dịch vụ"
+                        name="name"
+                        rules={[{ required: true, message: 'Vui lòng nhập tên dịch vụ!' }]}
+                    >
+                    <Input placeholder="Nhập tên dịch vụ" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Mô tả"
+                        name="description"
+                        rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}
+                    >
+                    <Input placeholder="Nhập mô tả" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Chọn loại dịch vụ"
+                        name="ServiceType"
+                        rules={[{ required: true, message: 'Vui lòng chọn loại dịch vụ!' }]}
+                    >
+                    <Select placeholder="Chọn loại dịch vụ">
+                        <Option>vui chơi</Option>
+                        <Option>ăn uống</Option>
+                        <Option>nghỉ dưỡng</Option>
+                    </Select>
+                    </Form.Item>
+                    <div style={{display:'flex', gap:'20px'}}>
+                        <ButtonCPN text="Thêm dịch vụ" type="primary" htmlType="submit" style={{width:'170px', height:'50px',fontSize:'14px'}}/>
+                        <ButtonCPN text="Đóng" onClick={()=> {setShowAddService(false)}} style={{width:'170px', height:'50px',fontSize:'14px', backgroundColor:'#ababaa'}}/>
+                    </div>
+                </Form>
+            </FormContainer>
+            )}
         <ServiceItemWrapper>
             {serviceData.map((service) => (
                 <ServiceItem key={service.id} onClick={() => handleServiceItemClick(service)}>
