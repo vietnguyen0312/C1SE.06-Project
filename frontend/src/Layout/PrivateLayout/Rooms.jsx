@@ -552,10 +552,6 @@ class Rooms extends Component {
     }
 
     handleAddRoomType = async () => {
-        console.log(this.state.roomTypeSelected);
-        console.log(this.state.detailAdd);
-        console.log(this.state.priceAdd);
-        console.log(this.state.maxPeopleAdd);
 
         if (this.state.addRoomType == false) {
             this.setState({
@@ -594,13 +590,8 @@ class Rooms extends Component {
     }
 
     handleUpdateRoomType = async () => {
-        console.log(this.state.roomTypeSelected);
-        console.log(this.state.detailAdd);
-        console.log(this.state.priceAdd);
-        console.log(this.state.maxPeopleAdd);
-        console.log(this.state.addRoomType);
+
         const name = this.state.roomType?.find(type => type.id === this.state.roomTypeSelected)?.name || "";
-        console.log(name);
 
         if (this.state.addRoomType == true) {
             this.setState({ addRoomType: false });
@@ -627,7 +618,6 @@ class Rooms extends Component {
     }
 
     handleDeleteRoomType = async () => {
-        console.log(this.state.roomTypeSelected);
         if (this.state.addRoomType == true) {
             this.setState({ addRoomType: false });
             return;
@@ -882,9 +872,15 @@ class Rooms extends Component {
                                                                             {"quá hạn"}
                                                                         </StatusRoomBooked>
                                                                     ) : (
-                                                                        <StatusRoomBooked>
-                                                                            {"đã đặt"}
-                                                                        </StatusRoomBooked>
+                                                                        booking.checkIned != null ? (
+                                                                            <StatusRoomBooked>
+                                                                                {"sử dụng"}
+                                                                            </StatusRoomBooked>
+                                                                        ) : (
+                                                                            <StatusRoomBooked>
+                                                                                {"đã đặt"}
+                                                                            </StatusRoomBooked>
+                                                                        )
                                                                     );
                                                                 }
                                                             })()
@@ -1046,9 +1042,7 @@ class Rooms extends Component {
                                     </select>
                                 </div>
 
-                                <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
-                                    <input type="number" placeholder="Nhập số ngày" style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }} />
-                                </div>
+
                             </div>
                             <div style={{ display: 'flex', gap: '15px', marginTop: '15px' }}>
                                 <ButtonCPN text="thêm" onClick={() => { this.handleAddRoom() }} style={{ width: 'auto', height: 'auto', fontSize: '13px', padding: '10px 20px', borderRadius: '5px', backgroundColor: '#4CAF50', color: 'white' }} />

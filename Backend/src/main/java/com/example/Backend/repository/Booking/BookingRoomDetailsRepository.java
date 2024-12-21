@@ -52,4 +52,5 @@ public interface BookingRoomDetailsRepository extends JpaRepository<BookingRoomD
 
         List<BookingRoomDetails> findByBookingRoom_id(String bookingRoomId);
 
+        List<BookingRoomDetails> findByBookingRoom_User_phoneNumber(String phoneNumber);
 }

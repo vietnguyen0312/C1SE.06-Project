@@ -62,7 +62,7 @@ const StyledLink = styled(Link)`
 `;
 
 const BannerSectionHotels = styled.section`
-  background-image: url('/img/hotels/headerHotel.jpg');
+  background-image: url('https://res.cloudinary.com/dgff7kkuu/image/upload/v1733643418/headerHotel_imr71k.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -266,6 +266,8 @@ class BookingRoom extends Component {
             nameCustomer: null,
             phoneCustomer: null,
             emailCustomer: null,
+            showModal: false,
+            payment: null,
 
         };
         this.lastPostElementRef = createRef();
@@ -442,10 +444,13 @@ class BookingRoom extends Component {
         currentDate.setHours(0, 0, 0, 0);
 
         const { startDate, endDate } = this.state;
-        if (!(startDate instanceof Date && endDate instanceof Date)) {
 
-            return; // Stop execution or handle error
+        // Check if startDate and endDate are not selected
+        if (!startDate || !endDate) {
+            toast.error('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!');
+            return; // Stop execution if dates are not selected
         }
+
         if (startDate && endDate) {
             const start = new Date(startDate);
             const end = new Date(endDate);
@@ -453,12 +458,10 @@ class BookingRoom extends Component {
             end.setHours(0, 0, 0, 0);
             if (start < currentDate) {
                 toast.error('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại!');
-                // alert('Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại!');
                 return;
             }
             if (end < start) {
                 toast.error('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu!');
-                // alert('Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu!');
                 return;
             }
             if (start.getTime() === end.getTime()) {
@@ -471,12 +474,8 @@ class BookingRoom extends Component {
             this.startDate = formattedDate;
             this.endDate = formattedDate1;
 
-
             this.handleRoomTypeSelect(this.state.activeRoomIndex);
             this.checkSelectedRoom();
-        } else {
-            toast.error('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!');
-            // alert('Vui lòng chọn cả ngày bắt đầu và ngày kết thúc!');
         }
     };
 
@@ -624,10 +623,9 @@ class BookingRoom extends Component {
             totalBookings[groupKey] += selectedRoom.roomType.price * this.calculateDays(checkInDate, checkOutDate);
         }
         let lastBookingId = null
-
+        var status = this.state.payment ? 'đã thanh toán' : 'chưa thanh toán'
         for (const groupKey in totalBookings) {
             const [checkInDate, checkOutDate] = groupKey.split('--');
-
 
             if (!bookingRoomsMap.has(groupKey)) {
                 const response1 = await axios.post('booking_room/create_by_staff', {
@@ -636,7 +634,7 @@ class BookingRoom extends Component {
                     checkOutDate: checkOutDate,
                     total: totalBookings[groupKey],
                     datePay: now,
-                    status: 'chưa thanh toán'
+                    status: status
                 });
 
                 lastBookingId = response1.result.id;
@@ -654,25 +652,42 @@ class BookingRoom extends Component {
                 price: selectedRoom.roomType.price * this.calculateDays(checkInDate, checkOutDate)
             });
         }
-
-        const paymentUrl = await axios.get('/payment/vn-pay', {
-            params: {
-                amount: this.state.totalPrice,
-                orderInfo: `r${lastBookingId}`
-            }
-        });
-        window.location.href = paymentUrl.result;
+        const payment1 = this.state.payment;
+        if (payment1 == false) {
+            const paymentUrl = await axios.get('/payment/vn-pay', {
+                params: {
+                    amount: this.state.totalPrice,
+                    orderInfo: `r${lastBookingId}`
+                }
+            });
+            window.location.href = paymentUrl.result;
+        }
+        if (payment1 == true) {
+            window.location.href = `/checkout?vnp_OrderInfo=v${lastBookingId}&vnp_Amount=${this.state.totalPrice}`;
+        }
     }
 
+    tam = async () => {
+        this.setState({ payment: null })
+        return new Promise((resolve) => {
+            this.setState({ showModal: true }, () => {
+                // Chờ người dùng chọn phương thức thanh toán
+                const interval = setInterval(() => {
+                    if (this.state.payment !== null) {
+                        clearInterval(interval);
+                        resolve(this.state.payment);
+                    }
+                }, 100); // Kiểm tra trạng thái mỗi 100ms
+            });
+        });
+    };
     CheckBookingRoom = async () => {
-
-
+        const payment = await this.tam(); // Chờ người dùng chọn phương thức thanh toán
         if (this.state.nameCustomer && this.state.phoneCustomer && this.state.emailCustomer) {
             const response = await axios.get(`/users/email/${this.state.emailCustomer}`);
             if (response.result) {
                 this.BookingRoomByStaff(response.result.id);
             } else {
-
                 const response1 = await axios.post('/users', {
                     username: this.state.nameCustomer,
                     phoneNumber: this.state.phoneCustomer,
@@ -680,7 +695,7 @@ class BookingRoom extends Component {
                     email: this.state.emailCustomer,
                     gender: 'Other',
                 });
-                if (response1.code == 1000) {
+                if (response1.code === 1000) {
                     this.BookingRoomByStaff(response1.result.id);
                 } else {
                     toast.warning('Email không tồn tại!');
@@ -689,7 +704,8 @@ class BookingRoom extends Component {
         } else {
             toast.error('Vui lòng nhập đầy đủ thông tin!');
         }
-    }
+    };
+
 
     formatDateForApi = (startDate, endDate) => {
         // Chuyển đổi checkIn và checkOut sang múi giờ 'Asia/Ho_Chi_Minh'
@@ -981,6 +997,18 @@ class BookingRoom extends Component {
         return this.formatDate(this.state.startDate);
     }
 
+    handlePayment(method) {
+        const paymentValue = method === "tiền mặt";
+        this.setState(
+            {
+                payment: paymentValue,
+                showModal: false
+            },
+            () => {
+
+            }
+        );
+    }
 
 
     render() {
@@ -1234,6 +1262,37 @@ class BookingRoom extends Component {
                         )}
                     </div>
                 ))}
+
+                {this.state.showModal && (
+                    <div
+                        style={{
+                            position: "fixed",
+                            top: "50%",
+                            left: "50%",
+                            transform: "translate(-50%, -50%)",
+                            backgroundColor: "white",
+                            padding: "20px",
+                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                            borderRadius: "8px",
+                            textAlign: "center",
+                        }}
+                    >
+                        <p>Bạn muốn thanh toán bằng tiền mặt hay chuyển khoản?</p>
+                        <button
+                            onClick={() => this.handlePayment("tiền mặt")}
+                            style={{ margin: "10px", backgroundColor: "#f8b600", color: "white", padding: "10px 20px", borderRadius: "5px", cursor: "pointer" }}
+                        >
+                            Tiền mặt
+                        </button>
+                        <button
+                            onClick={() => this.handlePayment("chuyển khoản")}
+                            style={{ margin: "10px", backgroundColor: "#f8b600", color: "white", padding: "10px 20px", borderRadius: "5px", cursor: "pointer" }}
+                        >
+                            Chuyển khoản
+                        </button>
+                    </div>
+                )}
+
             </>
         );
     }

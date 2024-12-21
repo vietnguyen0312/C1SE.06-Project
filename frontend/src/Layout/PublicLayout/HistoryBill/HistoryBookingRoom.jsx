@@ -703,7 +703,7 @@ const HistoryBookingRoom = () => {
                                                                     <td style={rowStyle}>{bookingRoomDetailIndex + 1}</td>
                                                                     <td style={rowStyle}>
                                                                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                                                            <img src={"/img/hotels/room_type/" + bookingRoomDetail.room.roomType.image} alt={bookingRoomDetail.room.roomType.image} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
+                                                                            <img src={bookingRoomDetail.room.roomType.image} alt={bookingRoomDetail.room.roomType.image} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
                                                                             <div>
                                                                                 {bookingRoomDetail.roomTypeName}
                                                                                 <div style={{ fontSize: '13px', color: '#7e8d9f' }}>Phòng: {bookingRoomDetail.room.roomNumber}</div>
@@ -848,7 +848,7 @@ const HistoryBookingRoom = () => {
                     {selectedBookingRoomDetails && (
                         <>
                             <div style={{ display: 'flex', gap: '20px', fontSize: '25px', borderBottom: '1px solid #e0e0e0', paddingBottom: '20px' }}>
-                                <img src={"/img/hotels/room_type/" + selectedBookingRoomDetails.room.roomType.image} alt={selectedBookingRoomDetails.room.roomTypeName} style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
+                                <img src={selectedBookingRoomDetails.room.roomType.image} alt={selectedBookingRoomDetails.room.roomTypeName} style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
                                 <div>
                                     {selectedBookingRoomDetails.room.roomTypeName}
                                     <div style={{ fontSize: '23px', color: '#7e8d9f' }}>số phòng:{selectedBookingRoomDetails.room.roomNumber}</div>
@@ -914,7 +914,7 @@ const HistoryBookingRoom = () => {
                     {selectedBookingRoomDetails && (
                         <>
                             <div style={{ display: 'flex', gap: '20px', fontSize: '25px', borderBottom: '1px solid #e0e0e0', paddingBottom: '20px' }}>
-                                <img src={"/img/hotels/room_type/" + selectedBookingRoomDetails.room.roomType.image} alt={selectedBookingRoomDetails.room.roomTypeName} style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
+                                <img src={selectedBookingRoomDetails.room.roomType.image} alt={selectedBookingRoomDetails.room.roomTypeName} style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '10px', boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.1)', cursor: 'pointer' }} />
                                 <div>
                                     {selectedBookingRoomDetails.room.roomTypeName}
                                     <div style={{ fontSize: '16px', color: '#7e8d9f' }}>số phòng: {selectedBookingRoomDetails.room.roomNumber}</div>

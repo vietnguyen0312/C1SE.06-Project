@@ -98,8 +98,6 @@ const Checkout = () => {
                     const updatePromises = bookingRoomIds.map(bookingRoomId =>
                         axios.put(`/booking_room/${bookingRoomId}`, { status: 'đã thanh toán' })
                     );
-
-
                     const updateResponses = await Promise.all(updatePromises);
                     const detailsRes = await axios.get(`/booking_room_details/byBookingRoom/${id}`);
 
@@ -108,6 +106,10 @@ const Checkout = () => {
                         billDetails: detailsRes.result
                     });
                 }
+            }
+            if (category === 'v') {
+                const getBill = await axios.get(`/booking_room_details/byBookingRoom/${id}`);
+                setBillData({ billInfo: getBill.result[0].value[0].bookingRoom });
             }
         };
         fetchBillData();
@@ -120,25 +122,22 @@ const Checkout = () => {
     return (
         <Container>
             {checkCategory === 't' ? (
+                Ticket1.map(ticket => (
+                    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }} key={ticket.id}>
+                        <Title className='Allison'>Checkout for room</Title>
+                        <OrderContainer>
+                            <SectionTitle>Thông tin phòng</SectionTitle>
+                            <InfoText>Phòng số: {ticket.RoomNumber}</InfoText>
+                            <InfoText>Ngày bắt đầu: {ticket.Startday}</InfoText>
+                            <InfoText>Ngày kết thúc: {ticket.EndDay}</InfoText>
+                            <InfoText>Tổng tiền: {ticket.price.toLocaleString()} VNĐ</InfoText>
+                            <InfoText>Trạng thái: <Status>{ticket.status}</Status></InfoText>
+                        </OrderContainer>
+                        <ButtonCPN text="Quay lại trang chủ" />
+                    </div>
+                ))
+            ) : checkCategory === 'r' ? (
                 <>
-                    {Ticket1.map(ticket => (
-                        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }} key={ticket.id}>
-                            <Title className='Allison'>Checkout for room</Title>
-                            <OrderContainer>
-                                <SectionTitle>Thông tin phòng</SectionTitle>
-                                <InfoText>Phòng số: {ticket.RoomNumber}</InfoText>
-                                <InfoText>Ngày bắt đầu: {ticket.Startday}</InfoText>
-                                <InfoText>Ngày kết thúc: {ticket.EndDay}</InfoText>
-                                <InfoText>Tổng tiền: {ticket.price.toLocaleString()} VNĐ</InfoText>
-                                <InfoText>Trạng thái: <Status>{ticket.status}</Status></InfoText>
-                            </OrderContainer>
-                            <ButtonCPN text="Quay lại trang chủ" />
-                        </div>
-                    ))}
-                </>
-            ) : (
-                <>
-
                     <Title className='Allison'>Checkout for room</Title>
                     <OrderContainer>
                         <SectionTitle>Thông tin đơn hàng</SectionTitle>
@@ -166,10 +165,25 @@ const Checkout = () => {
                             </div>
                         )}
                     </OrderContainer>
-                    <ButtonCPN text="Quay lại trang chủ" />
+                    <ButtonCPN text="Quay lại trang chủ" onClick={() => { window.location.href = '/hotels'; }} />
                 </>
-            )}
-        </Container>
+            ) : checkCategory === 'v' ? (
+                <>
+                    <Title className='Allison'>Checkout for room</Title>
+                    <OrderContainer>
+                        <div>
+                            <SectionTitle>Thông tin đơn hàng</SectionTitle>
+                            <InfoText>Mã đơn hàng: {billData.billInfo?.id}</InfoText>
+                            <InfoText>Ngày đặt: {formatDate(billData.billInfo?.datePay)}</InfoText>
+                            <InfoText>Tổng tiền: {billData.billInfo?.total.toLocaleString()} VNĐ</InfoText>
+                            <InfoText>Trạng thái: <Status>{billData.billInfo?.status}</Status> </InfoText>
+                        </div>
+                    </OrderContainer>
+                    <ButtonCPN text="Quay lại trang chủ" onClick={() => { window.location.href = '/manager/bookings'; }} />
+                </>
+            ) : null
+            }
+        </Container >
     );
 };
 
