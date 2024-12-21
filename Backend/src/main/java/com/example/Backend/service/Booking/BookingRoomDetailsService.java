@@ -1,5 +1,6 @@
 package com.example.Backend.service.Booking;
 
+import com.example.Backend.dto.request.Booking.BookingRoomDeTailsUpdateRequest;
 import com.example.Backend.dto.request.Booking.BookingRoomDetailsCreationRequest;
 import com.example.Backend.dto.response.Booking.BookingRoomDetailsResponse;
 import com.example.Backend.dto.response.Booking.BookingRoomResponse;
@@ -111,38 +112,24 @@ public class BookingRoomDetailsService {
                         .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
                         .toList();
         }
+        @PreAuthorize("hasRole('MANAGER')")
+        public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDeTailsUpdateRequest request) {
 
-        @PostAuthorize("returnObject.bookingRoom.user.email == authentication.name or hasRole('EMPLOYEE')")
-        public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDetailsCreationRequest request) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
 
-                Room room = roomRepository.findById(request.getRoomId())
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-                BookingRoom bookingRoom = bookingRoomRepository.findById(request.getBookingId())
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-
-                bookingRoomDetails.setRoom(room);
-                bookingRoomDetails.setBookingRoom(bookingRoom);
-                bookingRoomDetails.setPrice(request.getPrice());
-
-                if (request.getCheckIned() != null) {
-                        bookingRoomDetails.setCheckIned(request.getCheckIned());
-                }
-
-                if (request.getCheckOuted() != null) {
-                        bookingRoomDetails.setCheckOuted(request.getCheckOuted());
-                }
-                if(request.getStatus() != null){
-                        bookingRoomDetails.setStatus(request.getStatus());
-                }
+                
+                bookingRoomDetails.setCheckIned(request.getCheckIned());
+                bookingRoomDetails.setCheckOuted(request.getCheckOuted());
 
                 BookingRoomDetails updatedBookingRoomDetails = bookingRoomDetailsRepository.save(bookingRoomDetails);
+
                 return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(updatedBookingRoomDetails);
         }
 
 
-//        @PreAuthorize("hasRole('MANAGER')")
+
+        //        @PreAuthorize("hasRole('MANAGER')")
         public List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> getBookingRoomDetailsByBookingRoom(String bookingRoomId) {
                 List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetails>>> bookingRoomDetailsMap = new LinkedList<>();
 
@@ -355,5 +342,11 @@ public class BookingRoomDetailsService {
         public List<BookingRoomDetails> getBookingRoomDetailsByBookingRoomStaff(String bookingRoomId) {
                 return bookingRoomDetailsRepository.findByBookingRoom_id(bookingRoomId);
         }
+
+        @PreAuthorize("hasRole('MANAGER')")
+        public List<BookingRoomDetails> getBookingRoomDetailsByBookingRoomStaff1(String phoneNumber) {
+                return bookingRoomDetailsRepository.findByBookingRoom_User_phoneNumber(phoneNumber);
+        }
+
 
 }

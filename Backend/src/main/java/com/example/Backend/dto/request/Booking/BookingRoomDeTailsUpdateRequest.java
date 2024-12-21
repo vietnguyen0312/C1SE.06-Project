@@ -16,9 +16,4 @@ public class BookingRoomDeTailsUpdateRequest {
 
     Instant checkOuted;
 
-
-    public boolean isValid() {
-        // Kiểm tra chỉ một trong hai giá trị khác null
-        return (checkIned == null) != (checkOuted == null);
-    }
 }

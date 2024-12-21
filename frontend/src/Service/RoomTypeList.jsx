@@ -127,7 +127,7 @@ const InfoText = styled.p`
 `;
 
 const BannerSectionHotels = styled.section`
-  background-image: url('/img/hotels/headerHotel.jpg');
+  background-image: url('https://res.cloudinary.com/dgff7kkuu/image/upload/v1733643418/headerHotel_imr71k.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -467,8 +467,6 @@ class RoomTypeList extends Component {
         tempReview: rate.comment,
         selectedRateRoom: rate,
       });
-    } else {
-      console.error("Error: rate or rate.bookingRoom is undefined");
     }
   };
 
@@ -579,7 +577,7 @@ class RoomTypeList extends Component {
           <InfoContainer>
             <InfoRow>
               <InfoLeft>
-                <InfoImage src="/img/hotels/h2.jpg" alt="About Us" />
+                <InfoImage src="https://res.cloudinary.com/dgff7kkuu/image/upload/v1733643419/h2_kair7g.jpg" alt="About Us" />
               </InfoLeft>
               <InfoRight>
                 <h1>Chào mừng đến với <br />Healing Ecotourism</h1>
@@ -699,7 +697,7 @@ class RoomTypeList extends Component {
                             <div key={index} style={{ marginBottom: '30px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
                               <RatingItem>
                                 <div>
-                                  <RatingImage src={`/img/user/${rating.user.avatar}`} />
+                                  <RatingImage src={rating.user.avatar} />
                                 </div>
                                 <RatingContent>
                                   <RatingAuthor>{rating.user.username}</RatingAuthor>
@@ -757,7 +755,7 @@ class RoomTypeList extends Component {
           </Container>
         </TypeRoom>
         <ContainerSlider>
-          <SliderCpn arrImages={['/img/hotels/slider/slider-1.jpg', '/img/hotels/slider/slider-2.jpg', '/img/hotels/slider/slider-3.jpg', '/img/hotels/slider/slider-4.jpg']} />
+          <SliderCpn arrImages={['https://res.cloudinary.com/dgff7kkuu/image/upload/v1733643418/slider-1_zhvvqa.jpg', 'https://res.cloudinary.com/dgff7kkuu/image/upload/v1733643419/slider-2_ktolzm.jpg', 'https://res.cloudinary.com/dgff7kkuu/image/upload/v1733643419/slider-3_iu7asr.jpg', 'https://res.cloudinary.com/dgff7kkuu/image/upload/v1733643419/slider-4_u3cqsy.jpg']} />
         </ContainerSlider>
 
         <ModalWrapper show={showModal} onHide={this.handleCloseModal} centered>

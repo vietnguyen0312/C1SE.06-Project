@@ -1,5 +1,6 @@
 package com.example.Backend.controller;
 
+import com.example.Backend.dto.request.Booking.BookingRoomDeTailsUpdateRequest;
 import com.example.Backend.dto.request.Booking.BookingRoomDetailsCreationRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Booking.BookingRoomDetailsResponse;
@@ -39,7 +40,7 @@ public class BookingRoomDetailsController {
     // Cập nhật BookingRoomDetails theo ID (giả sử có update method)
     @PutMapping("/{id}")
     public ApiResponse<BookingRoomDetailsResponse> git(@PathVariable String id,
-                                                       @RequestBody @Valid BookingRoomDetailsCreationRequest request) {
+                                                       @RequestBody @Valid BookingRoomDeTailsUpdateRequest request) {
         BookingRoomDetailsResponse bookingRoomDetailsResponse = bookingRoomDetailsService.updateBookingRoomDetails(id,
                 request);
         return ApiResponse.<BookingRoomDetailsResponse>builder()
@@ -126,6 +127,15 @@ public class BookingRoomDetailsController {
     public ApiResponse<List<BookingRoomDetails>> getActiveBookingRoomDetailsByBookingRoomIdByStaff(
             @PathVariable String bookingRoomId) {
         List<BookingRoomDetails> activeBookingRoomDetails = bookingRoomDetailsService.getBookingRoomDetailsByBookingRoomStaff(bookingRoomId);
+        return ApiResponse.<List<BookingRoomDetails>>builder()
+                .result(activeBookingRoomDetails)
+                .build();
+    }
+
+    @GetMapping("/byBookingRoom/byStaff1/{phoneNumber}")
+    public ApiResponse<List<BookingRoomDetails>> getActiveBookingRoomDetailsByBookingRoomIdByStaff1(
+            @PathVariable String phoneNumber) {
+        List<BookingRoomDetails> activeBookingRoomDetails = bookingRoomDetailsService.getBookingRoomDetailsByBookingRoomStaff1(phoneNumber);
         return ApiResponse.<List<BookingRoomDetails>>builder()
                 .result(activeBookingRoomDetails)
                 .build();
