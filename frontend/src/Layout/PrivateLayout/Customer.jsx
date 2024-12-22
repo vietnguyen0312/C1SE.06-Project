@@ -18,9 +18,6 @@ const CustomerContainer = styled.div`
   background-color: #f5f5f5;
 `;
 
-const handleDelete = (record) => {
-  console.log("Delete user:", record);
-};
 const FormContainer = styled.div`
     margin-bottom: 20px;
     background-color: #ffffff;
@@ -71,19 +68,43 @@ const Customer = () => {
       <Spin size="large" style={{ display: "block", margin: "50px auto" }} />
     );
   }
+  const updateUserStatus = async (id, status, userData) => {
+    const response = await axios.put(`/users/${id}`, {
+      ...userData,
+      status: status,
+    });
+  };
 
+  const handleBanUser = (record) => {
+    Modal.confirm({
+      title: "Xác nhận",
+      content: "Cấm người dùng này không?",
+      onOk: async () => {
+        await updateUserStatus(record.id, "BAN", record);
+        fetchData(pagination.current, pagination.pageSize);
+      },
+      okButtonProps: {
+        style: { backgroundColor: '#f8b600', borderColor: '#f8b600' },
+      },
+    });
+  };
+  
   const columnsCustomer = [
     {
       title: "ID",
       dataIndex: "id",
       key: "id",
-      render: (id) => `${id.slice(0, 6)}...`,
+      render: (id, record) => (
+        <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+          {id.slice(0, 6)}...
+        </span>
+      ),
     },
     {
       title: "Thông tin khách hàng",
       key: "userInfo",
       render: (record) => (
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", opacity: record.status === "BAN" ? 0.5 : 1 }}>
           <img
             src={record.avatar}
             alt="Avatar"
@@ -93,34 +114,70 @@ const Customer = () => {
         </div>
       ),
     },
-    { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Email", 
+      render: (record) => (
+        <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+          {record.email}
+        </span>
+      ),
+    },
     {
       title: "Mật khẩu",
       dataIndex: "password",
-      key: "password",
       render: () => "*****",
     },
-    { title: "Số điện thoại", dataIndex: "phoneNumber", key: "phoneNumber" },
-    { title: "Giới tính", dataIndex: "gender", key: "gender" },
+    { title: "Số điện thoại", 
+      render: (record) => (
+        <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+          {record.phoneNumber || "N/A"}
+        </span>
+      ),
+    },
+    { title: "Giới tính", 
+      render: (record) => (
+        <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+          {record.gender || "N/A"}
+        </span>
+      ),
+    },
     {
       title: "Loại khách hàng",
       dataIndex: "customerType",
       key: "customerType",
-      render: (customerType) =>
-        Array.isArray(customerType)
-          ? customerType.map((type) => type.name).join(", ")
-          : customerType?.name || "N/A",
+      render: (customerType, record) => (
+        <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+          {Array.isArray(customerType)
+            ? customerType.map((type) => type.name).join(", ")
+            : customerType?.name || "N/A"}
+        </span>
+      ),
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "status",
+      render: (status, record) => (
+        <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+          {status === "BAN" ? "Bị cấm " : "Đang hoạt động"}
+        </span>
+      ),
     },
     {
       title: "Action",
-      dataIndex: "action",
       key: "action",
       render: (_, record) => (
         <Popover
           content={
             <div>
               <PopoverItem onClick={() => showModal(record)}>Edit</PopoverItem>
-              <PopoverItem onClick={() => handleDelete(record)}>Delete</PopoverItem>
+              <PopoverItem
+                  onClick={() => handleBanUser(record)}
+                  style={{
+                    pointerEvents: record.status === "BAN" ? "none" : "auto",
+                    opacity: record.status === "BAN" ? 0.5 : 1,
+                  }}
+                >
+                  Set ban
+            </PopoverItem>
             </div>
           }
           trigger="click"
@@ -176,6 +233,12 @@ const Customer = () => {
                   <Input placeholder="Nhập email" />
                   </Form.Item>
                   <Form.Item
+                      label="Trạng thái"
+                      name="status"
+                  >
+                  <Input placeholder="Nhập trạng thái" />
+                  </Form.Item>
+                  <Form.Item
                       label="Số điện thoại"
                       name="phoneNumber"
                   >
@@ -205,3 +268,4 @@ const Customer = () => {
 };
 
 export default Customer;
+
