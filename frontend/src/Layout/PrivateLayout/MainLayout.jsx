@@ -11,7 +11,7 @@ const Left = styled.div`
 
 const Right = styled.div`
   width: 120%;
-  height: 100vh;
+  height: auto;
   background-color: #f5f5f5;
 `;
 
