@@ -2,12 +2,9 @@ package com.example.Backend.service.Blog;
 
 import com.example.Backend.dto.request.Blog.BlogImagesCreateRequest;
 import com.example.Backend.dto.response.Blog.BlogImagesResponse;
-import com.example.Backend.dto.response.Blog.BlogResponse;
-import com.example.Backend.entity.Blog.Blog;
 import com.example.Backend.entity.Blog.BlogImages;
 import com.example.Backend.enums.ErrorCode;
 import com.example.Backend.exception.AppException;
-import com.example.Backend.exception.GlobalExceptionHandler;
 import com.example.Backend.mapper.Blog.BlogImagesMapper;
 import com.example.Backend.repository.Blog.BlogRepository;
 import com.example.Backend.repository.Blog.BlogImagesRepository;
@@ -29,15 +26,15 @@ public class BlogImagesService {
     BlogImagesMapper blogImagesMapper;
 
     public BlogImagesResponse createBlogImages(BlogImagesCreateRequest request) {
-           BlogImages blogImages = blogImagesMapper.toBlogImages(request);
+        BlogImages blogImages = blogImagesMapper.toBlogImages(request);
 
-           blogImages.setBlog(blogRepository.findById(request.getBlogId()).orElse(null));
+        blogImages.setBlog(blogRepository.findById(request.getBlogId()).orElse(null));
 
-           if(blogImagesRepository.existsByImage(blogImages.getImage())) {
-               throw new AppException(ErrorCode.EXISTED);
-           }
+        if(blogImagesRepository.existsByImage(blogImages.getImage())) {
+            throw new AppException(ErrorCode.EXISTED);
+        }
 
-           return blogImagesMapper.toBlogImagesResponse(blogImagesRepository.save(blogImages));
+        return blogImagesMapper.toBlogImagesResponse(blogImagesRepository.save(blogImages));
     }
 
     public List<BlogImagesResponse> getBlogImagesByBlog(String blogId) {
@@ -59,5 +56,4 @@ public class BlogImagesService {
     public void deleteBlogImages(String blogID) {
         blogImagesRepository.deleteById(blogID);
     }
-
 }
