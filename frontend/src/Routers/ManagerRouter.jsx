@@ -13,7 +13,7 @@ import Service from "../Layout/PrivateLayout/Service";
 import Manager from "../Layout/PrivateLayout/Manager";
 const ManagerRouter = [
     {
-//         element: <ProtectedRoute role='MANAGER' />,
+        element: <ProtectedRoute role='MANAGER' />,
         children: [
             {
                 path: "/manager",

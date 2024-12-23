@@ -342,7 +342,7 @@ export class ServiceList extends Component {
                     {this.state.services.map(service => (
                         <div className="col-md-4 ftco-animate container" key={service.id}>
                             <div className="project-wrap">
-                                <a className="img" style={{ backgroundImage: `url(/img/service/${service.image})` }}></a>
+                                <a className="img" style={{ backgroundImage: `url(${service.image})` }}></a>
                                 <div className="text p-4">
                                     <h3>
                                         <button
@@ -382,7 +382,7 @@ export class ServiceList extends Component {
                                         </div>
                                         <div className="mb-3 text-center">
                                             <ServiceImage
-                                                src={`/img/service/${this.state.selectedService.service.image}`}
+                                                src={`${this.state.selectedService.service.image}`}
                                                 alt="Service Image"
                                                 className="img-fluid"
                                             />
@@ -440,7 +440,7 @@ export class ServiceList extends Component {
                                                                 <div key={index} style={{ marginBottom: '30px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
                                                                     <RatingItem>
                                                                         <div>
-                                                                            <RatingImage src={`/img/user/${rating.user.avatar}`} />
+                                                                            <RatingImage src={`${rating.user.avatar}`} />
                                                                         </div>
                                                                         <RatingContent>
                                                                             <RatingAuthor>{rating.user.username}</RatingAuthor>
