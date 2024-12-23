@@ -48,10 +48,22 @@ const UserInfo = () => {
                                 Thông tin cá nhân
                             </NavMenuLink>
                         </li>
-                        <li>
-                            <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/customer/historyTicketBill">
+                        <li className="dropdown-submenu" onMouseEnter={() => setShowSubmenu(true)} onMouseLeave={() => setShowSubmenu(false)}>
+                            <NavMenuLink style={{ color: 'black' }} className="dropdown-item dropdown-toggle">
                                 Lịch sử giao dịch
                             </NavMenuLink>
+                            <ul className={`dropdown-menu ${showSubmenu ? 'show' : ''}`} style={{ position: 'absolute', left: '100%', top: '0' }}>
+                                <li>
+                                    <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/customer/historyBookingRoom">
+                                        Lịch sử phòng
+                                    </NavMenuLink>
+                                </li>
+                                <li>
+                                    <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="/customer/historyTicketBill">
+                                        Lịch sử vé
+                                    </NavMenuLink>
+                                </li>
+                            </ul>
                         </li>
                         <li>
                             <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href="" onClick={handleLogout}>

@@ -119,7 +119,7 @@ const PopularDestinations = () => {
         </TitleArea>
         <ImageGame>
           <ImageGame1>
-            <Image src="/img/service/xichlo1.jpg" />
+            <Image src="/img/xichlo1.jpg" />
             <Content>Di Chuyển</Content>
           </ImageGame1>
           <ImageGame2>

@@ -93,6 +93,7 @@ const Checkout = () => {
                         billInfo: res.result,
                         billDetails: detailsRes.result
                     });
+                    console.log(res.result, detailsRes.result);
                 } else if (category === 'r') {
                     const bookingRoomIds = orderInfo.slice(1).split('%2C');
                     const updatePromises = bookingRoomIds.map(bookingRoomId =>
@@ -100,7 +101,6 @@ const Checkout = () => {
                     );
                     const updateResponses = await Promise.all(updatePromises);
                     const detailsRes = await axios.get(`/booking_room_details/byBookingRoom/${id}`);
-
                     setBillData({
                         billInfo: updateResponses.map(res => res.result),
                         billDetails: detailsRes.result
@@ -115,30 +115,22 @@ const Checkout = () => {
         fetchBillData();
     }, [orderInfo, vnp_ResponseCode]);
 
-    const Ticket1 = [
-        { RoomNumber: 1, Startday: '10/2/2024', EndDay: '12/2/2024', price: 10000, status: 'Đã thanh toán' }
-    ];
-
     return (
         <Container>
+            <Title className='Allison'>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi</Title>
             {checkCategory === 't' ? (
-                Ticket1.map(ticket => (
-                    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }} key={ticket.id}>
-                        <Title className='Allison'>Checkout for room</Title>
-                        <OrderContainer>
-                            <SectionTitle>Thông tin phòng</SectionTitle>
-                            <InfoText>Phòng số: {ticket.RoomNumber}</InfoText>
-                            <InfoText>Ngày bắt đầu: {ticket.Startday}</InfoText>
-                            <InfoText>Ngày kết thúc: {ticket.EndDay}</InfoText>
-                            <InfoText>Tổng tiền: {ticket.price.toLocaleString()} VNĐ</InfoText>
-                            <InfoText>Trạng thái: <Status>{ticket.status}</Status></InfoText>
+                <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }} key={billData?.billInfo?.id}>
+                    <OrderContainer>
+                        <SectionTitle>Thông tin đơn hàng</SectionTitle>
+                            <InfoText>Loại dịch vụ: {billData?.billDetails?.map(detail => detail.key.name).join(', ')}</InfoText>
+                            <InfoText>Được tạo vào: {formatDate(billData?.billInfo?.dateCreated)}</InfoText>
+                            <InfoText>Tổng tiền: {billData?.billInfo?.total.toLocaleString()} VNĐ</InfoText>
+                            <InfoText>Trạng thái: <Status>{billData?.billInfo?.status}</Status></InfoText>
                         </OrderContainer>
-                        <ButtonCPN text="Quay lại trang chủ" />
-                    </div>
-                ))
+                        <ButtonCPN text="Quay lại trang chủ" onClick={() => { window.location.href = '/'; }} />
+                </div>
             ) : checkCategory === 'r' ? (
                 <>
-                    <Title className='Allison'>Checkout for room</Title>
                     <OrderContainer>
                         <SectionTitle>Thông tin đơn hàng</SectionTitle>
                         {Array.isArray(billData.billInfo) ? (
@@ -169,7 +161,6 @@ const Checkout = () => {
                 </>
             ) : checkCategory === 'v' ? (
                 <>
-                    <Title className='Allison'>Checkout for room</Title>
                     <OrderContainer>
                         <div>
                             <SectionTitle>Thông tin đơn hàng</SectionTitle>

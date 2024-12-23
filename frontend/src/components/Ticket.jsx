@@ -315,7 +315,7 @@ const Ticket = ({ style }) => {
         return `${username.charAt(0)}*****@gmail.com`;
     }
 
-    const handlePayment = async () => {
+    const handlePaymentOnline = async () => {
         const total = cartItems.reduce((acc, cartItem) => acc + cartItem.value.reduce((acc, ticketBooking) => acc + ticketBooking.total, 0), 0);
 
         let bill;
@@ -352,7 +352,7 @@ const Ticket = ({ style }) => {
            orderInfo: `t${bill.result.id}`
          } 
        });
-    //    window.location.href = paymentUrl.result;
+       window.location.href = paymentUrl.result;
     }
     return (
         <>
@@ -380,7 +380,7 @@ const Ticket = ({ style }) => {
                     </SearchContainer>
 
                     <ContainerTicket>
-                        {isEmployee == true && (
+                        {isEmployee === true && (
                             <>
                                 <div style={{ marginTop: '20px' }}>
                                     <div
@@ -470,7 +470,6 @@ const Ticket = ({ style }) => {
                                 <ContentTicket1 style={{ textAlign: 'center', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 </ContentTicket1>
                             </div>
-
                         )}
                         <SelectTypeService>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

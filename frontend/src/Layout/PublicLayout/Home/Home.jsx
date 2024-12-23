@@ -41,7 +41,6 @@ function Home() {
       <PopularDestinations />
       <BookNow />
       <OtherIssues />
-      <TestimonialArea />
       {/* <BlogArea /> */}
     </>
   );

@@ -138,13 +138,6 @@ const Header = () => {
             </SidebarHeader>
           </HeaderLeftContent>
           <HeaderRightContent>
-            <Flag
-              src="/img/vietnam.png"
-              alt="Flag"
-              style={{ margin: "10px" }}
-            />
-            <AppstoreOutlined style={{ fontSize: "24px", margin: "10px" }} />
-            <BellOutlined style={{ fontSize: "24px", margin: "10px" }} />
             <Dropdown
               overlay={UserMenu}
               trigger={["click"]}

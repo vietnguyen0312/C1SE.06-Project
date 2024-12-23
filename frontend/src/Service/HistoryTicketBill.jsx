@@ -334,7 +334,7 @@ const HistoryTicketBill = () => {
                                       }}
                                     >
                                       <img
-                                        src={`/img/service/${bill.key.image}`}
+                                        src={`${bill.key.image}`}
                                         alt={bill.key.name}
                                         style={{
                                           width: "50px",
@@ -502,7 +502,7 @@ const HistoryTicketBill = () => {
                 }}
               >
                 <img
-                  src={`/img/service/${selectedService.key.image}`}
+                  src={`${selectedService.key.image}`}
                   alt={selectedService.key.name}
                   style={{
                     width: "150px",

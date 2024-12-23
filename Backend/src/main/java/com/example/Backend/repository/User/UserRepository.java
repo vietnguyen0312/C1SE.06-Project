@@ -30,4 +30,13 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT u FROM User u WHERE SIZE(u.roles) = :priorityRole")
     Page<User> findByRoles_Size(@Param("priorityRole") int priorityRole, Pageable pageable);
 
+    @Query("SELECT u FROM User u " +
+            "WHERE (:search IS NULL OR u.phoneNumber LIKE %:search%) " +
+            "AND EXISTS (SELECT r FROM u.roles r WHERE r.name = 'CUSTOMER')")
+    List<User> findBySearchAndRoleCustomerByPhone(@Param("search") String search);
+
+    @Query("SELECT u FROM User u " +
+            "WHERE (:search IS NULL OR u.email LIKE %:search%) " +
+            "AND EXISTS (SELECT r FROM u.roles r WHERE r.name = 'CUSTOMER')")
+    List<User> findBySearchAndRoleCustomerByEmail(@Param("search") String search);
 }

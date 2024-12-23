@@ -12,6 +12,7 @@ import moment from 'moment-timezone';
 import { toast } from 'react-toastify';
 import { ClipLoader } from 'react-spinners';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import debounce from 'lodash/debounce';
 
 const Overlay = styled.div`
   position: absolute;
@@ -227,6 +228,58 @@ const DeleteIcon = styled.span`
     }
 `;
 
+
+const SearchDropdown = styled.div`
+  position: absolute;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  width: 200px;
+  margin-left: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 4px;
+`;
+
+const SearchContainer = styled.div`
+  background-color: #fff;
+  border-radius: 10px;
+  margin-right: 10px;
+  user-select: none;
+  width: 28%;
+`;
+
+const DropdownItem = styled.div`
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  &:hover {
+    background-color: #f0f0f0; 
+  }
+`;
+
+
+const ServiceImg = styled.img`
+  width: 200px;
+  height: 200px;
+  border-radius: 10px;
+  transition: 0.5s;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
+const ServiceName = styled.div`
+`;
+
+const ServiceType = styled.div`
+  color: #bebebe;
+`;
+
+
 const RoomImage = ({ imageUrl, name, onClick, isSelected }) => {
     return (
         <RoomImageContainer onClick={onClick} isSelected={isSelected}>
@@ -268,7 +321,8 @@ class BookingRoom extends Component {
             emailCustomer: null,
             showModal: false,
             payment: null,
-
+            filteredBookingRoomByPhone: [],
+            filteredBookingRoomByEmail: [],
         };
         this.lastPostElementRef = createRef();
         this.tempStartDate = null; // Biến tạm lưu giá trị startDate
@@ -952,13 +1006,20 @@ class BookingRoom extends Component {
 
 
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps, prevState) {
+        // Merge logic from both componentDidUpdate methods
+
+        // Check if searchTerm has changed
+        if (prevState.searchTerm !== this.state.searchTerm) {
+            this.handleSearch(this.state.searchTerm); // Call handleSearch when searchTerm changes
+        }
+        if (prevState.searchEmail !== this.state.searchEmail) {
+            this.handleSearchEmail(this.state.searchEmail); // Call handleSearch when searchTerm changes
+        }
+
+        // Check if lastPostElementRef is available and set up observer
         if (this.lastPostElementRef.current) {
-            // console.log("Phần tử cuối cùng sau khi render:", this.lastPostElementRef.current);
-            // console.log(this.startDate);
-            this.setupObserver()
-        } else {
-            // console.log("Phần tử cuối cùng hiện không tồn tại hoặc chưa được gán ref!");
+            this.setupObserver();
         }
     }
 
@@ -1009,6 +1070,37 @@ class BookingRoom extends Component {
             }
         );
     }
+
+    handleSearch = debounce(async (searchValue) => {
+        console.log(searchValue);
+        if (searchValue === '') {
+            this.setState({ filteredBookingRoomByPhone: [] }); // Reset lại filteredTickets nếu searchValue trống
+        } else {
+            try {
+                const response = await axios.get('/users/booking/byPhone', { params: { search: searchValue.toLowerCase() } });
+                this.setState({ filteredBookingRoomByPhone: response.result }); // Giả sử response.data.result chứa kết quả
+                console.log(response.result);
+            } catch (error) {
+                console.error('Error fetching tickets:', error);
+            }
+        }
+    }, 700);
+
+    handleSearchEmail = debounce(async (searchValue) => {
+        console.log(searchValue);
+        if (searchValue === '') {
+            this.setState({ filteredBookingRoomByEmail: [] }); // Reset lại filteredTickets nếu searchValue trống
+        } else {
+            try {
+                const response = await axios.get('/users/booking/byEmail', { params: { search: searchValue.toLowerCase() } });
+                this.setState({ filteredBookingRoomByEmail: response.result }); // Giả sử response.data.result chứa kết quả
+                console.log(response.result);
+            } catch (error) {
+                console.error('Error fetching tickets:', error);
+            }
+        }
+    }, 700);
+
 
 
     render() {
@@ -1064,28 +1156,12 @@ class BookingRoom extends Component {
                                         backgroundColor: '#fff',
                                     }}
                                 >
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
-                                            Họ và Tên:
-                                        </label>
-                                        <input
-                                            onChange={(e) => this.setState({ nameCustomer: e.target.value })}
-                                            type="text"
-                                            placeholder="Nhập họ và tên"
-                                            style={{
-                                                padding: '8px',
-                                                fontSize: '14px',
-                                                border: '1px solid #ccc',
-                                                borderRadius: '5px',
-                                                minWidth: '150px',
-                                            }}
-                                        />
-                                    </div>
+
                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                                         <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
                                             Số điện thoại:
                                         </label>
-                                        <input
+                                        {/* <input
                                             onChange={(e) => this.setState({ phoneCustomer: e.target.value })}
                                             type="text"
                                             placeholder="Nhập số điện thoại"
@@ -1096,17 +1172,91 @@ class BookingRoom extends Component {
                                                 borderRadius: '5px',
                                                 minWidth: '150px',
                                             }}
-                                        />
+                                        /> */}
+                                        <SearchContainer>
+                                            <input
+                                                onChange={(e) => this.handleSearch(e.target.value)}
+                                                type="text"
+                                                placeholder="Nhập số điện thoại"
+                                                style={{
+                                                    padding: '8px',
+                                                    fontSize: '14px',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '5px',
+                                                    minWidth: '150px',
+                                                }}
+                                            />
+                                            <SearchDropdown>
+                                                {this.state.filteredBookingRoomByPhone.map((item, index) => (
+                                                    <DropdownItem key={index} >
+                                                        {/* <ServiceImg src={item.image} alt={item.name} style={{ width: '60px', height: '60px' }} /> */}
+                                                        <div style={{ marginLeft: '10px' }}>
+                                                            <ServiceName>{item.username}</ServiceName>
+                                                            <ServiceType>{item.email}</ServiceType>
+                                                            <ServiceType>{item.phoneNumber ? item.phoneNumber : 'Không có'}</ServiceType>
+
+                                                        </div>
+                                                    </DropdownItem>
+                                                ))}
+
+                                            </SearchDropdown>
+                                        </SearchContainer>
                                     </div>
 
                                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                                         <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
                                             Email:
                                         </label>
-                                        <input
+                                        {/* <input
                                             onChange={(e) => this.setState({ emailCustomer: e.target.value })}
                                             type="email"
                                             placeholder="Nhập email"
+                                            style={{
+                                                padding: '8px',
+                                                fontSize: '14px',
+                                                border: '1px solid #ccc',
+                                                borderRadius: '5px',
+                                                minWidth: '150px',
+                                            }}
+                                        /> */}
+
+                                        <SearchContainer>
+                                            <input
+                                                onChange={(e) => this.handleSearchEmail(e.target.value)}
+                                                type="text"
+                                                placeholder="Nhập email"
+                                                style={{
+                                                    padding: '8px',
+                                                    fontSize: '14px',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '5px',
+                                                    minWidth: '150px',
+                                                }}
+                                            />
+                                            <SearchDropdown>
+                                                {this.state.filteredBookingRoomByEmail.map((item, index) => (
+                                                    <DropdownItem key={index} >
+                                                        {/* <ServiceImg src={item.image} alt={item.name} style={{ width: '60px', height: '60px' }} /> */}
+                                                        <div style={{ marginLeft: '10px' }}>
+                                                            <ServiceName>{item.username}</ServiceName>
+                                                            <ServiceType>{item.email}</ServiceType>
+                                                            <ServiceType>{item.phoneNumber ? item.phoneNumber : 'Không có'}</ServiceType>
+
+                                                        </div>
+                                                    </DropdownItem>
+                                                ))}
+
+                                            </SearchDropdown>
+                                        </SearchContainer>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                        <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
+                                            Họ và Tên:
+                                        </label>
+                                        <input
+                                            onChange={(e) => this.setState({ nameCustomer: e.target.value })}
+                                            type="text"
+                                            placeholder="Nhập họ và tên"
                                             style={{
                                                 padding: '8px',
                                                 fontSize: '14px',

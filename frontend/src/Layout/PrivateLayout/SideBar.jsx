@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { 
     DashboardOutlined, 
-    RightOutlined, 
     FileTextOutlined, 
     UserOutlined, 
     TeamOutlined, 
@@ -59,68 +59,51 @@ const Sidebar = () => {
     };
     const navigate = useNavigate(); // Khởi tạo useNavigate
 
-    const menuItems = (
-        <>
-            <div><a href="#option1">Option 1</a></div>
-            <div><a href="#option2">Option 2</a></div>
-            <div style={{ color: 'gray' }}>Disabled Option</div>
-        </>
-    );
-
-    const dashboard = (
-        <>
-            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={() => navigate('/manager')}><FileTextOutlined />Report</div>
-        </>
-    );
-
     return (
         <SidebarContainer>
             <SidebarContent>
                 <div style={{ padding: '15px 0', borderBottom: '1px solid #e5e5e5' }} onClick={() => navigate('/manager')}>
                     <Item>
                         <DashboardOutlined />
-                        <div>Dashboard</div>
+                        <div>Trang chủ</div>
                     </Item>
                 </div>
                 <Hotel>
-                    <Content>HOTEL | ROOM</Content>
-                    <Item>
-                        <UserOutlined />
-                        <div>Guest</div>
-                    </Item>
-                    <Item>
-                        <ProfileOutlined />
-                        <div>Guest Details</div>
-                    </Item>
+                    <Content>KHÁCH SẠN | DỊCH VỤ</Content>
                     <Item onClick={() => navigate('/manager/rooms')}>
                         <HomeOutlined />
-                        <div>Rooms</div>
+                        <div>Phòng</div>
                     </Item>
-                    <Item onClick={() => navigate('/manager/bookings')}>
-                        <CalendarOutlined />
-                        <div>Bookings</div>
+                    <Item onClick={() => navigate('/manager/service')}>
+                        <KeyOutlined />
+                        <div>Dịch vụ</div>
                     </Item>
                     <Item>
                         <FileDoneOutlined />
-                        <div>Invoice</div>
+                        <Link style={{textDecoration: "none", color: "inherit"}} to='/manager/blogs'>Blogs</Link>
+                    </Item>
+                    <Item onClick={() => navigate('/manager/bookings')}>
+                        <CalendarOutlined />
+                        <div>Đặt phòng/vé</div>
+                    </Item>
+                    <Item>
+                        <FileDoneOutlined />
+                        <div>Lịch sử giao dịch</div>
                     </Item>
                 </Hotel>
                 <Hotel>
-                    <Content>EMPLOYEE | CUSTOMER</Content>
+                    <Content>KHÁCH HÀNG | NHÂN SỰ</Content>
+                    <Item onClick={() => navigate('/manager/listManager')}>
+                        <TeamOutlined />
+                        <div>Quản lý</div>
+                    </Item>
                     <Item onClick={() => navigate('/manager/employee')}>
                         <TeamOutlined />
-                        <div>Employee</div>
+                        <div>Nhân viên</div>
                     </Item>
                     <Item onClick={() => navigate('/manager/customer')}>
                         <TeamOutlined />
-                        <div>Customer</div>
-                    </Item>
-                </Hotel>
-                <Hotel>
-                    <Content>SERVICE</Content>
-                    <Item onClick={() => navigate('/manager/service')}>
-                        <KeyOutlined />
-                        <div>Service</div>
+                        <div>Khách hàng</div>
                     </Item>
                 </Hotel>
             </SidebarContent>
