@@ -53,7 +53,7 @@ const Employee = () => {
         })            
         SetDsNhanVien(response.result.data)
         setPagination({
-            current: response.result.currentPage,                                                       
+            current: response.result.currentPage,
             pageSize: response.result.pageSize,
             total: response.result.totalElements,
         })
@@ -126,7 +126,7 @@ const Employee = () => {
                     content={
                         <div>
                             <PopoverItem onClick={() => handleEdit(record)}>Edit</PopoverItem>
-                            <PopoverItem onClick={() => handleDelete(record)}>Set ban</PopoverItem>
+                            <PopoverItem onClick={() => handleDelete(record)}>Delete</PopoverItem>
                         </div>
                     } 
                     trigger="click" 

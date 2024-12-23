@@ -16,8 +16,6 @@ import java.util.Set;
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
-    Optional<User> findByEmailOrPhoneNumber(String email, String phoneNumber);
-
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM User u " +

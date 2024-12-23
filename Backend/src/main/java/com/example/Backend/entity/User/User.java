@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.util.StringUtils;
 
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -28,7 +29,7 @@ public class User {
     @Column(length = 255)
     String password;
 
-    @Column(length = 255, unique = true)
+    @Column(length = 50)
     String phoneNumber;
 
     @Column(length = 10)
@@ -53,7 +54,7 @@ public class User {
             status = "Đang hoạt động";
         }
         if (!StringUtils.hasLength(avatar)){
-            avatar = "https://res.cloudinary.com/dgff7kkuu/image/upload/v1734445484/avatar-default.png?fbclid=IwZXh0bgNhZW0CMTAAAR2rsJqGL7u0h760U95I4kcgs-mfJlMCk5W-eWIrvIemyJDRJmiF9iLRm-g_aem_akE3Ike8YqfdihDFOjDI3Q";
+            avatar = "avatar-default.jpg";
         }
     }
 }

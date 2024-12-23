@@ -8,7 +8,6 @@ import debounce from 'lodash/debounce';
 import ButtonCPN from '../components/Button/Button';
 import axios from '../Configuration/AxiosConfig';
 import { CloseOutlined } from '@ant-design/icons';
-import { getRoles } from '../Service/Login';
 
 const TicketContainer = styled.div`
   display: flex;
@@ -194,17 +193,6 @@ const Ticket = ({ style }) => {
     const [selectedService, setSelectedService] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [isUpdateCart, setIsUpdateCart] = useState(true);
-    const [isEmployee, setIsEmployee] = useState(false);
-    const [nameCustomer, setNameCustomer] = useState('');
-    const [phoneCustomer, setPhoneCustomer] = useState('');
-
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        const roles = getRoles(token);
-        console.log(roles);
-        setIsEmployee(roles.includes('EMPLOYEE'));
-        console.log(isEmployee);
-    }, []);
 
     useEffect(() => {
         if (selectedTicket) {
@@ -309,24 +297,9 @@ const Ticket = ({ style }) => {
 
     };
 
-    const formatEmail = (email) => {
-        const emailParts = email.split('@');
-        const username = emailParts[0];
-        return `${username.charAt(0)}*****@gmail.com`;
-    }
-
     const handlePaymentOnline = async () => {
         const total = cartItems.reduce((acc, cartItem) => acc + cartItem.value.reduce((acc, ticketBooking) => acc + ticketBooking.total, 0), 0);
-
-        let bill;
-        if(isEmployee == true && nameCustomer != '' && phoneCustomer != ''){
-            console.log(formatEmail(nameCustomer));
-            const customer = await axios.post('/users', { username: nameCustomer, phoneNumber: phoneCustomer, email: formatEmail(nameCustomer) });
-
-            bill = await axios.post('/bill-ticket', { total: total, user: customer.result});
-        } else {
-            bill = await axios.post('/bill-ticket', { total: total });
-        }
+        const bill = await axios.post('/bill-ticket', { total: total });
 
         cartItems.forEach(cartItem => {
             cartItem.value.forEach(ticketBooking => {
@@ -368,7 +341,7 @@ const Ticket = ({ style }) => {
                             <SearchDropdown>
                                 {filteredTickets.map((ticket, index) => (
                                     <DropdownItem key={index} onClick={() => setSelectedService(ticket.key)}>
-                                        <ServiceImg src={`${ticket.key.image}`} alt={ticket.key.name} style={{ width: '60px', height: '60px' }} />
+                                        <ServiceImg src={`/img/service/${ticket.key.image}`} alt={ticket.key.name} style={{ width: '60px', height: '60px' }} />
                                         <div style={{ marginLeft: '10px' }}>
                                             <ServiceName>{ticket.key.name}</ServiceName>
                                             <ServiceType>{ticket.key.serviceType.name}</ServiceType>
@@ -380,7 +353,7 @@ const Ticket = ({ style }) => {
                     </SearchContainer>
 
                     <ContainerTicket>
-                        {isEmployee === true && (
+                        {isEmployee == true && (
                             <>
                                 <div style={{ marginTop: '20px' }}>
                                     <div
@@ -437,34 +410,33 @@ const Ticket = ({ style }) => {
                         )}
 
                         {selectedTicket && showService ? (
-                            <>
-                                <ServiceContainer data-aos="fade-in">
-                                    <ServiceImg src={`${selectedTicket.key.image}`} />
-                                    <ContentTicket>
-                                        <ServiceName>Tên dịch vụ: {selectedTicket.key.name}</ServiceName>
-                                        <div style={{ display: 'flex', gap: '10px' }}>
-                                            Loại dịch vụ: <ServiceType>{selectedTicket.key.serviceType.name}</ServiceType>
+                            <ServiceContainer data-aos="fade-in">
+                                <ServiceImg src={`/img/service/${selectedTicket.key.image}`} />
+                                <ContentTicket>
+                                    <ServiceName>Tên dịch vụ: {selectedTicket.key.name}</ServiceName>
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        Loại dịch vụ: <ServiceType>{selectedTicket.key.serviceType.name}</ServiceType>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccc', borderRadius: '10px', padding: '10px', }}>
+                                            Giá vé
                                         </div>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ccc', borderRadius: '10px', padding: '10px', }}>
-                                                Giá vé
-                                            </div>
-                                            <div style={{ display: 'table', width: '100%', borderCollapse: 'collapse' }}>
-                                                {selectedTicket.value.map((ticketValue) => (
-                                                    <div key={ticketValue.id} style={{ display: 'table-row', borderBottom: '1px solid #ddd' }}>
-                                                        <div style={{ display: 'table-cell', width: '50%', textAlign: 'right', padding: '8px', whiteSpace: 'nowrap', borderRight: '1px solid #ddd' }}>
-                                                            {ticketValue.ticketType.name}
-                                                        </div>
-                                                        <div style={{ display: 'table-cell', width: '50%', textAlign: 'left', padding: '8px' }}>
-                                                            {ticketValue.price.toLocaleString()} VND
-                                                        </div>
+                                        <div style={{ display: 'table', width: '100%', borderCollapse: 'collapse' }}>
+                                            {selectedTicket.value.map((ticketValue) => (
+                                                <div key={ticketValue.id} style={{ display: 'table-row', borderBottom: '1px solid #ddd' }}>
+                                                    <div style={{ display: 'table-cell', width: '50%', textAlign: 'right', padding: '8px', whiteSpace: 'nowrap', borderRight: '1px solid #ddd' }}>
+                                                        {ticketValue.ticketType.name}
                                                     </div>
-                                                ))}
-                                            </div>
+                                                    <div style={{ display: 'table-cell', width: '50%', textAlign: 'left', padding: '8px' }}>
+                                                        {ticketValue.price.toLocaleString()} VND
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
-                                    </ContentTicket>
-                                </ServiceContainer>
-                            </>
+
+                                    </div>
+                                </ContentTicket>
+                            </ServiceContainer>
                         ) : (
                             <div>
                                 <ContentTicket1 style={{ textAlign: 'center', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -519,7 +491,7 @@ const Ticket = ({ style }) => {
                                     <TicketItem key={cartItem.id}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                             <img
-                                                src={`${cartItem.key.image}`}
+                                                src={`/img/service/${cartItem.key.image}`}
                                                 alt={cartItem.key.name}
                                                 style={{ width: '50px', height: '50px', borderRadius: '5px' }}
                                                 onClick={() => setSelectedService(cartItem.key)}

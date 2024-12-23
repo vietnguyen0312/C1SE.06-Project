@@ -85,7 +85,7 @@ public class BookingRoomService {
 
     @PostAuthorize("#isCustomer or hasRole('MANAGER')")
     public PageResponse<BookingRoomResponse> getBookingRooms(Boolean isCustomer, int page, int size) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "checkInDate");
+        Sort sort = Sort.by(Sort.Direction.DESC, "checkInDate").ascending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
         Page<BookingRoom> pageData;
 

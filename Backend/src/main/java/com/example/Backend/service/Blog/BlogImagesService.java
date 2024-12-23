@@ -59,5 +59,4 @@ public class BlogImagesService {
     public void deleteBlogImages(String blogID) {
         blogImagesRepository.deleteById(blogID);
     }
-
 }

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { 
     DashboardOutlined, 
-    RightOutlined, 
     FileTextOutlined, 
     UserOutlined, 
     TeamOutlined, 
@@ -94,7 +94,11 @@ const Sidebar = () => {
                     </Item>
                     <Item onClick={() => navigate('/manager/bookings')}>
                         <CalendarOutlined />
-                        <div>Đặt phòng/vé</div>
+                        <div>Bookings</div>
+                    </Item>
+                    <Item>
+                        <FileDoneOutlined />
+                        <Link style={{textDecoration: "none", color: "inherit"}} to='/manager/blogs'>Blogs</Link>
                     </Item>
                 </Hotel>
                 <Hotel>

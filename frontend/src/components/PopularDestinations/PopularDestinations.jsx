@@ -114,7 +114,7 @@ const PopularDestinations = () => {
     <Section className="popular-destination-area section-gap" data-aos="fade-up">
       <Container>
         <TitleArea>
-          <Subtitle className='Allison'>Danh sách các dịch vụ</Subtitle>
+          <Subtitle className='Allison'>Services List</Subtitle>
           <Title className='LibreBaskerville'>Trải nghiệm ngay !!</Title>
         </TitleArea>
         <ImageGame>

@@ -38,18 +38,11 @@ public class BillTicketService {
     public BillTicketResponse createBillTicket(BillTicketCreationRequest request) {
         BillTicket billTicket = billTicketMapper.toBillTicket(request);
 
-        User user;
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
 
-        if (request.getUser() == null)
-        {
-            var context = SecurityContextHolder.getContext();
-            String email = context.getAuthentication().getName();
-
-            user = userRepository.findByEmail(email).orElseThrow(
-                    () -> new AppException(ErrorCode.NOT_EXISTED));
-        } else {
-            user = request.getUser();
-        }
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new AppException(ErrorCode.NOT_EXISTED));
 
         billTicket.setUser(user);
 
@@ -67,7 +60,7 @@ public class BillTicketService {
     }
 
     public PageResponse<BillTicketResponse> getBills(int page, int size) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "dateCreated");
+        Sort sort = Sort.by(Sort.Direction.DESC, "dateCreated").ascending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 

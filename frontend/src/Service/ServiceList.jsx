@@ -315,7 +315,7 @@ export class ServiceList extends Component {
     };
 
     closeModal = () => {
-        this.setState({ isModalOpen: false, hasMoreRatings: true, ratingsOfSelectedService: [] });
+        this.setState({ isModalOpen: false, hasMoreRatings: true });
         this.enableScroll();
     }
 
@@ -342,9 +342,7 @@ export class ServiceList extends Component {
                     {this.state.services.map(service => (
                         <div className="col-md-4 ftco-animate container" key={service.id}>
                             <div className="project-wrap">
-                                <a className="img" href={service.image} target="_blank" rel="noopener noreferrer">
-                                    <img src={service.image} alt={service.name} style={{ width: '100%', height: 'auto' }} />
-                                </a>
+                                <a className="img" style={{ backgroundImage: `url(/img/service/${service.image})` }}></a>
                                 <div className="text p-4">
                                     <h3>
                                         <button
@@ -384,7 +382,7 @@ export class ServiceList extends Component {
                                         </div>
                                         <div className="mb-3 text-center">
                                             <ServiceImage
-                                                src={`${this.state.selectedService.service.image}`}
+                                                src={`/img/service/${this.state.selectedService.service.image}`}
                                                 alt="Service Image"
                                                 className="img-fluid"
                                             />
@@ -442,7 +440,7 @@ export class ServiceList extends Component {
                                                                 <div key={index} style={{ marginBottom: '30px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
                                                                     <RatingItem>
                                                                         <div>
-                                                                            <RatingImage src={`${rating.user.avatar}`} />
+                                                                            <RatingImage src={`/img/user/${rating.user.avatar}`} />
                                                                         </div>
                                                                         <RatingContent>
                                                                             <RatingAuthor>{rating.user.username}</RatingAuthor>

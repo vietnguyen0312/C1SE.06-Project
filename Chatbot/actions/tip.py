@@ -86,13 +86,12 @@ class ActionWeatherQuery(Action):
                 humidity
             )
             
-            combined_data = f"Nhiệt độ hiện tại là {temperature}°C, gió với tốc độ {windspeed} km/h. {weather_description}.\n"
+            combined_data = f" </br> Nhiệt độ hiện tại là {temperature}°C, </br>gió với tốc độ {windspeed} km/h</br><b>{weather_description}<b>.\n"
             weather_data_daily = requests.get( API_OPEN_METEO + f"forecast?latitude={latitude}&longitude={longitude}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&current_weather=true")
             weather_data_daily = weather_data_daily.json()  
             
             if 'daily' in weather_data_daily:
-                table = PrettyTable()
-                table.field_names = ["Ngày", "Nhiệt độ Cao nhất (°C)", "Nhiệt độ Thấp nhất (°C)", "Lượng mưa (mm)", "Mô tả"]
+                html_table = """ <style> table { border-collapse: collapse; width: 100%; } th, td { border: 1px solid black; padding: 8px; text-align: left; } th { background-color: #f2f2f2; } </style> <table border="1"> <tr> <th>Ngày</th> <th>Nhiệt độ Cao nhất (°C)</th> <th>Nhiệt độ Thấp nhất (°C)</th> <th>Lượng mưa (mm)</th> <th>Mô tả</th> </tr> """
     
                 for day in weather_data_daily['daily']['time'][:3]:  
                     max_temp = weather_data_daily['daily']['temperature_2m_max'][weather_data_daily['daily']['time'].index(day)]
@@ -100,9 +99,9 @@ class ActionWeatherQuery(Action):
                     precipitation = weather_data_daily['daily']['precipitation_sum'][weather_data_daily['daily']['time'].index(day)]
                     
                     description = analyze_weather(max_temp, precipitation, weather_data['current_weather'].get('cloudcover', 0), humidity)
-                    table.add_row([day, max_temp, min_temp, precipitation, description])
+                    html_table += f""" <tr> <td>{day}</td> <td>{max_temp}</td> <td>{min_temp}</td> <td>{precipitation}</td> <td>{description}</td> </tr> """
                 
-                html_table = table.get_html_string()
+                html_table += "</table>"
                 combined_data += f"<div>{html_table}</div>"
         except requests.exceptions.RequestException as e:
             dispatcher.utter_message(template="utter_error")
@@ -138,7 +137,7 @@ class ActionWeatherQuerySpecificDay(Action):
             humidity = current_weather_response['current_weather'].get('humidity', 0)
 
             description = analyze_weather(max_temp, precipitation, cloud_cover, humidity)
-            return f"Ngày {specific_date}: Nhiệt độ cao nhất {max_temp}°C, thấp nhất {min_temp}°C, lượng mưa {precipitation} mm. {description}"
+            return f"Ngày {specific_date}:</br> Nhiệt độ cao nhất {max_temp}°C</br>Nhiệt độ thấp nhất {min_temp}°C</br>lượng mưa {precipitation} mm.</br><b>{description}<b>"
         else:
             return "Không có dữ liệu thời tiết cho ngày này."
 

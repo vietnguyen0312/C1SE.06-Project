@@ -1,0 +1,18 @@
+version: "3.1"
+nlu:
+- lookup: service_name
+  examples: |
+    - Hoạt động giải trí
+    - Hoạt Động Thư Giản
+    - Không Gian Ẩm Thực
+    - Không Gian Nghỉ Dưỡng
+    - Không Gian Văn Hóa
+    - Phương Tiện Di Chuyển
+    - Dịch Vụ Spa
+    - Dịch Vụ Ăn Uống
+    - Dịch vụ mới
+    - Dịch vụ chăm sóc khách hàng
+    - Dịch vụ khách sạn
+    - Dịch vụ giặc ủi
+    - Dịch vụ vận chuyển
+    - Dịch vụ sửa chữa

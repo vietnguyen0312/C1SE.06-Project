@@ -13,8 +13,6 @@ import java.util.Date;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BillTicketCreationRequest {
-    User user;
-
     @PositiveOrZero(message = "POSITIVE_OR_ZERO")
     double total;
 }
