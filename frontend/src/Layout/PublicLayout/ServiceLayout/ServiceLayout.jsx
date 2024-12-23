@@ -71,17 +71,16 @@ const ServiceLayout = () => {
         <Container>
           <Row>
             <AboutContent>
-              <Title>Services</Title>
+              <Title>Dịch vụ</Title>
               <LinkNav>
-                <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Home</StyledLink>
+                <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Trang chủ</StyledLink>
                 <Arrow data-aos="fade-left" data-aos-delay="200">→</Arrow>
-                <StyledLink to="/services" data-aos="fade-left" data-aos-delay="0">Services</StyledLink>
+                <StyledLink to="/services" data-aos="fade-left" data-aos-delay="0">Dịch vụ</StyledLink>
               </LinkNav>
             </AboutContent>
           </Row>
         </Container>
       </BannerSection2>
-
       <Services />
     </>
   );

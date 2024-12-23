@@ -1,10 +1,12 @@
 package com.example.Backend.controller;
 
+import com.cloudinary.Api;
 import com.example.Backend.dto.request.User.UserChangePasswordRequest;
 import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.PageResponse;
+import com.example.Backend.dto.response.RecentRatingResponse;
 import com.example.Backend.dto.response.User.UserResponse;
 import com.example.Backend.service.User.UserService;
 import jakarta.validation.Valid;
@@ -106,6 +108,13 @@ public class UserController {
         return ApiResponse
                 .<UserResponse>builder()
                 .result(userService.changePassword(id, request))
+                .build();
+    }
+
+    @GetMapping("/recent-rating")
+    ApiResponse<RecentRatingResponse> getRecentRatings() {
+        return ApiResponse.<RecentRatingResponse>builder()
+                .result(userService.recentRating())
                 .build();
     }
 }

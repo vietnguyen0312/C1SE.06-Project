@@ -80,7 +80,7 @@ function Header() {
           <WrapperAICD className={isSticky ? 'sticky' : ''}>
             <Logo>
               <a href="/">
-                <img src="img/logo.png"/>
+                <img src="../img/logo.png"/>
                 <span>Healing</span>
               </a>
             </Logo>
