@@ -1,12 +1,10 @@
 package com.example.Backend.controller;
 
-import com.cloudinary.Api;
 import com.example.Backend.dto.request.User.UserChangePasswordRequest;
 import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.PageResponse;
-import com.example.Backend.dto.response.RecentRatingResponse;
 import com.example.Backend.dto.response.User.UserResponse;
 import com.example.Backend.service.User.UserService;
 import jakarta.validation.Valid;
@@ -98,6 +96,22 @@ public class UserController {
     ApiResponse<RecentRatingResponse> getRecentRatings() {
         return ApiResponse.<RecentRatingResponse>builder()
                 .result(userService.recentRating())
+                .build();
+    }
+
+    @GetMapping("/booking/byPhone")
+    ApiResponse<List<UserResponse>> getUserByPhone( @RequestParam(value = "search", required = false, defaultValue = "") String search) {
+        return ApiResponse
+                .<List<UserResponse>>builder()
+                .result(userService.getUsersBySearch(search))
+                .build();
+    }
+
+    @GetMapping("/booking/byEmail")
+    ApiResponse<List<UserResponse>> getUserByEmail1( @RequestParam(value = "search", required = false, defaultValue = "") String search) {
+        return ApiResponse
+                .<List<UserResponse>>builder()
+                .result(userService.getUsersBySearch1(search))
                 .build();
     }
 }

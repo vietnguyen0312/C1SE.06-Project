@@ -108,84 +108,84 @@ const testimonials = [
     image: "img/user.png",
     text: "Do you want to be even more successful? Learn to love learning and growth.",
     author: "Harriet Maxwell",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 4
   },
   {
     image: "img/user.png",
     text: "A purpose is the eternal condition for success. Every former smoker can tell you how hard it is.",
     author: "Carolyn Craig",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 3
   },
   {
     image: "img/user.png",
     text: "The more effort you put into improving your skills, the bigger the payoff.",
     author: "Dennis Williams",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 5
   },
-  { 
+  {
     image: "img/user.png",
     text: "Success depends on your willingness to keep learning and growing.",
     author: "Sophia Turner",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 5
   },
   {
     image: "img/user.png",
     text: "The more you grow, the more successful you become. Keep pushing your limits.",
     author: "James Smith",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 4
   },
   {
     image: "img/user.png",
     text: "Learn to love learning and growth. The more effort you put, the bigger the payoff.",
     author: "Natalie Brown",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 5
   },
   {
     image: "img/user.png",
     text: "Learn to love learning and growth. The more effort you put, the bigger the payoff.",
     author: "Natalie Brown",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 5
   },
   {
     image: "img/user.png",
     text: "Learn to love learning and growth. The more effort you put, the bigger the payoff.",
     author: "Natalie Brown",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 5
   },
   {
     image: "img/user.png",
     text: "Learn to love learning and growth. The more effort you put, the bigger the payoff.",
     author: "Natalie Brown",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 1
   },
   {
     image: "img/user.png",
     text: "Learn to love learning and growth. The more effort you put, the bigger the payoff.",
     author: "Natalie Brown",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 1
   },
   {
     image: "img/user.png",
     text: "Learn to love learning and growth. The more effort you put, the bigger the payoff.",
     author: "Natalie Brown",
-    Type: 'Khách hàng', 
+    Type: 'Khách hàng',
     rating: 1
   },
 
 ];
 
 const TestimonialArea = () => {
-  const ITEMS_PER_PAGE = 3; 
+  const ITEMS_PER_PAGE = 3;
   const [currentPage, setCurrentPage] = useState(1);
 
   const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
@@ -221,7 +221,7 @@ const TestimonialArea = () => {
                       icon={faStar}
                       color={i < testimonial.rating ? "#ffc107" : "#e4e5e9"}
                       data-aos="fade-left"
-                      data-aos-delay={`${i * 200}`} 
+                      data-aos-delay={`${i * 200}`}
                     />
                   ))}
                 </StarRating>

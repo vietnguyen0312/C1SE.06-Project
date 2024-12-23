@@ -24,7 +24,7 @@ import ServiceTypeKList from '../../../Service/ServiceTypeList.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Thêm dòng này để tích hợp Bootstrap JS
 import IsLogin from '../../../Service/IsLogin.jsx';
-import BlogTypeList from '../../../Service/BlogTypeList.jsx'  
+import BlogTypeList from '../../../Service/BlogTypeList.jsx'
 import { Link } from 'react-router-dom';
 
 
@@ -89,7 +89,7 @@ function Header() {
           <WrapperAICD className={isSticky ? 'sticky' : ''}>
             <Logo>
               <a href="/">
-                <img src="../img/logo.png"/>
+                <img src="../img/logo.png" />
                 <span>Healing</span>
               </a>
             </Logo>
@@ -101,13 +101,13 @@ function Header() {
                 <NavMenuItem><NavMenuLink href="/hotels">Khách sạn</NavMenuLink></NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/contact">Liên hệ</NavMenuLink></NavMenuItem>
                 <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('blog')} onMouseLeave={() => setActiveDropdown(null)}>
-                <NavMenuItem style={{top:"25%", color: 'white',margin:'0 10px'}}>
-                 <Link to="/blogs"  className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'blog'}>
-                   Tin tức
-                 </Link>
-               </NavMenuItem>
+                  <NavMenuItem style={{ top: "25%", color: 'white', margin: '0 10px' }}>
+                    <Link to="/blogs" className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'blog'}>
+                      Tin tức
+                    </Link>
+                  </NavMenuItem>
                   <ul className={`dropdown-menu ${activeDropdown === 'blog' ? 'show' : ''}`} aria-labelledby="blogDropdown">
-                    <BlogTypeList/>
+                    <BlogTypeList />
                   </ul>
                 </NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/ticket">Đặt vé</NavMenuLink></NavMenuItem>
