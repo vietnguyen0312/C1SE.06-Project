@@ -315,7 +315,7 @@ const Ticket = ({ style }) => {
         return `${username.charAt(0)}*****@gmail.com`;
     }
 
-    const handlePaymentOnline = async () => {
+    const handlePayment = async () => {
         const total = cartItems.reduce((acc, cartItem) => acc + cartItem.value.reduce((acc, ticketBooking) => acc + ticketBooking.total, 0), 0);
 
         let bill;

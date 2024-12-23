@@ -99,7 +99,7 @@ const Icon = styled(PhoneOutlined)`
 `
 const BookNow = () => {
   useEffect(() => {
-    AOS.init({ duration: 2000 });
+    AOS.init({ duration: 500 });
   }, []);
 
   return (
@@ -110,7 +110,7 @@ const BookNow = () => {
           <Image src="/img/home/gioiThieu.png" />
           <Content>
             <Icon />
-            <a href='tel:0905040943'>BOOK NOW: <br/>0905040943</a>
+            <a href='tel:0905040943'>BOOK NOW: <br />0905040943</a>
           </Content>
         </ContainerLeft>
         <ContainerRight className='PTSerif'>
@@ -123,7 +123,7 @@ const BookNow = () => {
           <p><CheckIcon />Chất lượng dịch vụ đạt chuẩn cao, được khách hàng đánh giá tích cực</p>
           <ButtonCPN text='Đặt vé ngay' onClick={() => {
             window.location.href = '/ticket';
-          }}/>
+          }} />
         </ContainerRight>
       </Container>
     </Section>

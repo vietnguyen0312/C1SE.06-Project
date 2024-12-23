@@ -7,7 +7,7 @@ import { UserOutlined, CommentOutlined } from "@ant-design/icons";
 import Aos from "aos";
 import "aos/dist/aos.css";
 import axios from "../../Configuration/AxiosConfig";
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 const Section = styled.section`
   padding: 80px 0;
   user-select: none;
@@ -113,7 +113,7 @@ const BlogArea = () => {
     const blogWithImages = await Promise.all(
       blogResponse.result.data.map(async (blog) => {
         const imagesResponse = await axios.get(
-          `/images/findImagesByBlog/${blog.id}`
+          `/blogImage/findImagesByBlog/${blog.id}`
         );
         const commentResponse = await axios.get(
           `/blogComments/byBlog/${blog.id}`
@@ -121,7 +121,7 @@ const BlogArea = () => {
         const commentsCount = commentResponse.result.totalElements;
         return {
           ...blog,
-          images: imagesResponse.result[0],
+          images: imagesResponse.result[0] || null,
           comments: commentsCount,
         };
       })
@@ -133,9 +133,8 @@ const BlogArea = () => {
 
   useEffect(() => {
     fetchBlog();
-    Aos.init({ duration: 1000 });
+    Aos.init({ duration: 2000 });
   }, [currentPage]);
-
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -156,10 +155,10 @@ const BlogArea = () => {
         <BlogGrid>
           {blogPosts.map((post, index) => (
             <BlogPost key={index}>
-              <Link to={`/blogDetail/${post.id}`} style={{ textDecoration: 'none', color: "#f8b600"  }}>
+              <Link to={`/blogDetail/${post.id}`} style={{ textDecoration: 'none', color: "#f8b600" }}>
                 <div style={{ position: "relative" }}>
                   <BlogImage
-                    src={`/img/blog/${post.images.image}`}
+                    src={post.images ? `${post.images.image}` : '/img/default-image.jpg'}
                     alt={post.title}
                   />
                   <BlogDate>{post.createdDate}</BlogDate>
@@ -197,9 +196,8 @@ const BlogArea = () => {
                 padding: "0",
                 backgroundColor:
                   currentPage === index + 1 ? "#f8b600" : "#ffffff",
-                border: `2px solid ${
-                  currentPage === index + 1 ? "#f8b600" : "#cccccc"
-                }`,
+                border: `2px solid ${currentPage === index + 1 ? "#f8b600" : "#cccccc"
+                  }`,
                 color: currentPage === index + 1 ? "#ffffff" : "#333333",
                 cursor: "pointer",
               }}
