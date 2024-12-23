@@ -91,6 +91,6 @@ public class GlobalExceptionHandler {
         String maxValue = String.valueOf(attributes.get(MAX_ATTRIBUTE));
 
         return message.replace("{" + MIN_ATTRIBUTE + "}", minValue)
-                .replace("{" + MAX_ATTRIBUTE + "}", maxValue);
+                        .replace("{" + MAX_ATTRIBUTE + "}", maxValue);
     }
 }

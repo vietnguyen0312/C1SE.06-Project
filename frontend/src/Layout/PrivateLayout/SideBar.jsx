@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 import { 
     DashboardOutlined, 
+    RightOutlined, 
     FileTextOutlined, 
     UserOutlined, 
     TeamOutlined, 
@@ -69,7 +69,7 @@ const Sidebar = () => {
 
     const dashboard = (
         <>
-            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={() => navigate('/manager')}><FileTextOutlined />Báo cáo</div>
+            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={() => navigate('/manager')}><FileTextOutlined />Report</div>
         </>
     );
 
@@ -79,18 +79,22 @@ const Sidebar = () => {
                 <div style={{ padding: '15px 0', borderBottom: '1px solid #e5e5e5' }} onClick={() => navigate('/manager')}>
                     <Item>
                         <DashboardOutlined />
-                        <div>Trang chủ</div>
+                        <div>Dashboard</div>
                     </Item>
                 </div>
                 <Hotel>
-                    <Content>KHÁCH SẠN | DỊCH VỤ</Content>
+                    <Content>HOTEL | ROOM</Content>
+                    <Item>
+                        <UserOutlined />
+                        <div>Guest</div>
+                    </Item>
+                    <Item>
+                        <ProfileOutlined />
+                        <div>Guest Details</div>
+                    </Item>
                     <Item onClick={() => navigate('/manager/rooms')}>
                         <HomeOutlined />
-                        <div>Phòng</div>
-                    </Item>
-                    <Item onClick={() => navigate('/manager/service')}>
-                        <KeyOutlined />
-                        <div>Dịch vụ</div>
+                        <div>Rooms</div>
                     </Item>
                     <Item onClick={() => navigate('/manager/bookings')}>
                         <CalendarOutlined />
@@ -98,22 +102,25 @@ const Sidebar = () => {
                     </Item>
                     <Item>
                         <FileDoneOutlined />
-                        <Link style={{textDecoration: "none", color: "inherit"}} to='/manager/blogs'>Blogs</Link>
+                        <div>Invoice</div>
                     </Item>
                 </Hotel>
                 <Hotel>
-                    <Content>KHÁCH HÀNG | NHÂN SỰ</Content>
-                    <Item onClick={() => navigate('')}>
-                        <TeamOutlined />
-                        <div>Quản lý</div>
-                    </Item>
+                    <Content>EMPLOYEE | CUSTOMER</Content>
                     <Item onClick={() => navigate('/manager/employee')}>
                         <TeamOutlined />
-                        <div>Nhân viên</div>
+                        <div>Employee</div>
                     </Item>
                     <Item onClick={() => navigate('/manager/customer')}>
                         <TeamOutlined />
-                        <div>Khách hàng</div>
+                        <div>Customer</div>
+                    </Item>
+                </Hotel>
+                <Hotel>
+                    <Content>SERVICE</Content>
+                    <Item onClick={() => navigate('/manager/service')}>
+                        <KeyOutlined />
+                        <div>Service</div>
                     </Item>
                 </Hotel>
             </SidebarContent>

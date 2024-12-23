@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import LoadingIcons from 'react-loading-icons'
-import axios from '../Configuration/AxiosConfig'; 
+import axios from '../Configuration/AxiosConfig'; // Đảm bảo đường dẫn đúng với cấu trúc dự án của bạn
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
 
 export const NavMenuLink = styled.a`
   color: white;
@@ -32,8 +31,13 @@ class BlogTypeList extends Component {
     }
 
     fetchBlogTypes = async () => {
+        try {
             const response = await axios.get('/blogTypes');
             this.setState({ blogTypes: response.result, loading: false });
+        } catch (error) {
+            console.error('Error fetching blog types:', error);
+            this.setState({ loading: false, error: 'Failed to load blog types' });
+        }
     };
 
     render() {
@@ -49,9 +53,9 @@ class BlogTypeList extends Component {
                 {blogTypes.map(blogType => (
                     <li key={blogType.id}>
              
-                        <Link style={{ color: 'black' }} className="dropdown-item" to={`/blogs?blogTypeId=${blogType.id}`}>
+                        <NavMenuLink style={{ color: 'black' }} className="dropdown-item" href={`/blogs?blogTypeId=${blogType.id}`}>
                            {blogType.name}
-                        </Link>
+                        </NavMenuLink>
                     </li>
                 ))}
             </>

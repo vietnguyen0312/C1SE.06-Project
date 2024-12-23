@@ -1,19 +1,19 @@
-import React, { Component } from "react";
-import LoadingIcons from "react-loading-icons";
-import axios from "../Configuration/AxiosConfig";
-import { Pagination as MuiPagination } from "@mui/material";
-import { Link } from "react-router-dom";
-import { format } from "date-fns";
-import { BannerSection2 } from "../Layout/PublicLayout/Home/style";
-import styled from "styled-components";
-import ButtonCPN from "../components/Button/Button";
+import React, { Component } from 'react';
+import LoadingIcons from 'react-loading-icons';
+import axios from '../Configuration/AxiosConfig';
+import { Pagination as MuiPagination } from '@mui/material';
+import { Link } from 'react-router-dom'; 
+import { format } from 'date-fns';
+import { BannerSection2 } from '../Layout/PublicLayout/Home/style';
+import styled from 'styled-components';
+
 const Overlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(4, 9, 30, 0.4);
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: rgba(4, 9, 30, 0.4);
 `;
 
 const Container = styled.div`
@@ -32,7 +32,8 @@ export const AboutContent = styled.div`
   text-align: center;
   position: relative;
   z-index: 1;
-  margin-top: 79px;
+  margin-top:79px;
+  
 `;
 
 const Title1 = styled.h1`
@@ -45,6 +46,7 @@ const LinkNav = styled.p`
   color: white;
   font-size: 16px;
 `;
+
 
 const Arrow = styled.span`
   margin: 0 10px;
@@ -59,22 +61,23 @@ export const Title = styled.h1`
 
 export const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr); 
   gap: 1.5rem;
   padding: 0 10px;
   max-width: 1140px;
   width: 100%;
-  margin: 0 auto;
+  margin: 0 auto; 
 
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr);
+  @media (max-width: 900px) { 
+    grid-template-columns: repeat(2, 1fr); 
   }
 
-  @media (max-width: 600px) {
-    grid-template-columns: 1fr;
+  @media (max-width: 600px) { 
+    grid-template-columns: 1fr; 
   }
 `;
-const BlogCard = styled(Link)`
+
+export const BlogCard = styled.div`
   background-color: white;
   border-radius: 8px;
   overflow: hidden;
@@ -85,10 +88,8 @@ const BlogCard = styled(Link)`
   display: flex;
   flex-direction: column;
   max-width: 100%;
-  min-height: 400px; 
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
+  min-height: 400px; // Thêm chiều cao tối thiểu để đảm bảo kích thước nhất quán
+
   &:hover {
     transform: scale(1.05);
   }
@@ -135,29 +136,30 @@ export const BlogBody = styled.p`
   padding: 5px;
   border-radius: 4px;
   height: 80px;
-  font-size: 0.8rem;
+  font-size: 0.8rem; 
 `;
 
 export const BlogInfoDate = styled.div`
   display: flex;
-  align-items: left;
+  align-items: center;
   color: #888;
   font-weight: bold;
   background-color: #ebedf0;
   border-radius: 4px;
   display: inline;
-  font-size: 0.6rem;
+  padding: 4px 8px;
+  font-size: 0.6rem; 
 `;
 
 export const BlogInfoBlogType = styled.div`
-  display: flex;
+    display: flex;
   align-items: left;
   color: #c31414;
   font-weight: bold;
   height: 25px;
   border-radius: 4px;
   background-color: #ebedf0;
-  font-size: 0.6rem;
+  font-size: 0.6rem; 
 `;
 
 export const BlogInfoUser = styled.div`
@@ -170,36 +172,21 @@ export const BlogInfoUser = styled.div`
   display: inline;
   border-radius: 4px;
   background-color: #ebedf0;
-  font-size: 0.6rem;
+  font-size: 0.6rem; 
 `;
 
 export const BlogButton = styled.button`
   width: 100%;
   padding: 5px;
-  background-color: #f8b600;
+  background-color: #333333;
   color: rgb(209, 245, 100);
   text-align: center;
   cursor: pointer;
   border: none;
   border-radius: 10px;
-  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  transition: background-color 0.3s ease;
   position: absolute;
   bottom: 10px;
-  &:hover {
-    background-color: black;
-    transform: translateY(-2px);
-    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.15);
-  }
-
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  &:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
 `;
 export const BlogIcon = styled.img`
   width: 20px;
@@ -232,15 +219,20 @@ export const SearchBar = styled.div`
     font-size: 16px;
     border: none;
     border-radius: 4px;
+    background-color: #5580ae;
+    color: white;
     cursor: pointer;
     margin-left: 10px;
-    width: 100px;
     transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: #d769146d;
+    }
   }
 `;
 
 export const NavButton = styled.button`
-  position: absolute; 
+  position: absolute; // Đảm bảo nút được định vị tuyệt đối
   top: 50%;
   transform: translateY(-50%);
 
@@ -248,42 +240,43 @@ export const NavButton = styled.button`
   border-radius: 50%;
   padding: 10px;
   cursor: pointer;
-  z-index: 1; 
+  z-index: 1; // Đảm bảo z-index cao hơn ảnh
 
-  width: 40px; 
-  height: 40px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center;
+  // Thay đổi kích thước nút
+  width: 40px; // Kích thước nút
+  height: 40px; // Kích thước nút
+  display: flex; // Sử dụng flex để căn giữa nội dung
+  align-items: center; // Căn giữa theo chiều dọc
+  justify-content: center; // Căn giữa theo chiều ngang
 
   &:hover {
     background-color: rgba(255, 255, 255, 1);
-    transform: scale(1.1);
+    transform: scale(1.1); // Hiệu ứng phóng to khi hover
   }
 
   &.left {
-    left: 10px; 
+    left: 10px; // Đặt nút bên trái
   }
 
   &.right {
-    right: 10px; 
+    right: 10px; // Đặt nút bên phải
   }
 `;
 const Body2 = styled.div`
-  margin: 0 12%; 
-  padding: 20px; 
-  background-color: #f5f5f5; 
-  border-radius: 8px;
+  margin: 0 12%; // Khoảng cách 300px ở hai bên
+  padding: 20px; // Thêm padding nếu cần
+  background-color: #f5f5f5; // Màu nền tùy chọn
+  border-radius: 8px; // Bo góc nếu cần
 `;
 
 const AnimatedBlogCard = styled(BlogCard)`
-  opacity: 0;
-  transform: translateY(20px);
+  opacity: 0; 
+  transform: translateY(20px); // Start slightly below
   transition: opacity 1s ease, transform 0.5s ease;
 
   &.visible {
-    opacity: 1.5; 
-    transform: translateY(0); 
+    opacity: 1.5; // Fully visible
+    transform: translateY(0); // Move to original position
   }
 `;
 
@@ -296,17 +289,17 @@ export class BlogList extends Component {
       currentPage: 1,
       totalPages: 0,
       pageSize: 6,
-      searchTerm: "",
+      searchTerm: '',
       filteredBlogs: [],
       selectedBlog: null,
       currentImageIndex: {},
       filterByBlogTypeId: props.blogTypeId || null,
       limit: props.limit || null,
-      visibleBlogs: [],
+      visibleBlogs: [], // Track visible blogs
     };
     this.debounceTimeout = null;
   }
-
+  
   debounce = (func, delay) => {
     return (...args) => {
       clearTimeout(this.debounceTimeout);
@@ -319,11 +312,11 @@ export class BlogList extends Component {
   componentDidMount() {
     this.debouncedSearch = this.debounce(this.handleSearch, 500);
     this.getBlogs();
-    window.addEventListener("scroll", this.handleScroll);
+    window.addEventListener('scroll', this.handleScroll);
   }
 
   componentWillUnmount() {
-    window.removeEventListener("scroll", this.handleScroll);
+    window.removeEventListener('scroll', this.handleScroll);
   }
 
   handleScroll = () => {
@@ -332,7 +325,7 @@ export class BlogList extends Component {
       const element = document.getElementById(`blog-${index}`);
       if (element) {
         const rect = element.getBoundingClientRect();
-        return rect.top < window.innerHeight;
+        return rect.top < window.innerHeight; // Check if the element is in view
       }
       return false;
     });
@@ -340,8 +333,7 @@ export class BlogList extends Component {
   };
 
   getBlogs = async () => {
-    const { currentPage, pageSize, searchTerm, filterByBlogTypeId, limit } =
-      this.state;
+    const { currentPage, pageSize, searchTerm, filterByBlogTypeId, limit } = this.state;
     this.setState({ loading: true });
 
     let responseBlogs;
@@ -354,12 +346,9 @@ export class BlogList extends Component {
     };
 
     if (filterByBlogTypeId) {
-      responseBlogs = await axios.get(
-        `/blogs/findByBlogType/${filterByBlogTypeId}`,
-        { params }
-      );
+      responseBlogs = await axios.get(`/blogs/findByBlogType/${filterByBlogTypeId}`, { params });
     } else {
-      responseBlogs = await axios.get("/blogs", { params });
+      responseBlogs = await axios.get('/blogs', { params });
     }
 
     if (limit) {
@@ -368,19 +357,18 @@ export class BlogList extends Component {
 
     blogsWithImages = await Promise.all(
       responseBlogs.result.data.map(async (blog) => {
-        const imageResponse = await axios.get(
-          `/blogImage/findImagesByBlog/${blog.id}`
-        );
+        const imageResponse = await axios.get(`/images/findImagesByBlog/${blog.id}`);
         const images = Array.isArray(imageResponse.result)
           ? imageResponse.result.map((image) => image.image)
           : [];
         return {
           ...blog,
-          images: images || [],
+          images: images || [], 
         };
       })
     );
 
+    // Cập nhật state
     this.setState({
       blogs: blogsWithImages,
       filteredBlogs: blogsWithImages,
@@ -392,7 +380,7 @@ export class BlogList extends Component {
 
   handleInputChange = (event) => {
     this.setState({ searchTerm: event.target.value });
-    this.debouncedSearch();
+    this.debouncedSearch(); 
   };
 
   handleSearch = () => {
@@ -407,15 +395,13 @@ export class BlogList extends Component {
     this.setState((prevState) => {
       const currentIndex = prevState.currentImageIndex[blogId] || 0;
       const blog = prevState.blogs.find((b) => b.id === blogId);
-
+      
       if (!blog || !blog.images || blog.images.length === 0) {
-        return prevState;
+        return prevState; 
       }
-
-      const newIndex =
-        (currentIndex + (direction === "next" ? 1 : -1) + blog.images.length) %
-        blog.images.length;
-
+  
+      const newIndex = (currentIndex + (direction === 'next' ? 1 : -1) + blog.images.length) % blog.images.length;
+  
       return {
         currentImageIndex: {
           ...prevState.currentImageIndex,
@@ -427,31 +413,17 @@ export class BlogList extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.blogTypeId !== this.props.blogTypeId) {
-      this.setState(
-        { filterByBlogTypeId: this.props.blogTypeId },
-        this.getBlogs
-      );
+      this.setState({ filterByBlogTypeId: this.props.blogTypeId }, this.getBlogs);
     }
     if (prevState.currentPage !== this.state.currentPage) {
       this.getBlogs();
     }
   }
 
-  loading = () => {
-    return <LoadingIcons.SpinningCircles />;
-  };
-
   render() {
-    const {
-      loading,
-      filteredBlogs,
-      currentImageIndex,
-      searchTerm,
-      visibleBlogs,
-      currentPage,
-      totalPages,
-    } = this.state;
+    const { loading, filteredBlogs, currentImageIndex, searchTerm, visibleBlogs, currentPage, totalPages } = this.state;
     const blogTypeId = this.state.filterByBlogTypeId;
+
 
     return (
       <div>
@@ -463,9 +435,7 @@ export class BlogList extends Component {
                 <Title1>Tin Tức</Title1>
                 <LinkNav>
                   {/* <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Home</StyledLink> */}
-                  <Arrow data-aos="fade-left" data-aos-delay="200">
-                    →
-                  </Arrow>
+                  <Arrow data-aos="fade-left" data-aos-delay="200">→</Arrow>
                   {/* <StyledLink to="/about" data-aos="fade-left" data-aos-delay="0">About Us</StyledLink> */}
                 </LinkNav>
               </AboutContent>
@@ -483,7 +453,7 @@ export class BlogList extends Component {
               onChange={this.handleInputChange}
               placeholder="Nhập tại đây"
             />
-            <ButtonCPN text="Tìm kiếm" onClick={this.handleSearch}></ButtonCPN>
+            <button style={{backgroundColor: "#333333", color: "white"}} onClick={this.handleSearch}>Tìm kiếm</button>
           </SearchBar>
 
           {loading ? (
@@ -492,37 +462,23 @@ export class BlogList extends Component {
             <Grid>
               {filteredBlogs.map((post, index) => (
                 <AnimatedBlogCard
-                  to={`/blogDetail/${post.id}`}
                   key={post.id}
                   id={`blog-${index}`}
-                  className={visibleBlogs[index] ? "visible" : ""}
+                  className={visibleBlogs[index] ? 'visible' : ''} // Add class based on visibility
                 >
-                  {post.images && post.images.length > 0 ? (
-                    <div style={{ position: "relative" }}>
+                  {post.images && post.images.length > 0 && (
+                    <div style={{ position: 'relative' }}>
                       <BlogImage
-                        src={`${
-                          post.images[currentImageIndex[post.id] || 0]
-                        }`}
+                        src={`/img/blog/${post.images[currentImageIndex[post.id] || 0]}`}
                         alt={post.title}
                       />
-                      <NavButton
-                        className="left"
-                        onClick={() => this.handleImageChange(post.id, "prev")}
-                      >
+                      <NavButton className="left" onClick={() => this.handleImageChange(post.id, 'prev')}>
                         &lt;
                       </NavButton>
-                      <NavButton
-                        className="right"
-                        onClick={() => this.handleImageChange(post.id, "next")}
-                      >
+                      <NavButton className="right" onClick={() => this.handleImageChange(post.id, 'next')}>
                         &gt;
                       </NavButton>
                     </div>
-                  ) : (
-                    <BlogImage
-                      src="/img/default-image.jpg" 
-                      alt={post.title}
-                    />
                   )}
                   <BlogContent>
                     <BlogTitle>{post.title}</BlogTitle>
@@ -541,13 +497,10 @@ export class BlogList extends Component {
                     </BlogInfoUser>
                   </BlogContent>
                   <BlogButton>
-                    <Link
-                      to={`/blogDetail/${post.id}`}
-                      style={{ color: "white", textDecoration: "none" }}
-                    >
-                      <strong>Xem chi tiết...</strong>
-                    </Link>
-                  </BlogButton>
+                <Link to={`/blogDetail/${post.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                  Xem chi tiết...
+                </Link>
+              </BlogButton>
                 </AnimatedBlogCard>
               ))}
             </Grid>
@@ -555,13 +508,7 @@ export class BlogList extends Component {
         </Body2>
 
         {this.state.totalPages > 1 && (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "20px",
-            }}
-          >
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
             <MuiPagination
               count={totalPages}
               page={currentPage}
@@ -570,9 +517,9 @@ export class BlogList extends Component {
               showFirstButton
               showLastButton
               onChange={(event, page) => {
-                this.paginate(page);
+                this.paginate(page); 
               }}
-              sx={{ display: "flex", justifyContent: "center" }}
+              sx={{ display: 'flex', justifyContent: 'center' }}
             />
           </div>
         )}
@@ -580,5 +527,7 @@ export class BlogList extends Component {
     );
   }
 }
+
+
 
 export default BlogList;

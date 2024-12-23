@@ -127,11 +127,11 @@ const Contact = () => {
         <Container>
           <Row>
             <AboutContent>
-              <Title>Liên hệ</Title>
+              <Title>Contact US</Title>
               <LinkNav>
-                <StyledLink to="/home" data-aos="fade-left" data-aos-delay="400">Trang chủ</StyledLink>
+                <StyledLink to="/home" data-aos="fade-left" data-aos-delay="400">Home</StyledLink>
                 <Arrow data-aos="fade-left" data-aos-delay="200">→</Arrow>
-                <StyledLink to="/contact" data-aos="fade-left" data-aos-delay="0">Liên hệ</StyledLink>
+                <StyledLink to="/contact" data-aos="fade-left" data-aos-delay="0">Contact US</StyledLink>
               </LinkNav>
             </AboutContent>
           </Row>
@@ -168,14 +168,14 @@ const Contact = () => {
             <ContactForm id="myForm" action="mail.php" method="post">
               <Row>
                 <FormGroup style={{marginRight:'30px'}}>
-                  <Input name="name" placeholder="Nhập tên của bạn" required type="text" />
-                  <Input name="email" placeholder="Nhập địa chỉ email" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,63}$" required type="email" />
-                  <Input name="subject" placeholder="Nhập chủ đề" required type="text" />
+                  <Input name="name" placeholder="Enter your name" required type="text" />
+                  <Input name="email" placeholder="Enter email address" pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{1,63}$" required type="email" />
+                  <Input name="subject" placeholder="Enter subject" required type="text" />
                 </FormGroup>
                 <FormGroup>
-                  <Textarea name="message" placeholder="Nhập tin nhắn" required></Textarea>
+                  <Textarea name="message" placeholder="Enter Message" required></Textarea>
                   <Buttonn>
-                    <ButtonCPN type="submit" text="Gửi tin nhắn" />
+                    <ButtonCPN type="submit" text="SEND MESSEGE" />
                   </Buttonn>
                 </FormGroup>
               </Row>

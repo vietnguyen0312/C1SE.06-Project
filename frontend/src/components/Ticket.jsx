@@ -201,9 +201,9 @@ const Ticket = ({ style }) => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         const roles = getRoles(token);
-        if(roles != null) {
-            setIsEmployee(roles.includes('EMPLOYEE'));
-        }
+        console.log(roles);
+        setIsEmployee(roles.includes('EMPLOYEE'));
+        console.log(isEmployee);
     }, []);
 
     useEffect(() => {

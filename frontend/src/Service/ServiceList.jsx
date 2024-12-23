@@ -315,7 +315,7 @@ export class ServiceList extends Component {
     };
 
     closeModal = () => {
-        this.setState({ isModalOpen: false, hasMoreRatings: true });
+        this.setState({ isModalOpen: false, hasMoreRatings: true, ratingsOfSelectedService: [] });
         this.enableScroll();
     }
 
@@ -342,7 +342,9 @@ export class ServiceList extends Component {
                     {this.state.services.map(service => (
                         <div className="col-md-4 ftco-animate container" key={service.id}>
                             <div className="project-wrap">
-                                <a className="img" style={{ backgroundImage: `url(${service.image})` }}></a>
+                                <a className="img" href={service.image} target="_blank" rel="noopener noreferrer">
+                                    <img src={service.image} alt={service.name} style={{ width: '100%', height: 'auto' }} />
+                                </a>
                                 <div className="text p-4">
                                     <h3>
                                         <button

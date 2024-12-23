@@ -36,5 +36,7 @@ public class RateRoom {
     @Column(columnDefinition = "TEXT")
     String comment;
 
+
+
     Instant dateUpdate;
 }

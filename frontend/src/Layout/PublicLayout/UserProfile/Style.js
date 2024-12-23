@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 
 export const BannerSection3 = styled.section`
-background-image: url('https://res.cloudinary.com/dgff7kkuu/image/upload/v1734868733/userProfile_p3lcbs.jpg');
+background-image: url('/img/User/userProfile.jpg');
 background-size: cover;
 background-position: center;
 background-repeat: no-repeat;

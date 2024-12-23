@@ -17,7 +17,7 @@ import {
   ModalFooter,
   WriteRating,
 } from "../Layout/PublicLayout/HistoryBill/style";
-import NoInvoices from "../components/NoInvoices"; 
+import NoInvoices from "../components/NoInvoices"; // Adjust the path as necessary
 
 export const AboutContent = styled.div`
   text-align: center;

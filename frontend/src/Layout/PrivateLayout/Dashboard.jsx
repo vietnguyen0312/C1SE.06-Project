@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { RetweetOutlined, UserOutlined, CalendarOutlined, HomeOutlined, DollarOutlined, RiseOutlined, FallOutlined, SettingOutlined, BarsOutlined, SortAscendingOutlined, SortDescendingOutlined, EyeOutlined } from '@ant-design/icons';
-import { LineChart, Line, Tooltip, BarChart, Bar, CartesianGrid, XAxis, YAxis, Legend } from 'recharts';
-import { Select, Input, Table, Popover, Modal } from 'antd';
+import { RetweetOutlined, UserOutlined, CalendarOutlined, HomeOutlined, DollarOutlined, RiseOutlined, FallOutlined, BarsOutlined, EyeOutlined } from '@ant-design/icons';
+import { LineChart, Line, Tooltip, CartesianGrid, XAxis, YAxis, Legend } from 'recharts';
+import { Table, Popover, Modal } from 'antd';
 import ButtonCPN from '../../components/Button/Button';
 import axios from '../../Configuration/AxiosConfig';
-import { style } from '@mui/system';
 
 const Container = styled.div`
     padding: 20px;
@@ -303,7 +302,7 @@ const RoomDetailColumns = [
         render: (record) => (
           <div style={{ display: "flex", alignItems: "center" }}>
             <img
-              src={record.room.roomType.image}
+              src={record.image}
               alt="Avatar"
               style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
             />
@@ -312,12 +311,15 @@ const RoomDetailColumns = [
         ),
     },
     { title: 'Phòng số',render:(record)=>record.room.roomNumber},
+    { title: 'Số lượng người', render:(record)=>record.room.roomType.maxOfPeople},
     { title: 'Ngày đặt', render:(record)=>new Date(record.bookingRoom.checkInDate).toLocaleDateString()},
     {title:'Ngày trả',render:(record)=>new Date(record.bookingRoom.checkOutDate).toLocaleDateString()},
     { title: 'Thành tiền', sorter: (a, b) => a.total - b.total,
         render: (record)=>record.room.roomType.price.toLocaleString('vi-VN',{style:'currency',currency:'VND'})
      },
 ];
+
+
 
 const viewRoomColumns = [
     {
@@ -330,7 +332,7 @@ const viewRoomColumns = [
         render: (record) => (
           <div style={{ display: "flex", alignItems: "center" }}>
             <img
-              src={`${record.roomType.image}`}
+              src={`/img/hotels/room_type/${record.roomType.image}`}
               alt="Avatar"
               style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
             />
@@ -344,6 +346,8 @@ const viewRoomColumns = [
         render:(record)=>record.revenue.toLocaleString('vi-VN',{style:'currency',currency:'VND'})
     },  
 ]
+
+
 
 const Dashboard = () => {
     const [showHistoryTicket, setShowHistoryTicket] = useState(true);
@@ -361,6 +365,8 @@ const Dashboard = () => {
     });
     const [revenueService1, setRevenueService1] = useState([]);
     const [pagination, setPagination] = useState([]);
+    const [paginationBillTicket, setPaginationBillTicket] = useState([]);
+    const [paginationBillRoom, setPaginationBillRoom] = useState([]); 
     const [revenueRoomType1,setRevenueRoomType1]=useState([]);
     const [modalType, setModalType] = useState(null);
 
@@ -377,7 +383,7 @@ const Dashboard = () => {
             key: "serviceInfo",
             render: (record) => (
               <div style={{ display: "flex", alignItems: "center" }}>
-                <ImgService src={`${record.serviceEntity.image}`} />
+                <ImgService src={`/img/service/${record.serviceEntity.image}`} />
                 <span>{record.serviceEntity.name}</span>
               </div>
             ),
@@ -451,23 +457,6 @@ const Dashboard = () => {
         });
     };
 
-    const handleTableChange = (pagination) => {
-        fetchRevenueService1(
-            selectedTimeRange.startDate,
-            selectedTimeRange.endDate,
-            pagination.current,
-            pagination.pageSize
-        );
-        fetchBillTicket(
-            pagination.current,
-            pagination.pageSize
-        )
-        fetchBillRoom(
-            pagination.current,
-            pagination.pageSize
-        )
-    };
-    
     const fetchRevenueRoomType = async (startDate, endDate) => {
         const response = await axios.get('/revenue/room-type-revenue', {params: {
             startDate: new Date(new Date().setDate(new Date().getDate() - startDate)).toLocaleDateString('vi-VN'),
@@ -496,12 +485,13 @@ const Dashboard = () => {
             }
         })
         setBillTicket(billTicket.result.data);
-        setPagination({
+        setPaginationBillTicket({
             current: billTicket.result.currentPage,
             pageSize: billTicket.result.pageSize,
-            total: billTicket.result.totalElements
+            total: billTicket.result.totalElements,
         })
     }
+
     const fetchSelectedBillTicketDetail = async (bill) => {
         const response = await axios.get(`/bill-ticket-detail/get-by-bill-simple/${bill.id}`);
         return response.result;
@@ -515,7 +505,7 @@ const Dashboard = () => {
                 <span>{record.user?.username}</span>
             </div> 
         },
-        { title: "Số điện thoại", render: (record) => record.user.phoneNumber },
+        { title: "Giới tính", render: (record) => record.user.gender },
         { title: "Loại khách hàng", render: (record) => Array.isArray(record.user.customerType) ? record.user.customerType.map((type) => type.name).join(", ") : record.user.customerType?.name || "N/A" },
         { title: "Ngày đặt", render: (record) => {
             const date = new Date(record.dateCreated);
@@ -524,27 +514,8 @@ const Dashboard = () => {
             const year = date.getFullYear();
             return `${day}/${month}/${year}`;
         }},
+        { title: "Số điện thoại", render: (record) => record.user.phoneNumber },
         {title:'Tổng tiền',render:(record)=>record.total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})},
-        { 
-            title: "Trạng thái", 
-            render: (record) => {
-                let color;
-                switch (record.status.toLowerCase()) {
-                    case 'đã thanh toán':
-                        color = 'green';
-                        break;
-                    case 'đã huỷ':
-                        color = 'red';
-                        break;
-                    case 'chưa thanh toán':
-                        color = 'orange';
-                        break;
-                    default:
-                        color = 'black';
-                }
-                return <span style={{ color, fontWeight: 'bold' }}>{record.status.toUpperCase()}</span>;
-            }
-        },
         { 
             title: 'Chi tiết',
             render: (record) => (
@@ -576,12 +547,14 @@ const Dashboard = () => {
             }
         });
         setBillRoom(billRoom.result.data);
-        setPagination({
+        setPaginationBillRoom({
             current: billRoom.result.currentPage,
             pageSize: billRoom.result.pageSize,
             total: billRoom.result.totalElements
         })
     }
+    console.log('aaaaa',billRoom)
+    console.log('bbbb',paginationBillRoom)
     const fetchSelectedBillRoomDetail = async (bookingRoom) => {
         const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff/${bookingRoom.id}`);
         return response.result;
@@ -602,7 +575,7 @@ const Dashboard = () => {
               </div>
             ),
         },
-        { title: 'Số điện thoại', render:(record) => record.user.phoneNumber},
+        { title: 'Giới tính', render: (record) => record.user.gender },
         { title: 'Loại khách hàng', render:(record)=>record.user.customerType.name},
         { title: 'Ngày đặt', render:(record) => {
             const date = new Date(record.checkInDate);
@@ -611,28 +584,8 @@ const Dashboard = () => {
             const year = date.getFullYear();
             return `${day}/${month}/${year}`;
         }},
+        { title: 'Số điện thoại', render:(record) => record.user.phoneNumber},
         {title:'Tổng tiền',render:(record)=>record.total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})},
-        { 
-            title: "Trạng thái", 
-            render: (record) => {
-                let color;
-                switch (record.status.toLowerCase()) {
-                    case 'đã thanh toán':
-                        color = 'green';
-                        break;
-                    case 'đã huỷ':
-                    case 'đã hủy':
-                        color = 'red';
-                        break;
-                    case 'chưa thanh toán':
-                        color = 'orange';
-                        break;
-                    default:
-                        color = 'black';
-                }
-                return <span style={{ color, fontWeight: 'bold' }}>{record.status.toUpperCase()}</span>;
-            }
-        },
         { 
             title: 'Chi tiết', 
             render: (record) => (
@@ -674,17 +627,24 @@ const Dashboard = () => {
         setIsModalVisible(false);
     };
 
-    
+    const handleTableChange = (pagination) => {
+        fetchRevenueService1(
+            selectedTimeRange.startDate,
+            selectedTimeRange.endDate,
+            pagination.current,
+            pagination.pageSize
+        );
+    };
     
     return (
         <Container>
             <DashboardContainer>
                 <div>
-                    <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Doanh thu</div>
+                    <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Dashboard</div>
                     <Header>
-                        <HeaderItem>Trang chủ</HeaderItem>
+                        <HeaderItem>Home</HeaderItem>
                         <p>→</p>
-                        <HeaderItem>Doanh thu</HeaderItem>
+                        <HeaderItem>Dashboard</HeaderItem>
                     </Header>
                 </div>
                 <div>
@@ -886,7 +846,7 @@ const Dashboard = () => {
                                 <div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
                                         <div style={{ display: 'flex' }}>
-                                            <ImgService src={`${data.serviceEntity.image}`} />
+                                            <ImgService src={`/img/service/${data.serviceEntity.image}`} />
                                             <div>
                                                 <div style={{ marginRight: '10px' }}>{data.serviceEntity?.name}</div>
                                                 <div style={{ color: '#999', fontSize: '13px' }}> {data.serviceType?.name}</div>
@@ -931,24 +891,25 @@ const Dashboard = () => {
                                 dataSource={billTicket}
                                 columns={columnsTicket}
                                 pagination={{
-                                    pageSize: pagination.pageSize,
-                                    current: pagination.current,
-                                    total: pagination.total
+                                    pageSize: paginationBillTicket.pageSize,
+                                    current: paginationBillTicket.current,
+                                    total: paginationBillTicket.total
                                 }}
-                                rowKey='id'
-                                onChange={handleTableChange}
-                                
+                                onChange={(pagination) =>
+                                    fetchBillTicket(pagination.current, pagination.pageSize)
+                                }
                             />}
                             {showHistoryRoom && <Table
                                 dataSource={billRoom}
                                 columns={columnsRoom}
                                 pagination={{
-                                    pageSize: pagination.pageSize,
-                                    current: pagination.current,
-                                    total: pagination.total
+                                    pageSize: paginationBillRoom.pageSize,
+                                    current: paginationBillRoom.current,
+                                    total: paginationBillRoom.total
                                 }}
-                                rowKey='id'
-                                onChange={handleTableChange}
+                                onChange={(pagination) =>
+                                    fetchBillRoom(pagination.current, pagination.pageSize)
+                                }
                             />}
                         </div>
                     </div>
@@ -1004,7 +965,7 @@ const Dashboard = () => {
                                 <div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
                                         <div style={{ display: 'flex' }}>
-                                            <ImgService src={`${data.roomType.image}`} />
+                                            <ImgService src={`/img/hotels/room_type/${data.roomType.image}`} />
                                             <div>
                                                 <div style={{ marginRight: '10px' }}>{data.roomType?.name}</div>
                                             </div>

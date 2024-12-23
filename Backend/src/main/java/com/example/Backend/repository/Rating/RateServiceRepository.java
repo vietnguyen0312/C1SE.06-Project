@@ -8,8 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface RateServiceRepository extends JpaRepository<RateService, String> {
     Page<RateService> findByServiceEntity_Id(String id, Pageable pageable);
@@ -17,5 +15,4 @@ public interface RateServiceRepository extends JpaRepository<RateService, String
     @Query("SELECT COALESCE(AVG(rs.score), 0) FROM RateService rs WHERE rs.serviceEntity.id = :id")
     Double findAverageScoreByServiceEntity_Id(@Param("id") String id);
 
-    List<RateService> findTop6ByOrderByDateUpdateDesc();
 }

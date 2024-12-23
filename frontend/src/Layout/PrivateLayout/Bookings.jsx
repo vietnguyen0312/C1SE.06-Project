@@ -140,17 +140,6 @@ const Bookings = () => {
             <div style={{ marginTop: '20px' }}>
                 {showTicket && <Ticket style={{ padding: '0' }} />}
             </div>
-            {showSearch && showTicket && (
-                <InputContainer>
-                    <SearchInput type="text" placeholder="Tìm kiếm ..." />
-                </InputContainer>
-            )}
-            {/* <div >
-                {showHistoryBookingRoom && <HistoryBookingRoom />}
-            </div> */}
-            <div>
-                {showHistoryTicketBill && <HistoryTicketBill />}
-            </div>
         </ProfileContainer>
     );
 };

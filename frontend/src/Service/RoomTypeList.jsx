@@ -562,11 +562,11 @@ class RoomTypeList extends Component {
           <Container>
             <Row>
               <AboutContent>
-                <Title data-aos="zoom-in" data-aos-delay="100">Khách sạn</Title>
+                <Title data-aos="zoom-in" data-aos-delay="100">Hotels</Title>
                 <LinkNav>
-                  <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Trang chủ</StyledLink>
+                  <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Home</StyledLink>
                   <Arrow data-aos="fade-left" data-aos-delay="200">→</Arrow>
-                  <StyledLink to="/hotels" data-aos="fade-left" data-aos-delay="0">Khách sạn</StyledLink>
+                  <StyledLink to="/hotels" data-aos="fade-left" data-aos-delay="0">Hotels</StyledLink>
                 </LinkNav>
               </AboutContent>
             </Row>

@@ -14,9 +14,8 @@ import java.util.List;
 
 @Repository
 public interface RateRoomRepository extends JpaRepository<RateRoom, String> {
-    List<RateRoom> findAllByUser(User user);
 
+    List<RateRoom> findAllByUser(User user);
     Page<RateRoom> findByBookingRoomDetails_Room_RoomType_Id(String roomTypeId, Pageable pageable);
 
-    List<RateRoom> findTop6ByOrderByDateUpdateDesc();
 }
