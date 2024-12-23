@@ -9,6 +9,7 @@ import ButtonCPN from '../components/Button/Button';
 import axios from '../Configuration/AxiosConfig';
 import { CloseOutlined } from '@ant-design/icons';
 import { getRoles } from '../Service/Login';
+import { v4 as uuidv4 } from 'uuid';
 
 const TicketContainer = styled.div`
   display: flex;
@@ -192,18 +193,19 @@ const Ticket = ({ style }) => {
     const [totalPrice, setTotalPrice] = useState(0);
     const [ticketStates, setTicketStates] = useState([]);
     const [selectedService, setSelectedService] = useState(null);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [isUpdateCart, setIsUpdateCart] = useState(true);
     const [isEmployee, setIsEmployee] = useState(false);
     const [nameCustomer, setNameCustomer] = useState('');
     const [phoneCustomer, setPhoneCustomer] = useState('');
+    const [filteredCustomer, setFilteredCustomer] = useState([]);
+    const [showModalPaymentChoice, setShowModalPaymentChoice] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         const roles = getRoles(token);
-        console.log(roles);
         setIsEmployee(roles.includes('EMPLOYEE'));
-        console.log(isEmployee);
     }, []);
 
     useEffect(() => {
@@ -257,17 +259,63 @@ const Ticket = ({ style }) => {
         fetchTickets();
     }, [selectedService]);
 
-    const handleSearch = debounce(async (searchValue) => {
+    const handleSearchCustomer = async (name, phoneNumber) => {
+        let searchByName = [];
+        let searchByPhoneNumber = [];
+
+        if (name !== '') {
+            const responseByName = await axios.get('/users', { params: { search: name.toLowerCase() } });
+            searchByName = responseByName.result.data;
+        }
+
+        if (phoneNumber !== '') {
+            const responseByPhoneNumber = await axios.get('/users', { params: { search: phoneNumber.toLowerCase() } });
+            searchByPhoneNumber = responseByPhoneNumber.result.data;
+        }
+
+        if (name === '' && phoneNumber !== '') {
+            setFilteredCustomer(searchByPhoneNumber);
+        } else if (phoneNumber === '' && name !== '') {
+            setFilteredCustomer(searchByName);
+        } else {
+            const combinedResults = searchByName.filter(nameItem => 
+                searchByPhoneNumber.some(phoneItem => phoneItem.id === nameItem.id)
+            );
+            setFilteredCustomer(combinedResults);
+        }
+    };
+
+    useEffect(() => {
+        const debounceSearchCustomer = debounce(() => {
+            handleSearchCustomer(nameCustomer, phoneCustomer);
+        }, 700);
+
+        debounceSearchCustomer();
+
+        return () => {
+            debounceSearchCustomer.cancel();
+        };
+    }, [nameCustomer, phoneCustomer]);
+
+    const handleSearch = async (searchValue) => {
         if (searchValue === '') {
             setFilteredTickets([]);
         } else {
             const response = await axios.get('/tickets', { params: { search: searchValue.toLowerCase() } });
             setFilteredTickets(response.result);
         }
-    }, 700);
+    };
 
     useEffect(() => {
-        handleSearch(searchTerm);
+        const debounceSearch = debounce(() => {
+            handleSearch(searchTerm);
+        }, 700);
+
+        debounceSearch();
+
+        return () => {
+            debounceSearch.cancel();
+        };
     }, [searchTerm]);
 
     const handleSearchChange = (e) => {
@@ -309,21 +357,19 @@ const Ticket = ({ style }) => {
 
     };
 
-    const formatEmail = (email) => {
-        const emailParts = email.split('@');
-        const username = emailParts[0];
-        return `${username.charAt(0)}*****@gmail.com`;
-    }
-
-    const handlePayment = async () => {
+    const handlePayment = async (paymentMethod) => {
         const total = cartItems.reduce((acc, cartItem) => acc + cartItem.value.reduce((acc, ticketBooking) => acc + ticketBooking.total, 0), 0);
 
         let bill;
-        if(isEmployee == true && nameCustomer != '' && phoneCustomer != ''){
-            console.log(formatEmail(nameCustomer));
-            const customer = await axios.post('/users', { username: nameCustomer, phoneNumber: phoneCustomer, email: formatEmail(nameCustomer) });
-
-            bill = await axios.post('/bill-ticket', { total: total, user: customer.result});
+        if(isEmployee == true){
+            if(selectedCustomer){
+                bill = await axios.post('/bill-ticket', { total: total, user: selectedCustomer });
+            } else {
+                const email = nameCustomer.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '') + '-' + uuidv4() + '@gmail.com';
+                const customer = await axios.post('/users', { username: nameCustomer,
+                     phoneNumber: phoneCustomer, password: phoneCustomer, email: email });
+                bill = await axios.post('/bill-ticket', { total: total, user: customer.result });
+            }
         } else {
             bill = await axios.post('/bill-ticket', { total: total });
         }
@@ -346,13 +392,22 @@ const Ticket = ({ style }) => {
         });
         setCartItems([]);
 
-       const paymentUrl = await axios.get('/payment/vn-pay', { 
-         params: { 
-           amount: total, 
-           orderInfo: `t${bill.result.id}`
-         } 
-       });
-       window.location.href = paymentUrl.result;
+        let paymentUrl;
+        if(paymentMethod == "tiền mặt"){
+            paymentUrl = "http://localhost:3000/checkout?vnp_OrderInfo=m" + bill.result.id;
+        } else if(paymentMethod == "chuyển khoản"){
+            const res = await axios.get('/payment/vn-pay', {
+                params: { 
+                  amount: total, 
+                  orderInfo: `t${bill.result.id}`
+                } 
+              });
+              paymentUrl = res.result;
+        }
+        
+        if(paymentUrl){
+            window.location.href = paymentUrl;
+        }
     }
     return (
         <>
@@ -402,6 +457,7 @@ const Ticket = ({ style }) => {
                                                 Họ và Tên:
                                             </label>
                                             <input
+                                                value={nameCustomer}
                                                 onChange={(e) => setNameCustomer(e.target.value)}
                                                 type="text"
                                                 placeholder="Nhập họ và tên"
@@ -412,6 +468,7 @@ const Ticket = ({ style }) => {
                                                     borderRadius: '5px',
                                                     minWidth: '150px',
                                                 }}
+                                                disabled={selectedCustomer !== null}
                                             />
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -419,6 +476,7 @@ const Ticket = ({ style }) => {
                                                 Số điện thoại:
                                             </label>
                                             <input
+                                                value={phoneCustomer}
                                                 onChange={(e) => setPhoneCustomer(e.target.value)}
                                                 type="text"
                                                 placeholder="Nhập số điện thoại"
@@ -429,9 +487,41 @@ const Ticket = ({ style }) => {
                                                     borderRadius: '5px',
                                                     minWidth: '150px',
                                                 }}
+                                                disabled={selectedCustomer !== null}
+                                            />
+                                        </div>
+                                        <div>
+                                            <ButtonCPN
+                                                text='Reset'
+                                                style={{ marginTop: '20px', width: '150px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                                onClick={() => {
+                                                    setSelectedCustomer(null);
+                                                    setNameCustomer('');
+                                                    setPhoneCustomer('');
+                                                }}
                                             />
                                         </div>
                                     </div>
+                                    {filteredCustomer.length > 0 && (
+                                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                            <SearchDropdown style={{ width: '300px' }}>
+                                                {filteredCustomer.map((customer, index) => (
+                                                    <DropdownItem key={index} onClick={() => {
+                                                        setSelectedCustomer(customer);
+                                                        setNameCustomer(customer.username);
+                                                        setPhoneCustomer(customer.phoneNumber);
+                                                        setFilteredCustomer([]);
+                                                    }}>
+                                                        <ServiceImg src={`${customer.avatar}`} style={{ width: '60px', height: '60px' }} />
+                                                        <div style={{ marginLeft: '10px' }}>
+                                                            <ServiceName>{customer.username}</ServiceName>
+                                                            <ServiceType>{customer.phoneNumber}</ServiceType>
+                                                        </div>
+                                                    </DropdownItem>
+                                                ))}
+                                            </SearchDropdown>
+                                        </div>
+                                    )}
                                 </div>
                             </>
                         )}
@@ -553,7 +643,17 @@ const Ticket = ({ style }) => {
                             <ButtonCPN
                                 text='Thanh toán'
                                 style={{ width: '100%', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}
-                                onClick={handlePayment}
+                                onClick={() => {
+                                    if(isEmployee == true){
+                                        if(phoneCustomer.length !== 10){
+                                            alert('Số điện thoại không đúng');
+                                            return;
+                                        }
+                                        setShowModalPaymentChoice(true);
+                                    } else {
+                                        handlePayment("chuyển khoản");
+                                    }
+                                }}
                             />
                         </div>
                     ) : (
@@ -562,6 +662,47 @@ const Ticket = ({ style }) => {
                         </div>
                     )}
                 </CartItems>
+                {showModalPaymentChoice && (
+                    <div
+                        onClick={() => setShowModalPaymentChoice(false)}
+                        style={{
+                            position: "fixed",
+                            top: "0",
+                            left: "0",
+                            width: "100%",
+                            height: "100%",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                        }}
+                    >
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            style={{
+                                backgroundColor: "white",
+                                padding: "20px",
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                                borderRadius: "8px",
+                                textAlign: "center",
+                            }}
+                        >
+                            <p>Bạn muốn thanh toán bằng tiền mặt hay chuyển khoản?</p>
+                            <button
+                                onClick={() => handlePayment("tiền mặt")}
+                                style={{ margin: "10px", backgroundColor: "#f8b600", color: "white", padding: "10px 20px", borderRadius: "5px", cursor: "pointer" }}
+                            >
+                                Tiền mặt
+                            </button>
+                            <button
+                                onClick={() => handlePayment("chuyển khoản")}
+                                style={{ margin: "10px", backgroundColor: "#f8b600", color: "white", padding: "10px 20px", borderRadius: "5px", cursor: "pointer" }}
+                            >
+                                Chuyển khoản
+                            </button>
+                        </div>
+                    </div>
+                )}
             </TicketContainer>
         </>
     )

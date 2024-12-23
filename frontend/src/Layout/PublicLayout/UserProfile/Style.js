@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 
 export const BannerSection3 = styled.section`
-background-image: url('/img/User/userProfile.jpg');
+background-image: url('/img/userProfile.jpg');
 background-size: cover;
 background-position: center;
 background-repeat: no-repeat;

@@ -107,9 +107,14 @@ const Checkout = () => {
                     });
                 }
             }
+
             if (category === 'v') {
                 const getBill = await axios.get(`/booking_room_details/byBookingRoom/${id}`);
                 setBillData({ billInfo: getBill.result[0].value[0].bookingRoom });
+            } else if(category === 'm'){
+                const getBill = await axios.put(`/bill-ticket/${id}`, { status: 'Đã thanh toán' });
+                const detailsRes = await axios.get(`/bill-ticket-detail/get-by-bill/${id}`);
+                setBillData({ billInfo: getBill.result, billDetails: detailsRes.result });
             }
         };
         fetchBillData();
@@ -171,6 +176,19 @@ const Checkout = () => {
                         </div>
                     </OrderContainer>
                     <ButtonCPN text="Quay lại trang chủ" onClick={() => { window.location.href = '/manager/bookings'; }} />
+                </>
+            ) : checkCategory === 'm' ? (
+                <>
+                    <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }} key={billData?.billInfo?.id}>
+                    <OrderContainer>
+                        <SectionTitle>Thông tin đơn hàng</SectionTitle>
+                            <InfoText>Loại dịch vụ: {billData?.billDetails?.map(detail => detail.key.name).join(', ')}</InfoText>
+                            <InfoText>Được tạo vào: {formatDate(billData?.billInfo?.dateCreated)}</InfoText>
+                            <InfoText>Tổng tiền: {billData?.billInfo?.total.toLocaleString()} VNĐ</InfoText>
+                            <InfoText>Trạng thái: <Status>{billData?.billInfo?.status}</Status></InfoText>
+                        </OrderContainer>
+                        <ButtonCPN text="Quay lại trang chủ" onClick={() => { window.location.href = '/manager/bookings'; }} />
+                    </div>
                 </>
             ) : null
             }
