@@ -42,10 +42,10 @@ const Customer = () => {
     setIsModalVisible(true);
   };
 
-  const fetchData = async (page = 1, pageSize = 6) => {
+  const fetchData = async (page = 1, pageSize = 6, role="customer") => {
     setLoading(false);
     const response = await axios.get("/users", {
-      params: { page, pageSize },
+      params: { page, pageSize, role },
     });
     SetDsKhachHang(response.result.data);
     setPagination({

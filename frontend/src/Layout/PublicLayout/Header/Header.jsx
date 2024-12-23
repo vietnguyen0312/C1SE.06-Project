@@ -101,7 +101,7 @@ function Header() {
                 <NavMenuItem><NavMenuLink href="/hotels">Khách sạn</NavMenuLink></NavMenuItem>
                 <NavMenuItem><NavMenuLink href="/contact">Liên hệ</NavMenuLink></NavMenuItem>
                 <NavMenuItem className="nav-item dropdown" onMouseEnter={() => setActiveDropdown('blog')} onMouseLeave={() => setActiveDropdown(null)}>
-                <NavMenuItem style={{top:"25%", color: 'white'}}>
+                <NavMenuItem style={{top:"25%", color: 'white',margin:'0 10px'}}>
                  <Link to="/blogs"  className="nav-link dropdown-toggle" id="blogDropdown" role="button" aria-expanded={activeDropdown === 'blog'}>
                    Tin tức
                  </Link>

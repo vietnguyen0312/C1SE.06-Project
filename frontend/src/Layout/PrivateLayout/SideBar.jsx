@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { 
     DashboardOutlined, 
-    RightOutlined, 
     FileTextOutlined, 
     UserOutlined, 
     TeamOutlined, 
@@ -60,20 +59,6 @@ const Sidebar = () => {
     };
     const navigate = useNavigate(); // Khởi tạo useNavigate
 
-    const menuItems = (
-        <>
-            <div><a href="#option1">Option 1</a></div>
-            <div><a href="#option2">Option 2</a></div>
-            <div style={{ color: 'gray' }}>Disabled Option</div>
-        </>
-    );
-
-    const dashboard = (
-        <>
-            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={() => navigate('/manager')}><FileTextOutlined />Report</div>
-        </>
-    );
-
     return (
         <SidebarContainer>
             <SidebarContent>
@@ -111,7 +96,7 @@ const Sidebar = () => {
                     </Item>
                 </Hotel>
                 <Hotel>
-                    <Content>EMPLOYEE | CUSTOMER</Content>
+                    <Content>USERS</Content>
                     <Item onClick={() => navigate('/manager/employee')}>
                         <TeamOutlined />
                         <div>Employee</div>
@@ -119,6 +104,10 @@ const Sidebar = () => {
                     <Item onClick={() => navigate('/manager/customer')}>
                         <TeamOutlined />
                         <div>Customer</div>
+                    </Item>
+                    <Item onClick={() => navigate('/manager/listManager')}>
+                        <TeamOutlined />
+                        <div>Manager</div>
                     </Item>
                 </Hotel>
                 <Hotel>
