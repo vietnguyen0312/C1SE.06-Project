@@ -91,4 +91,20 @@ public class UserController {
                 .result(userService.changePassword(id, request))
                 .build();
     }
+
+    @GetMapping("/booking/byPhone")
+    ApiResponse<List<UserResponse>> getUserByPhone( @RequestParam(value = "search", required = false, defaultValue = "") String search) {
+        return ApiResponse
+                .<List<UserResponse>>builder()
+                .result(userService.getUsersBySearch(search))
+                .build();
+    }
+
+    @GetMapping("/booking/byEmail")
+    ApiResponse<List<UserResponse>> getUserByEmail1( @RequestParam(value = "search", required = false, defaultValue = "") String search) {
+        return ApiResponse
+                .<List<UserResponse>>builder()
+                .result(userService.getUsersBySearch1(search))
+                .build();
+    }
 }

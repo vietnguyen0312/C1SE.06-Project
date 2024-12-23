@@ -7,7 +7,7 @@ import { UserOutlined, CommentOutlined } from "@ant-design/icons";
 import Aos from "aos";
 import "aos/dist/aos.css";
 import axios from "../../Configuration/AxiosConfig";
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 const Section = styled.section`
   padding: 80px 0;
   user-select: none;
@@ -133,7 +133,7 @@ const BlogArea = () => {
 
   useEffect(() => {
     fetchBlog();
-    Aos.init({ duration: 1000 });
+    Aos.init({ duration: 2000 });
   }, [currentPage]);
 
   const handlePageChange = (pageNumber) => {
@@ -196,9 +196,8 @@ const BlogArea = () => {
                 padding: "0",
                 backgroundColor:
                   currentPage === index + 1 ? "#f8b600" : "#ffffff",
-                border: `2px solid ${
-                  currentPage === index + 1 ? "#f8b600" : "#cccccc"
-                }`,
+                border: `2px solid ${currentPage === index + 1 ? "#f8b600" : "#cccccc"
+                  }`,
                 color: currentPage === index + 1 ? "#ffffff" : "#333333",
                 cursor: "pointer",
               }}

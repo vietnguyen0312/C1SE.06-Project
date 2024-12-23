@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -145,4 +146,19 @@ public class UserService {
         return userMapper.toUserResponse(userRepository.save(user));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
+    public List<UserResponse> getUsersBySearch(String search) {
+        List<User> users = userRepository.findBySearchAndRoleCustomerByPhone(search);
+        return users.stream()
+                .map(userMapper::toUserResponse)
+                .collect(Collectors.toList());
+    }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    public List<UserResponse> getUsersBySearch1(String search) {
+        List<User> users = userRepository.findBySearchAndRoleCustomerByEmail(search);
+        return users.stream()
+                .map(userMapper::toUserResponse)
+                .collect(Collectors.toList());
+    }
 }
