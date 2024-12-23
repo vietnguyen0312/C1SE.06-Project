@@ -7,11 +7,13 @@ import { motion } from "framer-motion";
 import { Client } from "@stomp/stompjs";
 import { Link } from "react-router-dom";
 import SockJS from "sockjs-client/dist/sockjs";
-import { Heart, Share2, ArrowRight } from "lucide-react";
-import { toast } from "react-toastify"; // Import thư viện thông báo
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import ButtonCPN from "../components/Button/Button";
+import { toast } from "react-toastify";
 
 const BannerSection = styled.section`
-  background-image: url("/img/blog/tintuc.jpg");
+  background-image: url("https://res.cloudinary.com/dgff7kkuu/image/upload/v1733666949/Blog/9b4471bb-efad-476b-911a-802e83f04735-1.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -90,7 +92,6 @@ const Arrow = styled.span`
   margin: 0 10px;
 `;
 
-// Theme cho styled-components
 const theme = {
   colors: {
     primary: "#667eea",
@@ -117,7 +118,6 @@ const theme = {
   },
 };
 
-// Global Style
 const GlobalStyle = createGlobalStyle`
   body {
     font-family: ${(props) => props.theme.fonts.body};
@@ -129,7 +129,6 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
-// Styled-components for blog detail
 const Container = styled.div`
   max-width: 1000px;
   margin: 0 auto;
@@ -138,7 +137,7 @@ const Container = styled.div`
 
 const StyledContainer = styled.div`
   width: 100%;
-  height: 400px;
+  height: auto;
   overflow: hidden;
   border-radius: 1rem;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
@@ -187,43 +186,14 @@ const CardFooter = styled.div`
   align-items: center;
 `;
 
-const Button = styled.button`
-  background-color: #d3d3d3;
-
-  color: ${(props) =>
-    props.primary ? props.theme.colors.white : props.theme.colors.text};
-  border: none;
-  padding: ${(props) => props.theme.space.small}
-    ${(props) => props.theme.space.medium};
-  border-radius: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center; /* Căn giữa nội dung */
-  font-size: ${(props) => props.theme.fontSizes.small};
-  transition: background-color 0.3s ease;
-  width: 70px;
-  height: 50px;
-  &:hover {
-    background-color: ${(props) =>
-      props.primary
-        ? props.theme.colors.secondary
-        : props.theme.colors.background};
-  }
-
-  svg {
-    margin-right: ${(props) => props.theme.space.small};
-  }
-`;
-
 const CommentForm = styled.form`
   display: flex;
-  align-items: center;
   border-radius: 20px;
+  height: 200px;
   gap: ${(props) => props.theme.space.small};
   position: sticky;
   bottom: 0; /* Đặt ở dưới cùng */
-  background-color: #d3d3d3;
+  background-color: #f0f0f0;
   padding: 10px;
   border: 1px solid #aaa;
   z-index: 1;
@@ -239,10 +209,10 @@ const TextArea = styled.textarea`
   padding: ${(props) => props.theme.space.small};
   border: 1px solid ${(props) => props.theme.colors.text};
   border-radius: 4px;
-  resize: none; /* Ngăn không cho người dùng thay đổi kích thước */
-  height: 40px; /* Chiều cao cố định cho một dòng */
-  overflow: hidden; /* Ẩn cuộn */
-  width: 100%; /* Đảm bảo ô chiếm toàn bộ chiều rộng */
+  resize: none;
+  height: 40px;
+  overflow: hidden; 
+  width: 100%;
 `;
 
 const CommentWrapper = styled.div`
@@ -267,12 +237,12 @@ const CommentContent = styled.div`
 
 const UserName = styled.div`
   font-weight: bold;
-  color: #333; // Màu chữ tên người dùng
+  color: #333; 
 `;
 
 const CommentText = styled.p`
   margin: 5px 0;
-  color: #555; // Màu chữ nội dung bình luận
+  color: #555; 
 `;
 
 const CommentFooter = styled.div`
@@ -286,12 +256,12 @@ const ActionButton = styled.span`
   cursor: pointer;
   margin-right: 20px;
   &:hover {
-    color: #007bff; // Màu khi hover
+    color: #007bff; 
   }
 `;
 
 const CommentContainer = styled.div`
-  max-height: 450px;
+  max-height: 650px;
   overflow-y: auto;
   padding: 10px;
   border-radius: 10px;
@@ -310,10 +280,10 @@ const CommentBody = styled.div`
 `;
 
 const CommentSectionWrapper = styled.div`
-  border: 4px solid #ccc; /* Đặt border cho khung */
-  border-radius: 10px; /* Bo tròn các góc */
-  padding: 15px; /* Padding cho khung */
-  margin-top: 20px; /* Khoảng cách phía trên khung */
+  border: 4px solid #ccc; 
+  border-radius: 10px;
+  padding: 15px; 
+  margin-top: 20px; 
 `;
 
 const CollapseLink = styled.a`
@@ -349,13 +319,6 @@ const parseContent = (content, images) => {
           </StyledContainer>
         );
       }
-    } else if (section.startsWith("*title1*")) {
-      const title = section.replace("*title1*", "").trim();
-      parsedContent.push(
-        <Title1 key={`title-${index}`} style={{ margin: "1rem 0" }}>
-          {title}
-        </Title1>
-      );
     } else if (section === "|||") {
       parsedContent.push(<br key={`break-${index}`} />);
     } else if (section) {
@@ -363,9 +326,8 @@ const parseContent = (content, images) => {
         <p
           key={`paragraph-${index}`}
           style={{ margin: "1rem 0", textAlign: "justify" }}
-        >
-          {section}
-        </p>
+          dangerouslySetInnerHTML={{ __html: section }}
+        />
       );
     }
   });
@@ -421,6 +383,7 @@ const BlogDetail = () => {
       loadMoreComments();
       setPost(blog);
       setImages(images);
+      console.log("images", images);
     };
 
     fetchData();
@@ -434,7 +397,6 @@ const BlogDetail = () => {
     });
 
     stompClient.current.onConnect = () => {
-
       stompClient.current.subscribe("/topic/comments", (message) => {
         const newCommentData = JSON.parse(message.body);
 
@@ -452,8 +414,8 @@ const BlogDetail = () => {
             prevComments.map((comment) =>
               comment.id === updatedComment.id ? updatedComment : comment
             )
-          );     
-        } 
+          );
+        }
       });
     };
     stompClient.current.onStompError = (frame) => {
@@ -472,12 +434,12 @@ const BlogDetail = () => {
     const blogResponse = await axios.get(`/blogs/${blogId}`);
 
     const imagesResponse = await axios.get(
-      `/images/findImagesByBlog/${blogId}`
+      `/blogImage/findImagesByBlog/${blogId}`
     );
 
     return {
       blog: blogResponse.result,
-      images: imagesResponse.result.map((img) => `/img/blog/${img.image}`),
+      images: imagesResponse.result.map((img) => `${img.image}`),
     };
   };
 
@@ -490,7 +452,7 @@ const BlogDetail = () => {
     const commentsResponse = await axios.get(`/blogComments/byBlog/${postId}`, {
       params,
     });
-
+    console.log(commentsResponse.result);
     setTotalElements(commentsResponse.result.totalElements);
 
     setTotalPages(commentsResponse.result.totalPages);
@@ -510,16 +472,15 @@ const BlogDetail = () => {
     setTotalPages(commentsResponse.result.totalPages);
     return commentsResponse.result.data || [];
   };
-  const submitComment = async (commentData) => {
-    const response = await axios.post("/blogComments", commentData);
+  const submitComment = async (content) => {
+    const newComment = {
+      userId: user.id,
+      blogId: id,
+      comment: content,
+    };
+    await axios.post("/blogComments", newComment);
     toast.success("Bình luận của bạn đã được thêm thành công");
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleCommentSubmit(e); 
-    }
+    loadMoreComments();
   };
 
   const CheckCommentLength = (commentContent) => {
@@ -527,29 +488,26 @@ const BlogDetail = () => {
       console.warn("User hoặc commentContent null");
       return false;
     }
-    if(commentContent.length > 100){
-      toast.error("Bình luận không được quá 100 ký tự");
+    if (commentContent.length > 300) {
+      toast.error("Bình luận không được quá 300 ký tự");
       return false;
     }
     return true;
-  }
+  };
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
 
-    if(!CheckCommentLength(commentContent)){
+    if (!CheckCommentLength(commentContent)) {
       return;
     }
-    const newComment = {
-      userId: user.id,
-      blogId: id,
-      comment: commentContent,
-    };
+    const commentJson = JSON.stringify(commentContent);
+    console.log("commentJson", commentJson);
 
-    await submitComment(newComment);
+    await submitComment(commentJson);
     setCommentContent("");
-   
   };
+
   const handleDeleteComment = async (commentId) => {
     await axios.delete(`/blogComments/${commentId}`);
     setComments((prevComments) =>
@@ -559,26 +517,27 @@ const BlogDetail = () => {
   };
 
   const handleEditComment = (comment) => {
-    
     setEditingCommentId(comment.id);
-    setEditedCommentContent(comment.comment);
+    const convertComment = convertJson({ content: comment.comment });
+    setEditedCommentContent(convertComment);
+    console.log(convertComment);
   };
 
   const handleUpdateComment = async (e, commentId) => {
     e.preventDefault();
 
-    if(!CheckCommentLength(editedCommentContent)){
+    if (!CheckCommentLength(editedCommentContent)) {
       return;
     }
     const comment = {
-      comment: editedCommentContent,
+      comment: JSON.stringify(editedCommentContent),
     };
-
+    console.log(typeof editedCommentContent);
     await axios.put(`/blogComments/${commentId}`, comment);
     setComments((prevComments) =>
       prevComments.map((comment) =>
         comment.id === commentId
-          ? { ...comment, comment: editedCommentContent }
+          ? { ...comment, comment: JSON.stringify(editedCommentContent) }
           : comment
       )
     );
@@ -586,14 +545,20 @@ const BlogDetail = () => {
     setEditingCommentId(null);
     setEditedCommentContent("");
   };
-  
+
+  const convertJson = ({ content }) => {
+    console.log("commenthah", content);
+    const parsedComment = JSON.parse(content);
+
+    return parsedComment;
+  };
+
   if (!post) {
     return <p>Loading...</p>;
   }
 
   return (
     <div>
-      {/* Banner section */}
       <BannerSection>
         <Overlay />
         <Container1>
@@ -637,21 +602,28 @@ const BlogDetail = () => {
                 )}
               </CardHeader>
               <CardContent>
+                <div>
+                  {post.contentOpen}
+                </div>
                 {parseContent(post.body || "", images)}{" "}
-                {/* Sử dụng post.body */}
               </CardContent>
               <CardFooter>
-                <Button>
-                  <Share2 size={16} /> Share
-                </Button>
+                <ButtonCPN
+                  text="Chia sẻ"
+                  style={{
+                    padding: "0 10px",
+                    height: "40px",
+                    width: "100px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                />
               </CardFooter>
             </Card>
-
-            {/* Display comments */}
             <h3>Bình luận</h3>
             <CommentSectionWrapper>
               {" "}
-              {/* Thêm khung xung quanh phần bình luận */}
               <CommentContainer>
                 {showComments && (
                   <div>
@@ -661,7 +633,13 @@ const BlogDetail = () => {
                       comments.map((comment, index) => (
                         <CommentWrapper key={`${comment.id}-${index}`}>
                           <Avatar
-                            src={`/img/user/${comment.user.avatar}`}
+                            src={
+                              comment.user.avatar
+                                ? `/img/User/${comment.user.avatar}`
+                                : comment.user.gender === "Male"
+                                ? "/img/User/male.jpg"
+                                : "/img/User/female.jpg"
+                            }
                             alt="Avatar"
                           />
                           <CommentContent>
@@ -678,26 +656,53 @@ const BlogDetail = () => {
                                       handleUpdateComment(e, comment.id)
                                     }
                                   >
-                                    <TextArea
+                                    <ReactQuill
                                       value={editedCommentContent}
-                                      onChange={(e) =>
-                                        setEditedCommentContent(e.target.value)
-                                      }
+                                      onChange={setEditedCommentContent} 
                                       required
-                                      rows="2"
+                                      style={{ height: "100px", width: "100%" }}
                                     />
-                                    <Button type="submit" primary>
-                                      Lưu
-                                    </Button>
-                                    <Button
+                                    <ButtonCPN
+                                      type="submit"
+                                      primary
+                                      style={{
+                                        padding: "0 10px",
+                                        height: "40px",
+                                        width: "100px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                      }}
+                                      text="Lưu"
+                                    ></ButtonCPN>
+                                    <ButtonCPN
                                       type="button"
+                                      text="hủy"
+                                      style={{
+                                        padding: "0 10px",
+                                        height: "40px",
+                                        width: "100px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                      }}
                                       onClick={() => setEditingCommentId(null)}
                                     >
                                       Hủy
-                                    </Button>
+                                    </ButtonCPN>
                                   </CommentForm>
                                 ) : (
-                                  <CommentText>{comment.comment}</CommentText>
+                                  <CommentText>
+                                    <div>
+                                      <p
+                                        dangerouslySetInnerHTML={{
+                                          __html: convertJson({
+                                            content: comment.comment,
+                                          }),
+                                        }}
+                                      />
+                                    </div>
+                                  </CommentText>
                                 )}
                               </CommentBody>
                               <CommentFooter>
@@ -747,18 +752,35 @@ const BlogDetail = () => {
                 )}
               </CommentContainer>
               {/* Comment form */}
-              {user ? (
+             {user ? (
                 <CommentForm onSubmit={handleCommentSubmit}>
-                  <TextArea
-                    placeholder="Nội dung bình luận"
-                    value={commentContent}
-                    onChange={(e) => setCommentContent(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    required
+                  <ReactQuill
+                     value={commentContent}
+                    onChange={setCommentContent}
+                    style={{ height: "100px", width: "100%" }}
                   />
-                  <Button type="submit" primary style={{ padding: "0 10px" }}>
-                    <Icon src="/img/send.jpg" />
-                  </Button>
+
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                    }}
+                  >
+                    <ButtonCPN
+                      type="submit"
+                      text="Gửi"
+                      primary
+                      style={{
+                        padding: "0 10px",
+                        height: "50px",
+                        width: "50px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    ></ButtonCPN>
+                  </div>
                 </CommentForm>
               ) : (
                 <NavMenuLink
