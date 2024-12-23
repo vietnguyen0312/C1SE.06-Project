@@ -297,7 +297,7 @@ const Ticket = ({ style }) => {
 
     };
 
-    const handlePayment = async () => {
+    const handlePaymentOnline = async () => {
         const total = cartItems.reduce((acc, cartItem) => acc + cartItem.value.reduce((acc, ticketBooking) => acc + ticketBooking.total, 0), 0);
         const bill = await axios.post('/bill-ticket', { total: total });
 
@@ -353,6 +353,62 @@ const Ticket = ({ style }) => {
                     </SearchContainer>
 
                     <ContainerTicket>
+                        {isEmployee == true && (
+                            <>
+                                <div style={{ marginTop: '20px' }}>
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '15px',
+                                            border: '1px solid #ccc',
+                                            padding: '15px',
+                                            borderRadius: '10px',
+                                            maxWidth: '100%',
+                                            margin: '0 auto',
+                                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+                                            backgroundColor: '#fff',
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
+                                                Họ và Tên:
+                                            </label>
+                                            <input
+                                                onChange={(e) => setNameCustomer(e.target.value)}
+                                                type="text"
+                                                placeholder="Nhập họ và tên"
+                                                style={{
+                                                    padding: '8px',
+                                                    fontSize: '14px',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '5px',
+                                                    minWidth: '150px',
+                                                }}
+                                            />
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <label style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '5px' }}>
+                                                Số điện thoại:
+                                            </label>
+                                            <input
+                                                onChange={(e) => setPhoneCustomer(e.target.value)}
+                                                type="text"
+                                                placeholder="Nhập số điện thoại"
+                                                style={{
+                                                    padding: '8px',
+                                                    fontSize: '14px',
+                                                    border: '1px solid #ccc',
+                                                    borderRadius: '5px',
+                                                    minWidth: '150px',
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+
                         {selectedTicket && showService ? (
                             <ServiceContainer data-aos="fade-in">
                                 <ServiceImg src={`/img/service/${selectedTicket.key.image}`} />
@@ -386,7 +442,6 @@ const Ticket = ({ style }) => {
                                 <ContentTicket1 style={{ textAlign: 'center', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 </ContentTicket1>
                             </div>
-
                         )}
                         <SelectTypeService>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

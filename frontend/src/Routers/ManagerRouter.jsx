@@ -10,6 +10,7 @@ import Rooms from "../Layout/PrivateLayout/Rooms";
 import Employee from "../Layout/PrivateLayout/Employee";
 import Customer from "../Layout/PrivateLayout/Customer";
 import Service from "../Layout/PrivateLayout/Service";
+import Manager from "../Layout/PrivateLayout/Manager";
 const ManagerRouter = [
     {
 //         element: <ProtectedRoute role='MANAGER' />,
@@ -57,6 +58,10 @@ const ManagerRouter = [
                     {
                         path: "service",
                         element: <Service />,
+                    },
+                    {
+                        path: "listManager",
+                        element: <Manager />,
                     },
                 ],
             }

@@ -92,6 +92,13 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/recent-rating")
+    ApiResponse<RecentRatingResponse> getRecentRatings() {
+        return ApiResponse.<RecentRatingResponse>builder()
+                .result(userService.recentRating())
+                .build();
+    }
+
     @GetMapping("/booking/byPhone")
     ApiResponse<List<UserResponse>> getUserByPhone( @RequestParam(value = "search", required = false, defaultValue = "") String search) {
         return ApiResponse

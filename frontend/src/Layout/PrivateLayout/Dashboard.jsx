@@ -303,7 +303,7 @@ const RoomDetailColumns = [
         render: (record) => (
           <div style={{ display: "flex", alignItems: "center" }}>
             <img
-              src={record.image}
+              src={record.room.roomType.image}
               alt="Avatar"
               style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
             />
@@ -312,15 +312,12 @@ const RoomDetailColumns = [
         ),
     },
     { title: 'Phòng số',render:(record)=>record.room.roomNumber},
-    { title: 'Số lượng người', render:(record)=>record.room.roomType.maxOfPeople},
     { title: 'Ngày đặt', render:(record)=>new Date(record.bookingRoom.checkInDate).toLocaleDateString()},
     {title:'Ngày trả',render:(record)=>new Date(record.bookingRoom.checkOutDate).toLocaleDateString()},
     { title: 'Thành tiền', sorter: (a, b) => a.total - b.total,
         render: (record)=>record.room.roomType.price.toLocaleString('vi-VN',{style:'currency',currency:'VND'})
      },
 ];
-
-
 
 const viewRoomColumns = [
     {
@@ -333,7 +330,7 @@ const viewRoomColumns = [
         render: (record) => (
           <div style={{ display: "flex", alignItems: "center" }}>
             <img
-              src={`/img/hotels/room_type/${record.roomType.image}`}
+              src={`${record.roomType.image}`}
               alt="Avatar"
               style={{ width: 40, height: 40, borderRadius: "50%", marginRight: 11 }}
             />
@@ -347,8 +344,6 @@ const viewRoomColumns = [
         render:(record)=>record.revenue.toLocaleString('vi-VN',{style:'currency',currency:'VND'})
     },  
 ]
-
-
 
 const Dashboard = () => {
     const [showHistoryTicket, setShowHistoryTicket] = useState(true);
@@ -382,7 +377,7 @@ const Dashboard = () => {
             key: "serviceInfo",
             render: (record) => (
               <div style={{ display: "flex", alignItems: "center" }}>
-                <ImgService src={`/img/service/${record.serviceEntity.image}`} />
+                <ImgService src={`${record.serviceEntity.image}`} />
                 <span>{record.serviceEntity.name}</span>
               </div>
             ),
@@ -520,11 +515,36 @@ const Dashboard = () => {
                 <span>{record.user?.username}</span>
             </div> 
         },
-        { title: "Giới tính", render: (record) => record.user.gender },
-        { title: "Loại khách hàng", render: (record) => Array.isArray(record.user.customerType) ? record.user.customerType.map((type) => type.name).join(", ") : record.user.customerType?.name || "N/A" },
-        { title: "Ngày đặt", render: (record) => new Date(record.dateCreated).toLocaleDateString() },
         { title: "Số điện thoại", render: (record) => record.user.phoneNumber },
+        { title: "Loại khách hàng", render: (record) => Array.isArray(record.user.customerType) ? record.user.customerType.map((type) => type.name).join(", ") : record.user.customerType?.name || "N/A" },
+        { title: "Ngày đặt", render: (record) => {
+            const date = new Date(record.dateCreated);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }},
         {title:'Tổng tiền',render:(record)=>record.total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})},
+        { 
+            title: "Trạng thái", 
+            render: (record) => {
+                let color;
+                switch (record.status.toLowerCase()) {
+                    case 'đã thanh toán':
+                        color = 'green';
+                        break;
+                    case 'đã huỷ':
+                        color = 'red';
+                        break;
+                    case 'chưa thanh toán':
+                        color = 'orange';
+                        break;
+                    default:
+                        color = 'black';
+                }
+                return <span style={{ color, fontWeight: 'bold' }}>{record.status.toUpperCase()}</span>;
+            }
+        },
         { 
             title: 'Chi tiết',
             render: (record) => (
@@ -582,11 +602,37 @@ const Dashboard = () => {
               </div>
             ),
         },
-        { title: 'Giới tính', render: (record) => record.user.gender },
-        { title: 'Loại khách hàng', render:(record)=>record.user.customerType.name},
-        { title: 'Ngày đặt', render:(record) => new Date(record.checkInDate).toLocaleDateString()},
         { title: 'Số điện thoại', render:(record) => record.user.phoneNumber},
+        { title: 'Loại khách hàng', render:(record)=>record.user.customerType.name},
+        { title: 'Ngày đặt', render:(record) => {
+            const date = new Date(record.checkInDate);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }},
         {title:'Tổng tiền',render:(record)=>record.total.toLocaleString('vi-VN',{style:'currency',currency:'VND'})},
+        { 
+            title: "Trạng thái", 
+            render: (record) => {
+                let color;
+                switch (record.status.toLowerCase()) {
+                    case 'đã thanh toán':
+                        color = 'green';
+                        break;
+                    case 'đã huỷ':
+                    case 'đã hủy':
+                        color = 'red';
+                        break;
+                    case 'chưa thanh toán':
+                        color = 'orange';
+                        break;
+                    default:
+                        color = 'black';
+                }
+                return <span style={{ color, fontWeight: 'bold' }}>{record.status.toUpperCase()}</span>;
+            }
+        },
         { 
             title: 'Chi tiết', 
             render: (record) => (
@@ -634,11 +680,11 @@ const Dashboard = () => {
         <Container>
             <DashboardContainer>
                 <div>
-                    <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Dashboard</div>
+                    <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Doanh thu</div>
                     <Header>
-                        <HeaderItem>Home</HeaderItem>
+                        <HeaderItem>Trang chủ</HeaderItem>
                         <p>→</p>
-                        <HeaderItem>Dashboard</HeaderItem>
+                        <HeaderItem>Doanh thu</HeaderItem>
                     </Header>
                 </div>
                 <div>
@@ -840,7 +886,7 @@ const Dashboard = () => {
                                 <div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
                                         <div style={{ display: 'flex' }}>
-                                            <ImgService src={`/img/service/${data.serviceEntity.image}`} />
+                                            <ImgService src={`${data.serviceEntity.image}`} />
                                             <div>
                                                 <div style={{ marginRight: '10px' }}>{data.serviceEntity?.name}</div>
                                                 <div style={{ color: '#999', fontSize: '13px' }}> {data.serviceType?.name}</div>
@@ -958,7 +1004,7 @@ const Dashboard = () => {
                                 <div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 0' }}>
                                         <div style={{ display: 'flex' }}>
-                                            <ImgService src={`/img/hotels/room_type/${data.roomType.image}`} />
+                                            <ImgService src={`${data.roomType.image}`} />
                                             <div>
                                                 <div style={{ marginRight: '10px' }}>{data.roomType?.name}</div>
                                             </div>

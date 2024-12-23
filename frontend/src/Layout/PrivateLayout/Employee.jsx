@@ -46,7 +46,7 @@ const Employee = () => {
         setModalContent(content);
         setIsModalVisible(true);
       };
-    const fetchData = async (page =1 ,pageSize=6, role="customer")=>{
+    const fetchData = async (page =1 ,pageSize=6, role="employee")=>{
         setLoading(false);
         const response = await axios.get('/users',{
             params:{page,pageSize,role}

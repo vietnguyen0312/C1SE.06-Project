@@ -4,6 +4,7 @@ import com.example.Backend.dto.request.User.UserChangePasswordRequest;
 import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.PageResponse;
+import com.example.Backend.dto.response.RecentRatingResponse;
 import com.example.Backend.dto.response.User.UserResponse;
 import com.example.Backend.entity.Service.ServiceEntity;
 import com.example.Backend.entity.User.Role;
@@ -12,7 +13,11 @@ import com.example.Backend.enums.CustomerTypeEnum;
 import com.example.Backend.enums.RoleEnum;
 import com.example.Backend.exception.AppException;
 import com.example.Backend.enums.ErrorCode;
+import com.example.Backend.mapper.Rating.RateRoomMapper;
+import com.example.Backend.mapper.Rating.RateServiceMapper;
 import com.example.Backend.mapper.User.UserMapper;
+import com.example.Backend.repository.Rating.RateRoomRepository;
+import com.example.Backend.repository.Rating.RateServiceRepository;
 import com.example.Backend.repository.User.CustomerTypeRepository;
 import com.example.Backend.repository.User.UserRepository;
 import lombok.AccessLevel;
@@ -43,6 +48,8 @@ public class UserService {
     CustomerTypeRepository customerTypeRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    RateRoomRepository rateRoomRepository;
+    RateServiceRepository rateServiceRepository;
 
     public UserResponse createUser(UserCreationRequest request) {
 
@@ -161,4 +168,11 @@ public class UserService {
                 .map(userMapper::toUserResponse)
                 .collect(Collectors.toList());
     }
+    public RecentRatingResponse recentRating() {
+        return RecentRatingResponse.builder()
+                .rateRooms(rateRoomRepository.findTop6ByOrderByDateUpdateDesc())
+                .rateServices(rateServiceRepository.findTop6ByOrderByDateUpdateDesc())
+                .build();
+    }
+
 }
