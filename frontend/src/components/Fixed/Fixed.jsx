@@ -1,3 +1,4 @@
+
 import { UpOutlined, CloseOutlined, FullscreenOutlined, FullscreenExitOutlined, SendOutlined } from '@ant-design/icons';
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
@@ -8,14 +9,14 @@ import DOMPurify from 'dompurify';
 
 const Up = styled(UpOutlined)`
   position: fixed;
-  bottom: 20px;
-  right: 20px;
   padding: 10px 20px;
   background-color: white;
   border-radius: 50%;
   cursor: pointer;
-  width: 55px;
-  height: 55px;
+  right: 10px;
+  bottom: 20px;
+  width: 60px;
+  height: 60px;
   z-index: 1000; 
   display: flex;
   justify-content: center;
@@ -35,6 +36,16 @@ const Container = styled.div`
   position: fixed;
   bottom: 20px;
   left: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 999999;
+`;
+
+const FixedRight = styled.div`
+  position: fixed;
+  bottom: 90px;
+  right: 10px;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -75,9 +86,9 @@ const ChatBox = styled.div`
   @keyframes swing {
     0% { transform: rotate(0deg); }
     20% { transform: rotate(10deg); }
-    40% { transform: rotate(-30deg); }
-    60% { transform: rotate(5deg); }
-    80% { transform: rotate(-5deg); }
+    40% { transform: rotate(-10deg); }
+    60% { transform: rotate(10deg); }
+    80% { transform: rotate(-10deg); }
     100% { transform: rotate(0deg); }
   } 
 `;
@@ -114,6 +125,28 @@ const Ticket = styled.div`
   }
 `;
 
+const Manager = styled.div`
+  padding: 10px 20px;
+  background-color: #f9f9f9;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 60px;
+  height: 60px;
+  z-index: 1000; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  animation: pulse 1.5s infinite; 
+  bottom: 40px;
+
+  a img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    animation: swing 0.5s infinite; 
+  }
+`;
 const ChatWindow = styled.div`
   position: fixed;
   bottom: 20px;
@@ -293,7 +326,6 @@ const Fixed = () => {
     }
   };
 
-
   // Cuộn xuống cuối khi messages thay đổi
   const chatBodyRef = useRef(null);
   useEffect(() => {
@@ -301,6 +333,8 @@ const Fixed = () => {
       chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
     }
   }, [messages]);
+  
+
   return (
     <>
       <Container data-aos="fade-right">
@@ -355,11 +389,17 @@ const Fixed = () => {
           ))}
         </ChatBody>
         <ChatInputWrapper>
-  <ChatInput placeholder="Nhập tin nhắn..." onKeyDown={handleKeyDown} />
-  <Send onClick={(event) => handleSendMessage(event)} /> {/* Gọi với event */}
-</ChatInputWrapper>
+          <ChatInput placeholder="Nhập tin nhắn..." onKeyDown={handleKeyDown} />
+          <Send onClick={(event) => handleSendMessage(event)} /> {/* Gọi với event */}
+        </ChatInputWrapper>
       </ChatWindow>
-
+      <FixedRight>
+        <Manager>
+          <a href='/manager'>
+            <img src={('/img/manager.png')} alt='manager' />
+          </a>
+        </Manager>
+      </FixedRight>
       <Up className={sticky ? 'sticky' : ''} onClick={scrollToTop} data-aos="fade-left" />
     </>
   );

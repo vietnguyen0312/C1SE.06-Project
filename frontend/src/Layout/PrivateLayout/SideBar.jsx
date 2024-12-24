@@ -3,11 +3,8 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { 
     DashboardOutlined, 
-    FileTextOutlined, 
-    UserOutlined, 
     TeamOutlined, 
     KeyOutlined, 
-    ProfileOutlined, 
     HomeOutlined, 
     CalendarOutlined, 
     FileDoneOutlined 
@@ -52,13 +49,7 @@ const Content = styled.div`
 `;
 
 const Sidebar = () => {
-    const [activeDropdown, setActiveDropdown] = useState(null);
-
-    const toggleDropdown = (dropdownName) => {
-        setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
-    };
-    const navigate = useNavigate(); // Khởi tạo useNavigate
-
+    const navigate = useNavigate(); 
     return (
         <SidebarContainer>
             <SidebarContent>
@@ -85,10 +76,6 @@ const Sidebar = () => {
                     <Item onClick={() => navigate('/manager/bookings')}>
                         <CalendarOutlined />
                         <div>Đặt phòng/vé</div>
-                    </Item>
-                    <Item>
-                        <FileDoneOutlined />
-                        <div>Lịch sử giao dịch</div>
                     </Item>
                 </Hotel>
                 <Hotel>

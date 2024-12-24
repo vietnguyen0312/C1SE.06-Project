@@ -101,10 +101,6 @@ const Manager = () => {
           },
       });
     };
-    const handleEdit = (record) => {
-        console.log('Edit user:', record);
-        showModal(record); 
-    };
     
     const columns = [
         { 
@@ -163,7 +159,6 @@ const Manager = () => {
             dataIndex: "status",
             render: (status, record) => (
               <span style={{ 
-                opacity: record.status === "BAN" ? 0.5 : 1,
                 color: status === "BAN" ? "#ff0004" : "#52c41a",
                 fontWeight: '600'
               }}>
@@ -179,7 +174,6 @@ const Manager = () => {
                 <Popover 
                     content={
                         <div>
-                            <PopoverItem onClick={() => handleEdit(record)}>Edit</PopoverItem>
                             <PopoverItem
                                 onClick={() => handleBanUser(record)}
                                 style={{
@@ -273,47 +267,6 @@ const Manager = () => {
                 width={modalSize.width}
                 height={modalSize.height}
             >
-            <div>
-            {modalContent && (
-                <FormContainer>
-                <div style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px' }}>Chỉnh sửa thông tin nhân viên</div>
-                    <Form layout="vertical" >
-                    <Form.Item
-                        label="Họ tên nhân viên"
-                        name="name"
-                    >
-                    <Input placeholder="Nhập họ tên nhân viên" />
-                    </Form.Item>
-                    <Form.Item
-                        label="Email"
-                        name="email"
-                    >
-                    <Input placeholder="Nhập email" />
-                    </Form.Item>
-                    <Form.Item
-                        label="Số điện thoại"
-                        name="phoneNumber"
-                    >
-                    <Input placeholder="Nhập số điện thoại" />
-                    </Form.Item>
-                    <Form.Item
-                        label="Giới tính"
-                        name="gender"
-                    >
-                    <Select placeholder="Chọn giới tính">
-                        <Option value="male">Nam</Option>
-                        <Option value="female">Nữ</Option>
-                        <Option value="maleFemale">Khác</Option>
-                    </Select>
-                    </Form.Item>
-                    <div style={{display:'flex', gap:'20px'}}>
-                        <ButtonCPN text="Edit" type="primary" htmlType="submit" style={{width:'170px', height:'50px',fontSize:'14px'}}/>
-                        <ButtonCPN text="Đóng" onClick={()=>{setIsModalVisible(false)}} style={{width:'170px', height:'50px',fontSize:'14px', backgroundColor:'#ababaa'}}/>
-                    </div>
-                    </Form>
-                </FormContainer>
-                )}
-            </div>
             </Modal>
         </EmployeeContainer>
     );
