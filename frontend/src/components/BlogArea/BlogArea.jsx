@@ -133,7 +133,7 @@ const BlogArea = () => {
 
   useEffect(() => {
     fetchBlog();
-    Aos.init({ duration: 2000 });
+    Aos.init({ duration: 500 });
   }, [currentPage]);
 
   const handlePageChange = (pageNumber) => {

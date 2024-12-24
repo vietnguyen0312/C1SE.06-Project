@@ -18,7 +18,7 @@ import 'aos/dist/aos.css';
 
 function Home() {
   useEffect(() => {
-    AOS.init({ duration: 2000 });
+    AOS.init({ duration: 500 });
   }, []);
 
 
@@ -41,7 +41,7 @@ function Home() {
       <PopularDestinations />
       <BookNow />
       <OtherIssues />
-      {/* <BlogArea /> */}
+      <BlogArea />
     </>
   );
 }

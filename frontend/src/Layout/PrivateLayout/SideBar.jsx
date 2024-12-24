@@ -65,7 +65,7 @@ const Sidebar = () => {
                 <div style={{ padding: '15px 0', borderBottom: '1px solid #e5e5e5' }} onClick={() => navigate('/manager')}>
                     <Item>
                         <DashboardOutlined />
-                        <div>Trang chủ</div>
+                        <div>Doanh thu</div>
                     </Item>
                 </div>
                 <Hotel>

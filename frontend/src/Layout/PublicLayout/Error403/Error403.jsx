@@ -19,8 +19,11 @@ import {
   Headline
 } from './style';
 import Button from '../../../components/Button/Button';
+import { getRoles, getRedirectPath } from '../../../Service/Login';
+import { useNavigate } from 'react-router-dom';
 
 const Error403 = () => {
+  const navigate = useNavigate();
   return (
     <>
       <GlobalStyle />
@@ -138,7 +141,7 @@ const Error403 = () => {
             </svg>
             <Button style={{ backgroundColor: 'white', color: 'black', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',width: '200px', height: '50px', fontSize: '15px', }}
               text="Quay lại ngay ‼️ 😠"
-              onClick={() => window.location.href = "/"} />
+              onClick={() => navigate(getRedirectPath(getRoles(localStorage.getItem('token'))))} />
 
             <div />
           </UpperRoof>

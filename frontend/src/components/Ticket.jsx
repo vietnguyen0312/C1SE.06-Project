@@ -492,7 +492,7 @@ const Ticket = ({ style }) => {
                                         </div>
                                         <div>
                                             <ButtonCPN
-                                                text='Reset'
+                                                text='Xoá'
                                                 style={{ marginTop: '20px', width: '150px', height: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                                                 onClick={() => {
                                                     setSelectedCustomer(null);
