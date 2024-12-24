@@ -5,7 +5,6 @@ import { SettingOutlined, PlusOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import ButtonCPN from '../../components/Button/Button'
 
-
 const PopoverItem = styled.div`
     padding: 10px;
     cursor: pointer;
@@ -19,20 +18,10 @@ const EmployeeContainer = styled.div`
     background-color: #f5f5f5;
 `;
 
-
-
-const handleEdit = (record) => {
-    console.log('Edit user:', record);
-};
-
-const handleDelete = (record) => {
-    console.log('Delete user:', record);
-};
-
 const Employee = () => {
     const [DsNhanVien, SetDsNhanVien] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [showAddEmployee, setShowAddEmployee] = useState(false);
+    const [showAddUser, setShowAddUser] = useState(false);
     const [pagination, setPagination] = useState({
         current: 1,
         pageSize: 6,
@@ -78,9 +67,39 @@ const Employee = () => {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     `;
-
-    const handleAddCustomer = (values) => {
-        console.log('New employee:', values);
+    const updateUserStatus = async (id, status, userData) => {
+        const response = await axios.put(`/users/${id}`,{
+            ...userData,
+            status: status,
+        })
+    }
+    const handleBanUser = (record) => {
+        Modal.confirm({
+          title: "Xác nhận",
+          content: "Cấm người dùng này không?",
+          onOk: async () => {
+            await updateUserStatus(record.id, "BAN", record);
+            fetchData(pagination.current, pagination.pageSize);
+          },
+          okButtonProps: {
+            style: { backgroundColor: '#f8b600', borderColor: '#f8b600' },
+          },
+        });
+      };
+      
+    const handleAddUser = async (values) => {
+        const response = await axios.post('/users/create-employee',{
+            ...values,
+        });
+        fetchData(pagination.current, pagination.pageSize);
+        setShowAddUser(false);
+        Modal.success({
+            title: 'Thành công',
+            content: 'Thêm nhân viên mới thành công',
+            okButtonProps: {
+                style: { backgroundColor: '#f8b600', borderColor: '#f8b600' },
+            },
+        });
     };
     const handleEdit = (record) => {
         console.log('Edit user:', record);
@@ -92,13 +111,17 @@ const Employee = () => {
             title: 'ID', 
             dataIndex: 'id', 
             key: 'id',
-            render: (id) => `${id.slice(0, 6)}...` 
+            render: (id, record) => (
+                <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+                  {id.slice(0, 6)}...
+                </span>
+              ),
         },
         {
             title: "Thông tin nhân viên",
             key: "userInfo",
             render: (record) => (
-              <div style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", opacity: record.status === "BAN" ? 0.5 : 1 }}>
                 <img
                   src={record.avatar}
                   alt="Avatar"
@@ -108,15 +131,46 @@ const Employee = () => {
               </div>
             ),
         },
-        { title: 'Email', dataIndex: 'email', key: 'email' },
+        { title: 'Email', 
+            render: (record) => (
+                <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+                  {record.email}
+                </span>
+              ),
+        },
         { 
             title: 'Mật khẩu', 
             dataIndex: 'password', 
             key: 'password',
             render: () => '*****'
         },
-        { title: 'Số điện thoại', dataIndex: 'phoneNumber', key: 'phoneNumber' },
-        { title: 'Giới tính', dataIndex: 'gender', key: 'gender' },
+        { title: 'Số điện thoại', 
+            render: (record) => (
+                <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+                  {record.phoneNumber || "N/A"}
+                </span>
+              ),
+        },
+        { title: 'Giới tính', 
+            render: (record) => (
+                <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
+                  {record.gender || "N/A"}
+                </span>
+              ),
+        },
+        {
+            title: "Trạng thái",
+            dataIndex: "status",
+            render: (status, record) => (
+              <span style={{ 
+                opacity: record.status === "BAN" ? 0.5 : 1,
+                color: status === "BAN" ? "#ff0004" : "#52c41a",
+                fontWeight: '600'
+              }}>
+                {status === "BAN" ? "Dừng hoạt động" : "Đang hoạt động"}
+              </span>
+            ),
+        },
         { 
             title: 'Action', 
             dataIndex: 'action', 
@@ -126,7 +180,15 @@ const Employee = () => {
                     content={
                         <div>
                             <PopoverItem onClick={() => handleEdit(record)}>Edit</PopoverItem>
-                            <PopoverItem onClick={() => handleDelete(record)}>Delete</PopoverItem>
+                            <PopoverItem
+                                onClick={() => handleBanUser(record)}
+                                style={{
+                                    pointerEvents: record.status === "BAN" ? "none" : "auto",
+                                    opacity: record.status === "BAN" ? 0.5 : 1,
+                                }}
+                                >
+                                Set ban
+                            </PopoverItem>
                         </div>
                     } 
                     trigger="click" 
@@ -141,44 +203,14 @@ const Employee = () => {
     ];
     return (
         <EmployeeContainer>
-            <ButtonCPN text="Thêm nhân viên" style={{marginBottom:'20px'}} onClick={()=> setShowAddEmployee(true)}/>
-            {showAddEmployee && (
+            <ButtonCPN text="Thêm nhân viên" style={{marginBottom:'20px'}} onClick={()=> setShowAddUser(true)}/>
+            {showAddUser && (
                 <FormContainer>
             <div style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px' }}>Thêm mới nhân viên</div>
-                <Form layout="vertical" onFinish={handleAddCustomer}>
-                <Form.Item
-                    label="Ảnh đại diện"
-                    name="avatar"
-                    rules={[{ required: true, message: 'Vui lòng tải lên ảnh đại diện!' }]}
-                >
-                    <Upload
-                        listType="picture-card"
-                        maxCount={1}
-                        accept="image/*"
-                        beforeUpload={(file) => {
-                            const isImage = file.type.startsWith("image/");
-                            if (!isImage) {
-                                message.error("Vui lòng tải lên tệp hình ảnh!");
-                            }
-                            return isImage || Upload.LIST_IGNORE;
-                        }}
-                        onChange={(info) => {
-                            if (info.file.status === "done") {
-                                message.success(`${info.file.name} đã tải lên thành công.`);
-                            } else if (info.file.status === "error") {
-                                message.error(`${info.file.name} tải lên thất bại.`);
-                            }
-                        }}
-                    >
-                        <div>
-                            <PlusOutlined />
-                            <div style={{ marginTop: 8 }}>Tải ảnh</div>
-                        </div>
-                    </Upload>
-                </Form.Item>
+                <Form layout="vertical" onFinish={handleAddUser}>
                     <Form.Item
                         label="Họ tên"
-                        name="name"
+                        name="username"
                         rules={[{ required: true, message: 'Vui lòng nhập họ tên!' }]}
                     >
                     <Input placeholder="Nhập họ tên" />
@@ -189,6 +221,13 @@ const Employee = () => {
                         rules={[{ required: true, type: 'email', message: 'Vui lòng nhập email hợp lệ!' }]}
                     >
                     <Input placeholder="Nhập email" />
+                    </Form.Item>
+                    <Form.Item
+                        label="Mật khẩu"
+                        name="password"
+                        rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+                    >
+                    <Input.Password placeholder="Nhập mật khẩu" />
                     </Form.Item>
                     <Form.Item
                         label="Số điện thoại"
@@ -203,16 +242,15 @@ const Employee = () => {
                         rules={[{ required: true, message: 'Vui lòng chọn giới tính!' }]}
                     >
                     <Select placeholder="Chọn giới tính">
-                        <Option value="male">Nam</Option>
-                        <Option value="female">Nữ</Option>
-                        <Option value="maleFemale">Khác</Option>
+                        <Option value="Male">Male</Option>
+                        <Option value="Female">Female</Option>
+                        <Option value="Other">Other</Option>
                     </Select>
                     </Form.Item>
                     <div style={{display:'flex', gap:'20px'}}>
                         <ButtonCPN text="Thêm nhân viên" type="primary" htmlType="submit" style={{width:'170px', height:'50px',fontSize:'14px'}}/>
-                        <ButtonCPN text="Đóng" onClick={()=> {setShowAddEmployee(false)}} style={{width:'170px', height:'50px',fontSize:'14px', backgroundColor:'#ababaa'}}/>
+                        <ButtonCPN text="Đóng" onClick={()=> {setShowAddUser(false)}} style={{width:'170px', height:'50px',fontSize:'14px', backgroundColor:'#ababaa'}}/>
                     </div>
-                    
                 </Form>
             </FormContainer>
             )}

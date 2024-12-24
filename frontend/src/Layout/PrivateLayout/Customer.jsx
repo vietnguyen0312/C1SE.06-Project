@@ -36,7 +36,7 @@ const Customer = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalContent, setModalContent] = useState(null);
   const [modalSize, setModalSize] = useState({ width: 900, height: 500 });
-
+  const [showAddUser, setShowAddUser] = useState(false);
   const showModal = (content) => {
     setModalContent(content);
     setIsModalVisible(true);
@@ -156,8 +156,12 @@ const Customer = () => {
       title: "Trạng thái",
       dataIndex: "status",
       render: (status, record) => (
-        <span style={{ opacity: record.status === "BAN" ? 0.5 : 1 }}>
-          {status === "BAN" ? "Bị cấm " : "Đang hoạt động"}
+        <span style={{ 
+          opacity: record.status === "BAN" ? 0.5 : 1,
+          color: status === "BAN" ? "#ff0004" : "#52c41a",
+          fontWeight: '600'
+        }}>
+          {status === "BAN" ? "Dừng hoạt động" : "Đang hoạt động"}
         </span>
       ),
     },
