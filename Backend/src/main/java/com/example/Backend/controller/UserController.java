@@ -6,7 +6,6 @@ import com.example.Backend.dto.request.User.UserCreationRequest;
 import com.example.Backend.dto.request.User.UserUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.PageResponse;
-import com.example.Backend.dto.response.RecentRatingResponse;
 import com.example.Backend.dto.response.User.UserResponse;
 import com.example.Backend.service.User.UserService;
 import jakarta.validation.Valid;
@@ -111,58 +110,31 @@ public class UserController {
                 .build();
     }
 
+
+
+
     @GetMapping("/booking/byPhone")
-    ApiResponse<List<UserResponse>> getUserByPhone( @RequestParam(value = "search", required = false, defaultValue = "") String search) {
-        return ApiResponse
-                .<List<UserResponse>>builder()
-                .result(userService.getUsersBySearch(search))
-                .build();
+    public ApiResponse<PageResponse<UserResponse>> searchUsers(
+            @RequestParam(value = "search", required = false, defaultValue = "") String search,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+            PageResponse<UserResponse> userResponses = userService.getUsersBySearch(search, page, size);
+            return ApiResponse.<PageResponse<UserResponse>>builder()
+                    .result(userResponses)
+                    .build();
     }
+
 
     @GetMapping("/booking/byEmail")
-    ApiResponse<List<UserResponse>> getUserByEmail1( @RequestParam(value = "search", required = false, defaultValue = "") String search) {
-        return ApiResponse
-                .<List<UserResponse>>builder()
-                .result(userService.getUsersBySearch1(search))
-                .build();
-    }
-        @PostMapping("/change-password/{id}")
-        ApiResponse<UserResponse> changePassword(@PathVariable("id") String id,
-                        @RequestBody @Valid UserChangePasswordRequest request) {
-                return ApiResponse
-                                .<UserResponse>builder()
-                                .result(userService.changePassword(id, request))
-                                .build();
-        }
-
-        @GetMapping("/booking/byPhone")
-        public ApiResponse<PageResponse<UserResponse>> searchUsers(
-                @RequestParam(value = "search", required = false, defaultValue = "") String search,
-                @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
-                PageResponse<UserResponse> userResponses = userService.getUsersBySearch(search, page, size);
-                return ApiResponse.<PageResponse<UserResponse>>builder()
-                        .result(userResponses)
-                        .build();
+    public ApiResponse<PageResponse<UserResponse>> searchUsersByEmail(
+            @RequestParam(value = "search", required = false, defaultValue = "") String search,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+            PageResponse<UserResponse> userResponses = userService.getUsersBySearchByEmail(search, page, size);
+            return ApiResponse.<PageResponse<UserResponse>>builder()
+                    .result(userResponses)
+                    .build();
         }
 
 
-        @GetMapping("/booking/byEmail")
-        public ApiResponse<PageResponse<UserResponse>> searchUsersByEmail(
-                @RequestParam(value = "search", required = false, defaultValue = "") String search,
-                @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-                @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
-                PageResponse<UserResponse> userResponses = userService.getUsersBySearchByEmail(search, page, size);
-                return ApiResponse.<PageResponse<UserResponse>>builder()
-                        .result(userResponses)
-                        .build();
-        }
-
-
-        @GetMapping("/recent-rating")
-        ApiResponse<RecentRatingResponse> getRecentRatings() {
-                return ApiResponse.<RecentRatingResponse>builder()
-                                .result(userService.recentRating())
-                                .build();
-        }
 }
