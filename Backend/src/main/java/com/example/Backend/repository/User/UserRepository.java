@@ -1,6 +1,5 @@
 package com.example.Backend.repository.User;
 
-import com.example.Backend.dto.response.User.UserResponse;
 import com.example.Backend.entity.User.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +16,8 @@ import java.util.Set;
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByEmailOrPhoneNumber(String email, String phoneNumber);
+
     boolean existsByEmail(String email);
 
     @Query("SELECT u FROM User u " +
@@ -28,7 +29,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query("SELECT u FROM User u WHERE SIZE(u.roles) = :priorityRole")
     Page<User> findByRoles_Size(@Param("priorityRole") int priorityRole, Pageable pageable);
-
 
     @Query("SELECT u FROM User u " +
             "WHERE (:search IS NULL OR u.phoneNumber LIKE %:search%) " +

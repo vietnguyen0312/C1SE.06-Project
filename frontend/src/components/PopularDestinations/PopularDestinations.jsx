@@ -107,19 +107,19 @@ const Image = styled.img`
 const PopularDestinations = () => {
 
   useEffect(() => {
-    AOS.init({ duration: 2000 });
+    AOS.init({ duration: 500 });
   }, []);
 
   return (
     <Section className="popular-destination-area section-gap" data-aos="fade-up">
       <Container>
         <TitleArea>
-          <Subtitle className='Allison'>Services List</Subtitle>
+          <Subtitle className='Allison'>Danh sách các dịch vụ</Subtitle>
           <Title className='LibreBaskerville'>Trải nghiệm ngay !!</Title>
         </TitleArea>
         <ImageGame>
           <ImageGame1>
-            <Image src="/img/service/xichlo1.jpg" />
+            <Image src="/img/xichlo1.jpg" />
             <Content>Di Chuyển</Content>
           </ImageGame1>
           <ImageGame2>

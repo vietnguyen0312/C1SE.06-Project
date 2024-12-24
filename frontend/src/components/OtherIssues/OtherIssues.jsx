@@ -88,7 +88,7 @@ const OtherIssues = () => {
   return (
     <Container>
       <div>
-        <Title className="Allison">Services Hot</Title>
+        <Title className="Allison">Dịch vụ hàng đầu</Title>
       </div>
       <Section>
         <ImgLeftWrapper>

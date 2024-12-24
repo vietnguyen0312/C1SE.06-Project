@@ -59,20 +59,6 @@ const Sidebar = () => {
     };
     const navigate = useNavigate(); // Khởi tạo useNavigate
 
-    const menuItems = (
-        <>
-            <div><a href="#option1">Option 1</a></div>
-            <div><a href="#option2">Option 2</a></div>
-            <div style={{ color: 'gray' }}>Disabled Option</div>
-        </>
-    );
-
-    const dashboard = (
-        <>
-            <div style={{display: 'flex', alignItems: 'center', gap: '10px'}} onClick={() => navigate('/manager')}><FileTextOutlined />Báo cáo</div>
-        </>
-    );
-
     return (
         <SidebarContainer>
             <SidebarContent>
@@ -92,18 +78,22 @@ const Sidebar = () => {
                         <KeyOutlined />
                         <div>Dịch vụ</div>
                     </Item>
-                    <Item onClick={() => navigate('/manager/bookings')}>
-                        <CalendarOutlined />
-                        <div>Bookings</div>
-                    </Item>
                     <Item>
                         <FileDoneOutlined />
                         <Link style={{textDecoration: "none", color: "inherit"}} to='/manager/blogs'>Blogs</Link>
                     </Item>
+                    <Item onClick={() => navigate('/manager/bookings')}>
+                        <CalendarOutlined />
+                        <div>Đặt phòng/vé</div>
+                    </Item>
+                    <Item>
+                        <FileDoneOutlined />
+                        <div>Lịch sử giao dịch</div>
+                    </Item>
                 </Hotel>
                 <Hotel>
                     <Content>KHÁCH HÀNG | NHÂN SỰ</Content>
-                    <Item onClick={() => navigate('')}>
+                    <Item onClick={() => navigate('/manager/listManager')}>
                         <TeamOutlined />
                         <div>Quản lý</div>
                     </Item>

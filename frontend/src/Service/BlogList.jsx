@@ -462,11 +462,9 @@ export class BlogList extends Component {
               <AboutContent>
                 <Title1>Tin Tức</Title1>
                 <LinkNav>
-                  {/* <StyledLink to="/" data-aos="fade-left" data-aos-delay="400">Home</StyledLink> */}
                   <Arrow data-aos="fade-left" data-aos-delay="200">
                     →
                   </Arrow>
-                  {/* <StyledLink to="/about" data-aos="fade-left" data-aos-delay="0">About Us</StyledLink> */}
                 </LinkNav>
               </AboutContent>
             </Row>

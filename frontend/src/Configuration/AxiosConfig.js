@@ -29,7 +29,6 @@ instance.interceptors.response.use((response) => {
   if (error.response?.status === 401 && originalRequest) {
     if (!refreshTokenPromise) {
       const token = localStorage.getItem('token');
-      console.log(token);
       if (token === null) {
         window.location.href = '/authentication';
       }

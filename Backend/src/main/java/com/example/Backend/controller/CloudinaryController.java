@@ -80,7 +80,7 @@ public class CloudinaryController {
     }
 
     @DeleteMapping("/deleteImagesWithSubstring")
-     ApiResponse<String> deleteImagesWithSubstring(
+    ApiResponse<String> deleteImagesWithSubstring(
             @RequestParam("prefix") String prefix,
             @RequestParam("folder") String folder) {
         if (prefix.length() < 4) {

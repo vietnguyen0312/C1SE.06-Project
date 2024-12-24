@@ -33,9 +33,7 @@ public class SecurityConfig {
             "/blogComments", "/blogComments/**", "/room_type", "/room_type/**", "/room", "/room/**",
             "/swagger-ui/**", "/v3/api-docs/**", "/mails/send/*", "/ws","/ws/**", "/faq", "/faq/**",
             "/tickets","/tickets/**","/ticket-types","/ticket-types/**","/rate-services","/rate-services/**",
-             "/users/verify-email", "/upload","/upload/**",
-             "/rate-room","/rate-room/**", "/users/verify-email", "/users/recent-rating",
-            "/blogImage","/blogImage/**"
+            "/rate-room","/rate-room/**", "/users/verify-email", "/upload","/upload/**"
     };
 
     @Autowired

@@ -452,7 +452,7 @@ const BlogDetail = () => {
     const commentsResponse = await axios.get(`/blogComments/byBlog/${postId}`, {
       params,
     });
-    console.log(commentsResponse.result.data);
+    console.log(commentsResponse.result);
     setTotalElements(commentsResponse.result.totalElements);
 
     setTotalPages(commentsResponse.result.totalPages);
@@ -752,10 +752,10 @@ const BlogDetail = () => {
                 )}
               </CommentContainer>
               {/* Comment form */}
-              {user ? (
+             {user ? (
                 <CommentForm onSubmit={handleCommentSubmit}>
                   <ReactQuill
-                    value={commentContent}
+                     value={commentContent}
                     onChange={setCommentContent}
                     style={{ height: "100px", width: "100%" }}
                   />

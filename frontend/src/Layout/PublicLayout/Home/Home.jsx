@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, {  useEffect } from 'react';
 import {
   Container,
   BannerSection, BannerContent, BannerLeft,
@@ -9,6 +9,7 @@ import {
 import PopularDestinations from '../../../components/PopularDestinations/PopularDestinations';
 import BookNow from '../../../components/BookNow/BookNow';
 import OtherIssues from '../../../components/OtherIssues/OtherIssues';
+import TestimonialArea from '../../../components/TestimonialArea/TestimonialArea';
 import BlogArea from '../../../components/BlogArea/BlogArea';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -40,7 +41,7 @@ function Home() {
       <PopularDestinations />
       <BookNow />
       <OtherIssues />
-      <BlogArea />
+      {/* <BlogArea /> */}
     </>
   );
 }

@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { RetweetOutlined, UserOutlined, CalendarOutlined, HomeOutlined, DollarOutlined, RiseOutlined, FallOutlined, SettingOutlined, BarsOutlined, SortAscendingOutlined, SortDescendingOutlined, EyeOutlined } from '@ant-design/icons';
-import { LineChart, Line, Tooltip, BarChart, Bar, CartesianGrid, XAxis, YAxis, Legend } from 'recharts';
-import { Select, Input, Table, Popover, Modal } from 'antd';
+import { RetweetOutlined, UserOutlined, CalendarOutlined, HomeOutlined, DollarOutlined, RiseOutlined, FallOutlined, BarsOutlined, EyeOutlined } from '@ant-design/icons';
+import { LineChart, Line, Tooltip, CartesianGrid, XAxis, YAxis, Legend } from 'recharts';
+import { Table, Popover, Modal } from 'antd';
 import ButtonCPN from '../../components/Button/Button';
 import axios from '../../Configuration/AxiosConfig';
-import { style } from '@mui/system';
 
 const Container = styled.div`
     padding: 20px;
@@ -361,6 +360,8 @@ const Dashboard = () => {
     });
     const [revenueService1, setRevenueService1] = useState([]);
     const [pagination, setPagination] = useState([]);
+    const [paginationBillTicket, setPaginationBillTicket] = useState([]);
+    const [paginationBillRoom, setPaginationBillRoom] = useState([]); 
     const [revenueRoomType1,setRevenueRoomType1]=useState([]);
     const [modalType, setModalType] = useState(null);
 
@@ -451,23 +452,6 @@ const Dashboard = () => {
         });
     };
 
-    const handleTableChange = (pagination) => {
-        fetchRevenueService1(
-            selectedTimeRange.startDate,
-            selectedTimeRange.endDate,
-            pagination.current,
-            pagination.pageSize
-        );
-        fetchBillTicket(
-            pagination.current,
-            pagination.pageSize
-        )
-        fetchBillRoom(
-            pagination.current,
-            pagination.pageSize
-        )
-    };
-    
     const fetchRevenueRoomType = async (startDate, endDate) => {
         const response = await axios.get('/revenue/room-type-revenue', {params: {
             startDate: new Date(new Date().setDate(new Date().getDate() - startDate)).toLocaleDateString('vi-VN'),
@@ -496,12 +480,13 @@ const Dashboard = () => {
             }
         })
         setBillTicket(billTicket.result.data);
-        setPagination({
+        setPaginationBillTicket({
             current: billTicket.result.currentPage,
             pageSize: billTicket.result.pageSize,
-            total: billTicket.result.totalElements
+            total: billTicket.result.totalElements,
         })
     }
+
     const fetchSelectedBillTicketDetail = async (bill) => {
         const response = await axios.get(`/bill-ticket-detail/get-by-bill-simple/${bill.id}`);
         return response.result;
@@ -576,12 +561,14 @@ const Dashboard = () => {
             }
         });
         setBillRoom(billRoom.result.data);
-        setPagination({
+        setPaginationBillRoom({
             current: billRoom.result.currentPage,
             pageSize: billRoom.result.pageSize,
             total: billRoom.result.totalElements
         })
     }
+    console.log('aaaaa',billRoom)
+    console.log('bbbb',paginationBillRoom)
     const fetchSelectedBillRoomDetail = async (bookingRoom) => {
         const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff/${bookingRoom.id}`);
         return response.result;
@@ -674,7 +661,14 @@ const Dashboard = () => {
         setIsModalVisible(false);
     };
 
-    
+    const handleTableChange = (pagination) => {
+        fetchRevenueService1(
+            selectedTimeRange.startDate,
+            selectedTimeRange.endDate,
+            pagination.current,
+            pagination.pageSize
+        );
+    };
     
     return (
         <Container>
@@ -931,24 +925,25 @@ const Dashboard = () => {
                                 dataSource={billTicket}
                                 columns={columnsTicket}
                                 pagination={{
-                                    pageSize: pagination.pageSize,
-                                    current: pagination.current,
-                                    total: pagination.total
+                                    pageSize: paginationBillTicket.pageSize,
+                                    current: paginationBillTicket.current,
+                                    total: paginationBillTicket.total
                                 }}
-                                rowKey='id'
-                                onChange={handleTableChange}
-                                
+                                onChange={(pagination) =>
+                                    fetchBillTicket(pagination.current, pagination.pageSize)
+                                }
                             />}
                             {showHistoryRoom && <Table
                                 dataSource={billRoom}
                                 columns={columnsRoom}
                                 pagination={{
-                                    pageSize: pagination.pageSize,
-                                    current: pagination.current,
-                                    total: pagination.total
+                                    pageSize: paginationBillRoom.pageSize,
+                                    current: paginationBillRoom.current,
+                                    total: paginationBillRoom.total
                                 }}
-                                rowKey='id'
-                                onChange={handleTableChange}
+                                onChange={(pagination) =>
+                                    fetchBillRoom(pagination.current, pagination.pageSize)
+                                }
                             />}
                         </div>
                     </div>
