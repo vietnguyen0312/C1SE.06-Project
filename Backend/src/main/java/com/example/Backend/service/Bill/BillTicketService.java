@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 
@@ -66,7 +67,7 @@ public class BillTicketService {
         return billTicketMapper.toBillTicketResponse(billTicketRepository.save(billTicket));
     }
 
-    public PageResponse<BillTicketResponse> getBills(int page, int size) {
+    public PageResponse<BillTicketResponse> getBills(int page, int size, String search) {
         Sort sort = Sort.by(Sort.Direction.DESC, "dateCreated");
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -74,12 +75,15 @@ public class BillTicketService {
         Page<BillTicket> pageData;
 
         var context = SecurityContextHolder.getContext();
-        var isManager = context.getAuthentication().getAuthorities().stream()
-                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(RoleEnum.ROLE_MANAGER.name()));
+        var isEmployee = context.getAuthentication().getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(RoleEnum.ROLE_EMPLOYEE.name()));
 
-        if (isManager)
+        if (isEmployee)
         {
-            pageData = billTicketRepository.findAll(pageable);
+            if (StringUtils.hasLength(search))
+                pageData = billTicketRepository.findByIdContaining(search, pageable);
+            else
+                pageData = billTicketRepository.findAll(pageable);
         } else {
             String email = context.getAuthentication().getName();
 

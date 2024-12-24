@@ -33,12 +33,12 @@ public class BillTicketController {
 
     @GetMapping
     ApiResponse<PageResponse<BillTicketResponse>> getBillTickets(
-            @RequestParam(value = "isCustomer",required = false, defaultValue = "false")Boolean isCustomer,
             @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-            @RequestParam(value = "size", required = false, defaultValue = "6") int size
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size,
+            @RequestParam(value = "search", required = false, defaultValue = "") String search
     ) {
         return ApiResponse.<PageResponse<BillTicketResponse>>builder()
-                .result(billTicketService.getBills(page, size))
+                .result(billTicketService.getBills(page, size, search))
                 .build();
     }
 

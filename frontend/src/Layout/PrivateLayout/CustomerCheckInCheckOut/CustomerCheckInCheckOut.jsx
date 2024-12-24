@@ -220,7 +220,7 @@ const CustomerCheckInCheckOut = () => {
                     value={bookingRoomId}
                     onChange={handleBookingRoomIdChange}
                 />
-                <h1>or</h1>
+                <h1>hoặc</h1>
                 <SearchInput
                     placeholder="Số điện thoại"
                     value={phone}

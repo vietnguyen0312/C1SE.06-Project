@@ -19,6 +19,8 @@ public interface BillTicketRepository extends JpaRepository<BillTicket, String> 
     List<BillTicket> findByDateCreatedBeforeAndStatusIs(Instant dateCreated, String status);
     List<BillTicket> findByUserAndStatus(User user, String status);
 
+    Page<BillTicket> findByIdContaining(String id, Pageable pageable);
+
     @Query("SELECT COALESCE(SUM(b.total), 0) FROM BillTicket b WHERE MONTH(b.dateCreated) = :month AND YEAR(b.dateCreated) = :year")
     Double findSumIncomeByMonthAndYear(@Param("month") int month, @Param("year") int year);
 

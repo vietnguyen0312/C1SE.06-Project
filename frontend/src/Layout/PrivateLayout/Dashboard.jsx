@@ -256,7 +256,7 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 const ServiceDetailColumns = [
-    { title: "ID",render: (record) => `${record.ticket.serviceEntity.id.slice(0, 6)}...`},
+    { title: "ID",render: (record) => `${record.id.slice(0, 6)}...`},
     {
         title: "Thông tin dịch vụ",
         render: (record) => (
@@ -567,8 +567,7 @@ const Dashboard = () => {
             total: billRoom.result.totalElements
         })
     }
-    console.log('aaaaa',billRoom)
-    console.log('bbbb',paginationBillRoom)
+
     const fetchSelectedBillRoomDetail = async (bookingRoom) => {
         const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff/${bookingRoom.id}`);
         return response.result;
@@ -1027,7 +1026,7 @@ const Dashboard = () => {
                 {modalContent}
             </Modal>
 
-                </Container>
+        </Container>
     );
 }
 

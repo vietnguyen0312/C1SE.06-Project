@@ -6,6 +6,7 @@ import axios from '../../Configuration/AxiosConfig';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import DOMPurify from 'dompurify';
+import { getRoles, getRedirectPath } from '../../Service/Login';
 
 const Up = styled(UpOutlined)`
   position: fixed;
@@ -224,7 +225,18 @@ const Fixed = () => {
   const [sticky, setSticky] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isStaff, setIsStaff] = useState(false);
   const chatWindowRef = useRef(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if(token) {
+        const roles = getRoles(token);
+        if(roles.includes('EMPLOYEE')) {
+            setIsStaff(true);
+        }
+    }
+  }, []);
 
   const handleScroll = () => {
     if (window.scrollY > 20) {
@@ -393,13 +405,15 @@ const Fixed = () => {
           <Send onClick={(event) => handleSendMessage(event)} /> {/* Gọi với event */}
         </ChatInputWrapper>
       </ChatWindow>
-      <FixedRight>
-        <Manager>
-          <a href='/manager'>
-            <img src={('/img/manager.png')} alt='manager' />
-          </a>
-        </Manager>
-      </FixedRight>
+      {isStaff && (
+        <FixedRight>
+          <Manager>
+            <a href={getRedirectPath(getRoles(localStorage.getItem('token')))}>
+              <img src={('/img/manager.png')} alt='manager' />
+            </a>
+          </Manager>
+        </FixedRight>
+      )}
       <Up className={sticky ? 'sticky' : ''} onClick={scrollToTop} data-aos="fade-left" />
     </>
   );

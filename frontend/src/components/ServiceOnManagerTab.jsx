@@ -126,7 +126,7 @@ const ServiceOnManagerTab = () => {
                         </div>
                     </>
                 ) : (
-                    <div style={{marginTop: "20px", fontSize: "18px", fontWeight: "600", color: "#1b60d8"}}>Hết vé</div>
+                    <div style={{marginTop: "20px", fontSize: "18px", fontWeight: "600", color: "#1b60d8"}}>Chưa có vé</div>
                 )}
             </div>
         );

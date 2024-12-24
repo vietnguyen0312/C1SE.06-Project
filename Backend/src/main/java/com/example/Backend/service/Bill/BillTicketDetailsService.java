@@ -1,9 +1,13 @@
 package com.example.Backend.service.Bill;
 
+import com.example.Backend.dto.request.Bill.BillTicketDetailUpdateRequest;
 import com.example.Backend.dto.request.Bill.BillTicketDetailsRequest;
+import com.example.Backend.dto.request.Bill.BillTicketUpdateRequest;
 import com.example.Backend.dto.response.Bill.BillTicketDetailsResponse;
+import com.example.Backend.dto.response.Bill.BillTicketResponse;
 import com.example.Backend.dto.response.MapEntryResponse;
 import com.example.Backend.dto.response.Service.ServiceResponse;
+import com.example.Backend.entity.Bill.BillTicket;
 import com.example.Backend.entity.Bill.BillTicketDetails;
 import com.example.Backend.entity.Service.ServiceEntity;
 import com.example.Backend.entity.Ticket.Ticket;
@@ -75,6 +79,14 @@ public class BillTicketDetailsService {
         });
 
         return billTicketDetailsMap;
+    }
+
+    public BillTicketDetailsResponse updateBillTicketDetail(BillTicketDetailUpdateRequest request, String id) {
+        BillTicketDetails billTicketDetails = billTicketDetailsRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+
+        billTicketDetailsMapper.updateBillTicketDetail(billTicketDetails, request);
+
+        return billTicketDetailsMapper.toBillTicketDetailsResponse(billTicketDetailsRepository.save(billTicketDetails));
     }
 
     public List<BillTicketDetailsResponse> getBillTicketDetailsByBillTicketSimple(String idBillTicket){

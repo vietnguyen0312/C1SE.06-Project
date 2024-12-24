@@ -1,8 +1,11 @@
 package com.example.Backend.controller;
 
+import com.example.Backend.dto.request.Bill.BillTicketDetailUpdateRequest;
 import com.example.Backend.dto.request.Bill.BillTicketDetailsRequest;
+import com.example.Backend.dto.request.Bill.BillTicketUpdateRequest;
 import com.example.Backend.dto.response.ApiResponse;
 import com.example.Backend.dto.response.Bill.BillTicketDetailsResponse;
+import com.example.Backend.dto.response.Bill.BillTicketResponse;
 import com.example.Backend.dto.response.MapEntryResponse;
 import com.example.Backend.dto.response.Service.ServiceResponse;
 import com.example.Backend.service.Bill.BillTicketDetailsService;
@@ -48,6 +51,15 @@ public class BillTicketDetailController {
         billTicketService.getBill(id);
         return ApiResponse.<List<BillTicketDetailsResponse>>builder()
                 .result(billTicketDetailsService.getBillTicketDetailsByBillTicketSimple(id))
+                .build();
+    }
+
+    @PutMapping("/{id}")
+    ApiResponse<BillTicketDetailsResponse> updateBillTicketDetail(
+            @PathVariable("id")String id,
+            @RequestBody @Valid BillTicketDetailUpdateRequest request) {
+        return ApiResponse.<BillTicketDetailsResponse>builder()
+                .result(billTicketDetailsService.updateBillTicketDetail(request, id))
                 .build();
     }
 }

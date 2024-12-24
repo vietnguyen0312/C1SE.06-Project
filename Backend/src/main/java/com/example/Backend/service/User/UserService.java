@@ -174,7 +174,6 @@ public class UserService {
                 .build();
     }
 
-
     @PreAuthorize("hasRole('EMPLOYEE')")
     public PageResponse<UserResponse> getUsersBySearchByEmail(String search, int page, int size) {
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by("username").ascending());
