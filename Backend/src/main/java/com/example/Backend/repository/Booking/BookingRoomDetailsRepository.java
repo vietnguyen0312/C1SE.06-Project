@@ -52,5 +52,14 @@ public interface BookingRoomDetailsRepository extends JpaRepository<BookingRoomD
 
         List<BookingRoomDetails> findByBookingRoom_id(String bookingRoomId);
 
-        List<BookingRoomDetails> findByBookingRoom_User_phoneNumber(String phoneNumber);
+
+        @Query("SELECT b FROM BookingRoomDetails b " +
+                "JOIN b.bookingRoom br " +
+                "WHERE br.user.phoneNumber = :phoneNumber " +
+                "AND (" +
+                "    (br.checkInDate <= CURRENT_TIMESTAMP AND br.checkOutDate >= CURRENT_TIMESTAMP) " +
+                "    OR (b.checkIned IS NOT NULL AND b.checkOuted IS NULL)" +
+                ")")
+        List<BookingRoomDetails> findActiveBookingRoomDetailsByPhoneNumber(@Param("phoneNumber") String phoneNumber);
+
 }

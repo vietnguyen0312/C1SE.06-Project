@@ -154,19 +154,36 @@ public class UserService {
     }
 
     @PreAuthorize("hasRole('MANAGER')")
-    public List<UserResponse> getUsersBySearch(String search) {
-        List<User> users = userRepository.findBySearchAndRoleCustomerByPhone(search);
-        return users.stream()
+    public PageResponse<UserResponse> getUsersBySearch(String search, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("username").ascending());
+        Page<User> users = userRepository.findBySearchAndRoleCustomerByPhone(search, pageable);
+        List<UserResponse> userResponses = users.stream()
                 .map(userMapper::toUserResponse)
                 .collect(Collectors.toList());
+        return PageResponse.<UserResponse>builder()
+                .currentPage(page)
+                .totalPages(users.getTotalPages())
+                .pageSize(size)
+                .totalElements(users.getTotalElements())
+                .data(userResponses)
+                .build();
     }
 
+
     @PreAuthorize("hasRole('MANAGER')")
-    public List<UserResponse> getUsersBySearch1(String search) {
-        List<User> users = userRepository.findBySearchAndRoleCustomerByEmail(search);
-        return users.stream()
+    public PageResponse<UserResponse> getUsersBySearchByEmail(String search, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("username").ascending());
+        Page<User> users = userRepository.findBySearchAndRoleCustomerByEmail(search, pageable);
+        List<UserResponse> userResponses = users.stream()
                 .map(userMapper::toUserResponse)
                 .collect(Collectors.toList());
+        return PageResponse.<UserResponse>builder()
+                .currentPage(page)
+                .totalPages(users.getTotalPages())
+                .pageSize(size)
+                .totalElements(users.getTotalElements())
+                .data(userResponses)
+                .build();
     }
     public RecentRatingResponse recentRating() {
         return RecentRatingResponse.builder()

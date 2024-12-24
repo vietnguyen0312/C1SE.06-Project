@@ -345,7 +345,7 @@ public class BookingRoomDetailsService {
 
         @PreAuthorize("hasRole('MANAGER')")
         public List<BookingRoomDetails> getBookingRoomDetailsByBookingRoomStaff1(String phoneNumber) {
-                return bookingRoomDetailsRepository.findByBookingRoom_User_phoneNumber(phoneNumber);
+                return bookingRoomDetailsRepository.findActiveBookingRoomDetailsByPhoneNumber(phoneNumber);
         }
 
 
