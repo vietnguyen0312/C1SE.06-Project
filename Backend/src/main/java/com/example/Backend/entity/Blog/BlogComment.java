@@ -1,12 +1,12 @@
 package com.example.Backend.entity.Blog;
 
 import com.example.Backend.entity.User.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
-
 @Entity
 @Table(name = "blog_comment")
 @Data
@@ -32,5 +32,4 @@ public class BlogComment {
 
     @Column(nullable = false)
     Instant dateUpdate;
-
 }

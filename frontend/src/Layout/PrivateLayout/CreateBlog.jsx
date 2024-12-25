@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css";
+import QuillEditor from "../../components/QuillEditor";
 import styled from "styled-components";
 import ButtonCPN from "../../components/Button/Button";
 import axios from "../../Configuration/AxiosConfig";
 import { useNavigate } from "react-router-dom";
 import LoadingIcons from "react-loading-icons";
 import { toast } from "react-toastify";
+import ConfirmModal from "../../components/ConfirmModal";
 
 const BlogEditorContainer = styled.div`
   display: flex;
@@ -46,18 +46,10 @@ export const ErrorMessage = styled.div`
   margin-bottom: 10px;
 `;
 
-export const StyledQuill = styled(ReactQuill)`
-  .ql-container {
-    height: 200px;
-    overflow-y: auto;
-  }
-`;
-
 export const StyledContainer = styled.div`
   width: 100%;
   height: auto;
   overflow: hidden;
-  border-radius: 1rem;
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 
   display: flex;
@@ -75,7 +67,7 @@ export const ImageContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 `;
 
 export const ButtonStyled = styled(ButtonCPN)`
@@ -110,9 +102,10 @@ export const TrashButton = styled.button`
   cursor: pointer;
   width: 24px;
   height: 24px;
-  background-image: url("/img/bin.png");
+  background-image: url("https://res.cloudinary.com/dgff7kkuu/image/upload/v1735088701/bin_uoljbv.png");
   background-size: cover;
   transition: opacity 0.3s;
+  z-index: 1000;
 
   &:hover {
     opacity: 0.7; /* Slightly fade on hover */
@@ -130,6 +123,7 @@ const CreateBlog = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
@@ -180,14 +174,7 @@ const CreateBlog = () => {
     );
   };
 
-  const handleRemoveImage = (index) => {
-    const updatedSections = [...bodySections];
-    updatedSections[index].file = null;
-    updatedSections[index].name = "";
-    setBodySections(updatedSections);
-  };
-
-  const handleSubmit = async () => {
+  const handleOpenModal = () => {
     if (
       !title.trim() ||
       !contentOpen.trim() ||
@@ -198,6 +185,13 @@ const CreateBlog = () => {
       );
       return;
     }
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    setIsModalOpen(false);
+    setIsSubmitting(true);
+    setLoading(true);
 
     const blogData = {
       title,
@@ -217,13 +211,10 @@ const CreateBlog = () => {
     });
     blogData.body = blogData.body.trim();
 
-    setIsSubmitting(true);
-    setLoading(true);
-
     try {
       const response = await axios.post("/blogs", blogData);
       const blogId = response.result.id;
-      let index = 1; // Bắt đầu từ 1
+      let index = 1;
 
       const uploadPromises = bodySections.map((section) => {
         if (section.type === "image") {
@@ -342,7 +333,7 @@ const CreateBlog = () => {
               </ImageContainer>
             ) : (
               <div>
-                <StyledQuill
+                <QuillEditor
                   value={section}
                   onChange={(value) => handleBodyChange(index, value)}
                   placeholder="Nhập nội dung blog của bạn..."
@@ -355,11 +346,11 @@ const CreateBlog = () => {
       </EditorWrapper>
 
       <PreviewWrapper>
-        <h5
+        <h3
           style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center" }}
         >
           {title}
-        </h5>
+        </h3>
         <p>{contentOpen}</p>
         {bodySections.map((section, index) => (
           <div key={index}>
@@ -391,11 +382,21 @@ const CreateBlog = () => {
         />
         <ButtonStyled
           style={{ width: "200%", fontSize: "14px" }}
-          onClick={handleSubmit}
+          onClick={handleOpenModal}
           text="Lưu"
           disabled={isSubmitting}
         />
       </FixedButtonContainer>
+
+      <ConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmSubmit}
+        title="Xác nhận lưu"
+        message="Bạn có chắc chắn muốn lưu bài viết này?"
+        confirmText="Lưu"
+        cancelText="Hủy"
+      />
     </BlogEditorContainer>
   );
 };

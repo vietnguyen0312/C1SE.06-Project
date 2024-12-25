@@ -58,7 +58,7 @@ public class CloudinaryService {
                 Map<String, Object> options = ObjectUtils.asMap(
                         "type", "upload",
                         "prefix", img,
-                        "max_results", 100
+                        "max_results", 1000
                 );
                 if (nextCursor != null) {
                     options.put("next_cursor", nextCursor);
