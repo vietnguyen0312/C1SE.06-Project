@@ -75,7 +75,7 @@ const Sidebar = () => {
                     </Item>
                     <Item onClick={() => navigate('/manager/bookings')}>
                         <CalendarOutlined />
-                        <div>Đặt phòng/vé</div>
+                        <div>Đặt phòng / vé</div>
                     </Item>
                 </Hotel>
                 <Hotel>

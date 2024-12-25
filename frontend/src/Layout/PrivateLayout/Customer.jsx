@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "../../Configuration/AxiosConfig";
-import { Table, Popover, Spin, Modal } from "antd";
+import { Table, Popover, Spin, Modal, Input } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 import styled from "styled-components";
-
+import { debounce } from 'lodash';
+const { Search } = Input;
 const PopoverItem = styled.div`
   padding: 10px;
   cursor: pointer;
@@ -18,6 +19,7 @@ const CustomerContainer = styled.div`
 `;
 
 const Customer = () => {
+  const [search, setSearch] = useState("");
   const [DsKhachHang, SetDsKhachHang] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({
@@ -29,10 +31,10 @@ const Customer = () => {
   const [modalContent, setModalContent] = useState(null);
   const [modalSize, setModalSize] = useState({ width: 900, height: 500 });
 
-  const fetchData = async (page = 1, pageSize = 6, role="customer") => {
+  const fetchData = async (page = 1, pageSize = 6, role="customer", search="") => {
     setLoading(false);
     const response = await axios.get("/users", {
-      params: { page, pageSize, role },
+      params: { page, pageSize, role, search },
     });
     SetDsKhachHang(response.result.data);
     setPagination({
@@ -75,7 +77,26 @@ const Customer = () => {
       },
     });
   };
+
+  const handleUnbanUser = (record) => {
+    Modal.confirm({
+      title: "Xác nhận",
+      content: "Gỡ bỏ cấm người dùng này?",
+      onOk: async () => {
+        await updateUserStatus(record.id, "Đang hoạt động", record);
+        fetchData(pagination.current, pagination.pageSize);
+      },
+      okButtonProps: {
+        style: { backgroundColor: '#f8b600', borderColor: '#f8b600' },
+      },
+    });
+  };
   
+  const handleSearch = debounce((value) => {
+    setSearch(value);
+    fetchData(pagination.current, pagination.pageSize, "customer", value);
+  }, 300);
+
   const columnsCustomer = [
     {
       title: "ID",
@@ -159,14 +180,19 @@ const Customer = () => {
           content={
             <div>
               <PopoverItem
+                  onClick={() => handleUnbanUser(record)}
+                  style={{
+                      pointerEvents: record.status === "Đang hoạt động" ? "none" : "auto",
+                      opacity: record.status === "Đang hoạt động" ? 0.5 : 1,
+                  }}>Gỡ bỏ cấm
+              </PopoverItem>
+              <PopoverItem
                   onClick={() => handleBanUser(record)}
                   style={{
-                    pointerEvents: record.status === "BAN" ? "none" : "auto",
-                    opacity: record.status === "BAN" ? 0.5 : 1,
-                  }}
-                >
-                  Set ban
-            </PopoverItem>
+                      pointerEvents: record.status === "BAN" ? "none" : "auto",
+                      opacity: record.status === "BAN" ? 0.5 : 1,
+                  }}>Cấm người dùng
+              </PopoverItem>
             </div>
           }
           trigger="click"
@@ -182,6 +208,12 @@ const Customer = () => {
 
   return (
     <CustomerContainer>
+      <Search
+        placeholder="Tìm kiếm theo tên hoặc email..."
+        onChange={(e) => handleSearch(e.target.value)}
+        allowClear
+        style={{ marginBottom: "20px", width:'300px' }}
+      />
       <div style={{ fontSize: "20px", fontWeight: "600", marginBottom: "10px" }}>
         Danh sách khách hàng
       </div>

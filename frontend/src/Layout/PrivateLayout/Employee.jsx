@@ -4,7 +4,8 @@ import { Table, Popover, Spin, Form, Input, Select, Upload, Modal } from 'antd';
 import { SettingOutlined, PlusOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import ButtonCPN from '../../components/Button/Button'
-
+import { debounce } from 'lodash';
+const { Search } = Input;
 const PopoverItem = styled.div`
     padding: 10px;
     cursor: pointer;
@@ -19,6 +20,7 @@ const EmployeeContainer = styled.div`
 `;
 
 const Employee = () => {
+    const [search, setSearch] = useState("");
     const [DsNhanVien, SetDsNhanVien] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showAddUser, setShowAddUser] = useState(false);
@@ -35,10 +37,10 @@ const Employee = () => {
         setModalContent(content);
         setIsModalVisible(true);
       };
-    const fetchData = async (page =1 ,pageSize=6, role="employee")=>{
+    const fetchData = async (page =1 ,pageSize=6, role="employee", search="")=>{
         setLoading(false);
         const response = await axios.get('/users',{
-            params:{page,pageSize,role}
+            params:{page,pageSize,role,search}
         })            
         SetDsNhanVien(response.result.data)
         setPagination({
@@ -48,7 +50,7 @@ const Employee = () => {
         })
     }
     useEffect(()=>{
-        fetchData(pagination.current, pagination.pageSize)
+        fetchData(pagination.current, pagination.pageSize, "employee", search)
     },[])
 
     const handleTableChange = (pagination) => {
@@ -86,7 +88,7 @@ const Employee = () => {
           },
         });
       };
-      
+    
     const handleAddUser = async (values) => {
         const response = await axios.post('/users/create-employee',{
             ...values,
@@ -101,6 +103,25 @@ const Employee = () => {
             },
         });
     };
+
+    const handleUnbanUser = (record) => {
+        Modal.confirm({
+          title: "Xác nhận",
+          content: "Gỡ bỏ cấm người dùng này?",
+          onOk: async () => {
+            await updateUserStatus(record.id, "Đang hoạt động", record);
+            fetchData(pagination.current, pagination.pageSize);
+          },
+          okButtonProps: {
+            style: { backgroundColor: '#f8b600', borderColor: '#f8b600' },
+          },
+        });
+    };
+    
+    const handleSearch = debounce((value) => {
+        setSearch(value);
+        fetchData(pagination.current, pagination.pageSize, "employee", value);
+    }, 300);
     
     const columns = [
         { 
@@ -175,13 +196,18 @@ const Employee = () => {
                     content={
                         <div>
                             <PopoverItem
+                                onClick={() => handleUnbanUser(record)}
+                                style={{
+                                    pointerEvents: record.status === "Đang hoạt động" ? "none" : "auto",
+                                    opacity: record.status === "Đang hoạt động" ? 0.5 : 1,
+                                }}>Gỡ bỏ cấm
+                            </PopoverItem>
+                            <PopoverItem
                                 onClick={() => handleBanUser(record)}
                                 style={{
                                     pointerEvents: record.status === "BAN" ? "none" : "auto",
                                     opacity: record.status === "BAN" ? 0.5 : 1,
-                                }}
-                                >
-                                Set ban
+                                }}>Cấm người dùng
                             </PopoverItem>
                         </div>
                     } 
@@ -197,7 +223,15 @@ const Employee = () => {
     ];
     return (
         <EmployeeContainer>
-            <ButtonCPN text="Thêm nhân viên" style={{marginBottom:'20px'}} onClick={()=> setShowAddUser(true)}/>
+            <div style={{display:'flex', gap:'20px', alignItems:'center'}}>
+                <ButtonCPN text="Thêm nhân viên" style={{marginBottom:'20px'}} onClick={()=> setShowAddUser(true)}/>
+                <Search
+                    placeholder="Tìm kiếm theo tên hoặc email..."
+                    onChange={(e) => handleSearch(e.target.value)}
+                    allowClear
+                    style={{ marginBottom: "20px", width:'300px' }}
+                />
+            </div>
             {showAddUser && (
                 <FormContainer>
             <div style={{ fontSize: '18px', fontWeight: '600', marginBottom: '15px' }}>Thêm mới nhân viên</div>
