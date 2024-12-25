@@ -59,7 +59,7 @@ public class ScheduledTasks {
         });
     }
 
-    @Scheduled(fixedDelay = 2, timeUnit = TimeUnit.HOURS)
+    @Scheduled(fixedDelay = 10, timeUnit = TimeUnit.MINUTES)
     public void autoCancelBookingRoom() {
         Instant twoDaysAgo = Instant.now().minus(2, ChronoUnit.HOURS);
         List<BookingRoom> bookingRoomList = bookingRoomRepository.findByDatePayBeforeAndStatusIs(twoDaysAgo,"chưa thanh toán");

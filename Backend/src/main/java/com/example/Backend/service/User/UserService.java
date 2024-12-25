@@ -189,4 +189,20 @@ public class UserService {
                 .data(userResponses)
                 .build();
     }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public PageResponse<UserResponse> getUsersBySearchByName(String search, int page, int size) {
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by("username").ascending());
+        Page<User> users = userRepository.findBySearchAndRoleCustomerByName(search, pageable);
+        List<UserResponse> userResponses = users.stream()
+                .map(userMapper::toUserResponse)
+                .collect(Collectors.toList());
+        return PageResponse.<UserResponse>builder()
+                .currentPage(page)
+                .totalPages(users.getTotalPages())
+                .pageSize(size)
+                .totalElements(users.getTotalElements())
+                .data(userResponses)
+                .build();
+    }
 }

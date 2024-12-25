@@ -94,4 +94,5 @@ public class AspectActivities {
             userRepository.save(user);
         }
     }
+    
 }

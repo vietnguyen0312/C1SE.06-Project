@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ButtonCPN from '../../../components/Button/Button';
 import { NameRoom, TypeRoom, StatusRoomBooked, StatusRoomAvailable } from '../Rooms';
 import { Checkbox } from 'antd';
 import { toast } from 'react-toastify';
 import axios from "../../../Configuration/AxiosConfig";
+import debounce from 'lodash/debounce';
 
 
 const RoomItem = styled.div`
@@ -52,58 +53,139 @@ const SearchContainer = styled.div`
     gap: 10px;
 `;
 
+const SearchDropdown = styled.div`
+  position: absolute;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  width: 200px;
+  margin-left: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-top: 4px;
+`;
+
+const DropdownItem = styled.div`
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  &:hover {
+    background-color: #f0f0f0; 
+  }
+`;
+
+const ServiceName = styled.div`
+`;
+
+const ServiceType = styled.div`
+  color: #bebebe;
+`;
+
+const ServiceImg = styled.img`
+  width: 200px;
+  height: 200px;
+  border-radius: 10px;
+  transition: 0.5s;
+  cursor: pointer;
+  &:hover {
+    transform: scale(1.1);
+  }
+`;
+
 const CustomerCheckInCheckOut = () => {
     const [bookingRoomId, setBookingRoomId] = useState('');
-    const [phone, setPhone] = useState('');
     const [room, setRoom] = useState([]);
     const [showRoom, setShowRoom] = useState(false);
+    const [filteredCustomer, setFilteredCustomer] = useState([]);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [nameCustomer, setNameCustomer] = useState('');
+    const [phoneCustomer, setPhoneCustomer] = useState('');
+
+    useEffect(() => {
+        const debounceSearchCustomer = debounce(() => {
+            handleSearchCustomer(nameCustomer, phoneCustomer);
+        }, 700);
+
+        debounceSearchCustomer();
+
+        return () => {
+            debounceSearchCustomer.cancel();
+        };
+    }, [nameCustomer, phoneCustomer]);
+
+    const handleSearchCustomer = async (name, phoneNumber) => {
+
+        let searchByPhoneNumber = [];
+
+        if (phoneNumber !== '') {
+            const responseByPhoneNumber = await axios.get('/users/booking/byPhone', { params: { search: phoneNumber.toLowerCase() } });
+            searchByPhoneNumber = responseByPhoneNumber.result.data;
+            console.log(searchByPhoneNumber);
+            setFilteredCustomer(searchByPhoneNumber);
+        }
+
+    };
 
     const getRoomStatus = (bookingRoomDetail) => {
-        const checkInDate = new Date(bookingRoomDetail.bookingRoom.checkInDate);
-        const checkOutDate = new Date(bookingRoomDetail.bookingRoom.checkOutDate);
-        const currentDate = new Date();
+        // const checkInDate = new Date(bookingRoomDetail.bookingRoom.checkInDate);
+        // const checkOutDate = new Date(bookingRoomDetail.bookingRoom.checkOutDate);
+        // const currentDate = new Date();
 
-        // Format dates to compare only the date part (not time)
-        const formattedCheckIn = checkInDate.toISOString().split("T")[0];
-        const formattedCheckOut = checkOutDate.toISOString().split("T")[0];
+        // // Format dates to compare only the date part (not time)
+        // const formattedCheckIn = checkInDate.toISOString().split("T")[0];
+        // const formattedCheckOut = checkOutDate.toISOString().split("T")[0];
 
-        if (formattedCheckIn === formattedCheckOut) {
-            // Same day booking
-            return checkOutDate < currentDate ? "quá hạn" : "trong ngày";
-        } else {
-            // Multiple day booking
-            return checkOutDate < currentDate ? "quá hạn" : "đã đặt";
+        if (bookingRoomDetail.checkIned === null && bookingRoomDetail.checkOuted === null) {
+            return "chờ check-in";
         }
+        else if (bookingRoomDetail.checkOuted === null) {
+            return "đang dùng";
+        }
+        else if (bookingRoomDetail.checkOuted !== null) {
+            return "đã rời đi";
+        }
+
+        // else if (formattedCheckIn === formattedCheckOut) {
+        //     // Same day booking
+        //     return checkOutDate < currentDate ? "quá hạn" : "trong ngày";
+        // } else {
+        //     // Multiple day booking
+        //     return checkOutDate < currentDate ? "quá hạn" : "đã đặt";
+        // }
+
+
     };
 
     const handleSearch = () => {
         setShowRoom(false);
         setRoom([]);
 
-        if (bookingRoomId === '' && phone === '') {
+        if (bookingRoomId === '' && phoneCustomer === '') {
             toast.warn("Vui lòng nhập mã hóa đơn hoặc số điện thoại để tìm kiếm");
             return;
         }
 
         const phoneRegex = /^[0-9]+$/;
 
-        if (phone && !phoneRegex.test(phone)) {
+        if (phoneCustomer && !phoneRegex.test(phoneCustomer)) {
             toast.warn("Số điện thoại chỉ được chứa các chữ số. Vui lòng nhập lại.");
             return;
         }
 
         if (bookingRoomId) {
             handleBookingRoomdetailAPI(bookingRoomId);
-        } else if (phone) {
-            handleBookingRoomdetailAPIPhone(phone);
+        } else if (phoneCustomer) {
+            handleBookingRoomdetailAPIPhone(phoneCustomer);
         }
     };
 
     const handleBookingRoomdetailAPIPhone = async (phone) => {
-
+        setFilteredCustomer([]);
         const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff1/${phone}`);
         if (response.result.length === 0) {
-            toast.warn("Số điện thoại không tồn tại");
+            toast.warn("Số điện thoại không tồn tại hoặc không có phòng được đặt");
         } else {
             setRoom(response.result);
             setShowRoom(true);
@@ -117,8 +199,8 @@ const CustomerCheckInCheckOut = () => {
         const response = await axios.get(`/booking_room_details/byBookingRoom/byStaff/${bookingRoomId}`);
         if (response.result.length === 0) {
             toast.warn("Mã hóa đơn không tồn tại");
-            if (phone) {
-                handleBookingRoomdetailAPIPhone(phone);
+            if (phoneCustomer) {
+                handleBookingRoomdetailAPIPhone(phoneCustomer);
             }
         } else {
             setRoom(response.result);
@@ -133,7 +215,10 @@ const CustomerCheckInCheckOut = () => {
 
 
     const handlePhoneChange = (e) => {
-        setPhone(e.target.value);
+        // setPhone(e.target.value);
+        setPhoneCustomer(e.target.value)
+
+
     };
 
     const formattedDate = (date) => {
@@ -219,13 +304,50 @@ const CustomerCheckInCheckOut = () => {
                     placeholder="Mã hóa đơn"
                     value={bookingRoomId}
                     onChange={handleBookingRoomIdChange}
+                    style={{ position: 'relative', marginBottom: '20px' }}
                 />
                 <h1>hoặc</h1>
-                <SearchInput
-                    placeholder="Số điện thoại"
-                    value={phone}
-                    onChange={handlePhoneChange}
-                />
+                <div style={{ position: 'relative', marginBottom: '20px' }}>
+                    <SearchInput
+                        placeholder="Số điện thoại"
+                        value={phoneCustomer}
+                        onChange={handlePhoneChange}
+                    />
+                    {filteredCustomer.length > 0 && (
+                        <SearchDropdown style={{
+                            position: 'absolute', // Định vị tuyệt đối so với container cha
+                            top: '100%', // Hiển thị ngay bên dưới input
+                            left: 0, // Căn trái theo input
+                            width: '100%', // Độ rộng bằng với input
+                            zIndex: 10, // Hiển thị trên các phần tử khác
+                            backgroundColor: '#fff', // Nền trắng
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)', // Hiệu ứng đổ bóng
+                            borderRadius: '5px',
+                            padding: '10px',
+                            maxHeight: '200px', // Giới hạn chiều cao dropdown
+                            overflowY: 'auto' // Kích hoạt cuộn nếu danh sách dài
+                        }}>
+                            {filteredCustomer.map((customer, index) => (
+                                <DropdownItem key={index} onClick={() => {
+                                    setFilteredCustomer([]);
+                                    setSelectedCustomer(customer);
+                                    setNameCustomer(customer.username);
+                                    setPhoneCustomer(customer.phoneNumber);
+                                    handleBookingRoomdetailAPIPhone(customer.phoneNumber);
+
+
+                                }}>
+                                    <ServiceImg src={`${customer.avatar}`} style={{ width: '60px', height: '60px', borderRadius: '50%' }} />
+                                    <div style={{ marginLeft: '10px' }}>
+                                        <ServiceName>{customer.username}</ServiceName>
+                                        <ServiceType>{customer.phoneNumber}</ServiceType>
+                                    </div>
+                                </DropdownItem>
+                            ))}
+                        </SearchDropdown>
+                    )}
+                </div>
+
             </SearchContainer>
             <ButtonCPN
                 text="Tìm kiếm"
@@ -244,8 +366,12 @@ const CustomerCheckInCheckOut = () => {
                                         const status = getRoomStatus(bookingRoomDetail);
                                         if (status === "quá hạn") {
                                             return <StatusRoomBooked style={{ backgroundColor: "aqua" }}>Quá hạn</StatusRoomBooked>;
-                                        } else if (status === "trong ngày") {
-                                            return <StatusRoomBooked style={{ backgroundColor: "#FFCCFF" }}>Trong ngày</StatusRoomBooked>;
+                                        } else if (status === "chờ check-in") {
+                                            return <StatusRoomBooked style={{ backgroundColor: "#FFCCFF" }}>Chờ check-in</StatusRoomBooked>;
+                                        } else if (status === "đang dùng") {
+                                            return <StatusRoomBooked style={{ backgroundColor: "green" }}>Đang dùng</StatusRoomBooked>;
+                                        } else if (status === "đã rời đi") {
+                                            return <StatusRoomBooked style={{ backgroundColor: "red" }}>Đã rời đi</StatusRoomBooked>;
                                         } else {
                                             return <StatusRoomBooked>Đã đặt</StatusRoomBooked>;
                                         }

@@ -278,7 +278,7 @@ const Ticket = ({ style }) => {
         } else if (phoneNumber === '' && name !== '') {
             setFilteredCustomer(searchByName);
         } else {
-            const combinedResults = searchByName.filter(nameItem => 
+            const combinedResults = searchByName.filter(nameItem =>
                 searchByPhoneNumber.some(phoneItem => phoneItem.id === nameItem.id)
             );
             setFilteredCustomer(combinedResults);
@@ -361,13 +361,15 @@ const Ticket = ({ style }) => {
         const total = cartItems.reduce((acc, cartItem) => acc + cartItem.value.reduce((acc, ticketBooking) => acc + ticketBooking.total, 0), 0);
 
         let bill;
-        if(isEmployee == true){
-            if(selectedCustomer){
+        if (isEmployee == true) {
+            if (selectedCustomer) {
                 bill = await axios.post('/bill-ticket', { total: total, user: selectedCustomer });
             } else {
                 const email = nameCustomer.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '') + '-' + uuidv4() + '@gmail.com';
-                const customer = await axios.post('/users', { username: nameCustomer,
-                     phoneNumber: phoneCustomer, password: phoneCustomer, email: email });
+                const customer = await axios.post('/users', {
+                    username: nameCustomer,
+                    phoneNumber: phoneCustomer, password: phoneCustomer, email: email
+                });
                 bill = await axios.post('/bill-ticket', { total: total, user: customer.result });
             }
         } else {
@@ -376,10 +378,10 @@ const Ticket = ({ style }) => {
 
         cartItems.forEach(cartItem => {
             cartItem.value.forEach(ticketBooking => {
-                axios.post('/bill-ticket-detail', { 
+                axios.post('/bill-ticket-detail', {
                     idBillTicket: bill.result.id,
                     idTicket: ticketBooking.ticket.id,
-                    quantity: ticketBooking.quantity, 
+                    quantity: ticketBooking.quantity,
                     total: ticketBooking.total
                 });
             });
@@ -393,19 +395,19 @@ const Ticket = ({ style }) => {
         setCartItems([]);
 
         let paymentUrl;
-        if(paymentMethod == "tiền mặt"){
+        if (paymentMethod == "tiền mặt") {
             paymentUrl = "http://localhost:3000/checkout?vnp_OrderInfo=m" + bill.result.id;
-        } else if(paymentMethod == "chuyển khoản"){
+        } else if (paymentMethod == "chuyển khoản") {
             const res = await axios.get('/payment/vn-pay', {
-                params: { 
-                  amount: total, 
-                  orderInfo: `t${bill.result.id}`
-                } 
-              });
-              paymentUrl = res.result;
+                params: {
+                    amount: total,
+                    orderInfo: `t${bill.result.id}`
+                }
+            });
+            paymentUrl = res.result;
         }
-        
-        if(paymentUrl){
+
+        if (paymentUrl) {
             window.location.href = paymentUrl;
         }
     }
@@ -614,7 +616,7 @@ const Ticket = ({ style }) => {
                                                 style={{ width: '50px', height: '50px', borderRadius: '5px' }}
                                                 onClick={() => setSelectedService(cartItem.key)}
                                             />
-                                            <div style={{width: '100%'}}>
+                                            <div style={{ width: '100%' }}>
                                                 <div style={{ fontWeight: 'bold' }}>{cartItem.key.name}</div>
                                                 {cartItem.value.map((ticketBooking, idx) => (
                                                     <div key={idx} style={{ borderTop: '1px solid #ccc', paddingTop: '10px', position: 'relative', display: 'flex', justifyContent: 'space-between' }}>
@@ -644,8 +646,8 @@ const Ticket = ({ style }) => {
                                 text='Thanh toán'
                                 style={{ width: '100%', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '20px' }}
                                 onClick={() => {
-                                    if(isEmployee == true){
-                                        if(phoneCustomer.length !== 10){
+                                    if (isEmployee == true) {
+                                        if (phoneCustomer.length !== 10) {
                                             alert('Số điện thoại không đúng');
                                             return;
                                         }
