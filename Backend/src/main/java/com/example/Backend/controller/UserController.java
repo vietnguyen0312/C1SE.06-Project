@@ -136,5 +136,16 @@ public class UserController {
                     .build();
         }
 
+    @GetMapping("/booking/byName")
+    public ApiResponse<PageResponse<UserResponse>> searchUsersByName(
+            @RequestParam(value = "search", required = false, defaultValue = "") String search,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "6") int size) {
+        PageResponse<UserResponse> userResponses = userService.getUsersBySearchByName(search, page, size);
+        return ApiResponse.<PageResponse<UserResponse>>builder()
+                .result(userResponses)
+                .build();
+    }
+
 
 }

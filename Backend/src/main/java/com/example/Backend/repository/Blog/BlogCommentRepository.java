@@ -13,4 +13,5 @@ public interface BlogCommentRepository extends JpaRepository  <BlogComment, Stri
 
     Page<BlogComment> findAllByBlog(Blog Blog, Pageable pageable);
     Page<BlogComment> findAllByUser(User user, Pageable pageable);
+    void deleteByBlog(Blog blog);
 }

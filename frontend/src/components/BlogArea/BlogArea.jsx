@@ -110,6 +110,7 @@ const BlogArea = () => {
       size: 3,
     };
     const blogResponse = await axios.get(`/blogs`, { params });
+    console.log(blogResponse.result.data);
     const blogWithImages = await Promise.all(
       blogResponse.result.data.map(async (blog) => {
         const imagesResponse = await axios.get(
@@ -118,6 +119,9 @@ const BlogArea = () => {
         const commentResponse = await axios.get(
           `/blogComments/byBlog/${blog.id}`
         );
+        console.log(commentResponse.result);
+        console.log(imagesResponse.result);
+        console.log(commentResponse);
         const commentsCount = commentResponse.result.totalElements;
         return {
           ...blog,

@@ -544,6 +544,9 @@ class RoomTypeList extends Component {
     toast.success('Cập nhật đánh giá thành công');
 
   };
+  tamtam = (tamtam) => {
+    console.log("tamtam", tamtam);
+  }
 
   render() {
     const { rooms, selectedRoom, isModalOpen, RateByRoomType, totalElements, page, hasMore, selectedBookingRoomDetails, showModal, hoverRating, tempRating, tempReview } = this.state;
@@ -642,7 +645,7 @@ class RoomTypeList extends Component {
                 <ModalPrice>Giá: {selectedRoom.price.toLocaleString('vi-VN')} VNĐ</ModalPrice>
                 <p>Mô Tả: {selectedRoom.detail}</p>
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', paddingBottom: '20px', borderBottom: '1px solid #f8b600' }}>
-                  <ButtonCpn text="Đặt Phòng" />
+                  <LinkR to={`/booking?roomTypeId=${selectedRoom.id}`}> <ButtonCpn text="Đặt Phòng" /> </LinkR>
                 </div>
                 <div>
                   <RatingContainer>

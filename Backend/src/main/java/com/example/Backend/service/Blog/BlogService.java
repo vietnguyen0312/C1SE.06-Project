@@ -3,6 +3,9 @@ package com.example.Backend.service.Blog;
 import java.time.Instant;
 import java.util.List;
 
+import com.example.Backend.repository.Blog.BlogCommentRepository;
+import com.example.Backend.repository.Blog.BlogImagesRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +41,8 @@ public class BlogService {
     DateTimeFormatter dateTimeFormatter;
     BlogRepository blogRepository;
     BlogTypeRepository blogTypeRepository;
+    BlogCommentRepository blogCommentRepository;
+    BlogImagesRepository blogImagesRepository;
     UserRepository userRepository;
     BlogMapper blogMapper;
 
@@ -89,9 +94,12 @@ public class BlogService {
     }
 
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'MANAGER')")
-    public void deleteBlog(String id) {
-        Blog blog = blogRepository.findById(id)
+    @Transactional
+    public void deleteBlog(String blogId) {
+        Blog blog = blogRepository.findById(blogId)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        blogCommentRepository.deleteByBlog(blog);
+        blogImagesRepository.deleteByBlog(blog);
         blogRepository.delete(blog);
     }
 

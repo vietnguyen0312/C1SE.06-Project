@@ -47,7 +47,7 @@ public class BlogCommentService {
 
         Blog blog = blogRepository.findById(request.getBlogId())
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
-        System.out.println("lỗi trong này");
+
         blogComment.setUser(user);
         blogComment.setBlog(blog);
         blogComment.setDateUpdate(Instant.now());

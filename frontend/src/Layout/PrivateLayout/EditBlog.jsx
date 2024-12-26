@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import QuillEditor from "../../components/QuillEditor";
 import "react-quill/dist/quill.snow.css";
 import styled from "styled-components";
 import LoadingIcons from "react-loading-icons";
@@ -15,7 +16,6 @@ import {
   ImageContainer,
   StyledContainer,
   StyledImage,
-  StyledQuill,
   ErrorMessage,
 } from "./CreateBlog";
 import { preconnect } from "react-dom";
@@ -342,7 +342,7 @@ const EditBlog = () => {
               </StyledContainer>
             ) : (
               <div>
-                <StyledQuill
+                <QuillEditor
                   value={section}
                   onChange={(value) => handleBodyChange(index, value)}
                   placeholder="Nhập nội dung blog của bạn..."
@@ -354,11 +354,11 @@ const EditBlog = () => {
         ))}
       </EditorWrapper>
       <PreviewWrapper>
-        <h5
+        <h3
           style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center" }}
         >
           {title}
-        </h5>
+        </h3>
         <p>{contentOpen}</p>
         {bodySections.map((section, index) => (
           <div key={index}>
