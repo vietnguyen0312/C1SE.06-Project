@@ -53,4 +53,11 @@ public class TicketController {
                 .result(ticketService.updateTicket(request,id))
                 .build();
     }
+
+    @GetMapping("/service/{serviceId}")
+    ApiResponse<List<TicketResponse>> getTicketsByServiceId(@PathVariable("serviceId") String serviceId) {
+        return ApiResponse.<List<TicketResponse>>builder()
+                .result(ticketService.getTicketsByServiceId(serviceId))
+                .build();
+    }
 }

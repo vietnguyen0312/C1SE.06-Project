@@ -14,6 +14,7 @@ actions:
 - action_set_user_name
 - action_weather_query
 - action_service_entity
+- action_price_services
 # - action_food_services
 # - action_guide_services
 # - action_shuttle_services
@@ -30,6 +31,8 @@ actions:
 # - action_water_activities
 # - action_wildlife_sightings
 - action_weather_query_specific_day
+- action_get_rooms_by_checkin_and_roomtype
+
 entities:
 - name
 - service_list
@@ -38,6 +41,12 @@ entities:
 - gmail
 - email
 - specific_date
+- room_type
+- room_describe
+- check_in_date
+- check_out_date
+- price_service_name
+
 
 slots: 
   combined_data:
@@ -81,8 +90,37 @@ slots:
       - type: from_entity
         entity: specific_date
         role: inform
+  customer_name:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: customer_name
+  check_in_date:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: check_in_date
+  ngay_di:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: ngay_di
+  room_type:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: room_type
 
-
+  price_service_name:
+    type: list
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: price_service_name
 
 
 intents:
@@ -135,7 +173,7 @@ intents:
 - ask_about_activities
 # - ask_about_hiking_trails
 # - ask_about_nightlife
-- ask_about_events
+# - ask_about_events
 # - ask_about_scenic_drives
 # - ask_about_water_activities
 # - ask_about_family_friendly_activities
@@ -189,8 +227,9 @@ intents:
 - ask_dining_options
 - ask_about_specific_service
 - ask_weather_for_specific_day
-- ask_booking_room
-
+# - ask_booking_room
+- hỏi phòng trống với ngày check_in
+- ask_about_price_services
 
 responses:
   utter_cheer_up:
@@ -422,7 +461,8 @@ responses:
       Chúc Bạn có một ngày tốt lành!
 
   utter_ask_about_specific_service:
-  - text: "Dịch vụ  {combined_data} của chúng tôi cung cấp những gì?"
+  - text: "Chúng tôi có các dịch vụ như : {combined_data} </br> Bạn có muốn biết thêm về dịch vụ nào không?"
+  - text: "Chúng tôi cung cấp các dịch vụ : {combined_data} </br> Bạn có muốn biết thêm thông tin gì không?"
 
   utter_ask_about_weather_for_specific_day:
   - text: "Thời tiết vào ngày  {combined_data}"
@@ -431,7 +471,8 @@ responses:
   - text: |
       Vui lòng nhập ngày cụ thể để kiểm tra thời tiết.
       Ví dụ: "ngày mai",  "ngày 1 tháng 1 năm 2024", "1-1-2024", "1-1", "1/1/2024", "1/1"
-
+  utter_ask_about_price_services:
+  - text: " {combined_data} Bạn muốn biết thêm thông tin gì không?"
 session_config:
   carry_over_slots_to_new_session: true
   session_expiration_time: 60

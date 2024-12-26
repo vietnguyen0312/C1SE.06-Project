@@ -39,10 +39,10 @@ stories:
 
 
 
-- story: hỏi về các sự kiện trong khu du lịch
-  steps:
-  - intent: ask_about_events
-  - action: action_event_details
+# - story: hỏi về các sự kiện trong khu du lịch
+#   steps:
+#   - intent: ask_about_events
+#   - action: action_event_details
 
 
 
@@ -221,4 +221,14 @@ stories:
     - action: action_weather_query_specific_day
     - action: utter_ask_about_weather_for_specific_day
 
+- story: hỏi phòng trống với ngày check_in
+  steps:
+    - intent: hỏi phòng trống với ngày check_in
+    - action: action_get_rooms_by_checkin_and_roomtype
+
+- story: hỏi về giá dịch vụ
+  steps:
+    - intent: ask_about_price_services
+    - action: action_price_services
+    - action: utter_ask_about_price_services
 

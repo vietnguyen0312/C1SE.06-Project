@@ -77,4 +77,12 @@ rules:
       - intent: ask_weather_for_specific_day
       - action: action_weather_query_specific_day
       - action: utter_ask_about_weather_for_specific_day
+
+  - rule: hỏi về giá dịch vụ
+    steps:
+      - intent: ask_about_price_services
+      - action: action_price_services
+      - action: utter_ask_about_price_services
+
+  
   

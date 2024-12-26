@@ -4,6 +4,7 @@ import requests
 from typing import Any, Text, Dict, List
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.events import SlotSet, ActionExecutionRejected  # type: ignore
 from dotenv import load_dotenv
 import os
 
@@ -23,7 +24,13 @@ room_keywords = {
     "vip": "President Room"
 }
 
-
+room_type_id_mapping  = {
+    "Normal Room": "14dbb13e-d61d-4efc-8b5a-2bde1e6b66a7",
+    "Family Room": "876737f5-7573-4ef9-baab-4d422c1cec3f",
+    "Couple Room": "0163b8ef-61e1-4877-b018-608b48405e5f",
+    "Luxurious Room": "ec7a9e57-db90-4e63-bd23-71c5a504413f",
+    "President Room": "3f56c5fe-7071-4d7b-9090-69e2cfca02eb"
+}
 
 class ActionListRoomTypes(Action):
 
@@ -167,3 +174,91 @@ class ActionGetEmptyRooms(Action):
         
         return []
     
+class ActionGetRoomsByCheckinAndRoomType(Action):
+
+    def name(self) -> Text:
+        return "action_get_rooms_by_checkin_and_roomtype"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+
+        # Lấy các entity từ tracker
+        raw_check_in_date = str(tracker.get_slot('check_in_date'))
+        raw_room_keyword = str(tracker.get_slot('room_type'))
+
+        # Debug thông tin đầu vào
+        print(f"Check-in date: {raw_check_in_date}, Room type keyword: {raw_room_keyword}")
+
+        # Xử lý ngày check-in
+        check_in_date = convert_to_date(raw_check_in_date)
+        print(check_in_date)
+        if not check_in_date:
+            dispatcher.utter_message(text="Ngày check-in không hợp lệ.")
+            return []
+
+        # Ánh xạ từ keyword phòng qua tên loại phòng
+        room_type_name = room_keywords.get(raw_room_keyword.lower().strip())
+
+        if not room_type_name:
+            dispatcher.utter_message(text="Loại phòng không hợp lệ.")
+            return []
+
+        # Lấy room_type_id từ danh sách ánh xạ
+        room_type_id = room_type_id_mapping.get(room_type_name)
+
+        if not room_type_id:
+            dispatcher.utter_message(text="ID loại phòng không hợp lệ.")
+            return []
+
+        # In ra check-in date và room_type để kiểm tra
+        print(f"Check-in date: {check_in_date}, Room type: {room_type_name}, Room type ID: {room_type_id}")
+
+        # Gọi hàm lấy phòng từ API
+        rooms = get_rooms_by_checkin_and_roomtype(check_in_date, room_type_id)
+
+        # Xử lý phản hồi từ API
+        if "error" in rooms:
+            response = rooms["error"]
+        else:
+            if rooms:
+                response = f"Phòng trống cho ngày {check_in_date} và loại phòng {room_type_name} là:\n"
+                for room in rooms:
+                    room_number = room.get("roomNumber", "Không xác định")
+                    response += f"- Phòng số: {room_number}\n"
+            else:
+                response = f"Không có phòng trống cho ngày {check_in_date} và loại phòng {room_type_name}."
+        
+        # Gửi phản hồi đến người dùng
+        dispatcher.utter_message(text=response)
+
+        return []
+    
+class ActionGetReturnPolicy(Action):
+    def name(self) -> Text:
+        return "action_get_return_policy"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        combined_data = ""
+        intent = get_current_intent(tracker)
+        print("intent: ", intent)
+        try:
+            # Gửi yêu cầu GET đến API
+            response = requests.get(BASE_URL + "faq/"+intent)
+            response.raise_for_status()  # Kiểm tra mã trạng thái HTTP
+            data = response.json()
+            description = data['result']['description']
+            combined_data = f"{description}"
+            print(combined_data)
+            
+        except requests.exceptions.RequestException as e:
+            dispatcher.utter_message(template="utter_goodbye")
+            return [ActionExecutionRejected(self.name())]
+    
+        return [SlotSet("combined_data", combined_data)]
+    
+def get_current_intent(tracker):
+    # Lấy tên intent hiện tại
+    return tracker.latest_message['intent'].get('name')

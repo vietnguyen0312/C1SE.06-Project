@@ -81,4 +81,11 @@ public class TicketService {
         return ticketMapper.toResponse(ticketRepository.save(ticket));
     }
 
+    public List<TicketResponse> getTicketsByServiceId(String serviceId) {
+        ServiceEntity serviceEntity = serviceRepository.findById(serviceId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
+        List<Ticket> tickets = ticketRepository.findByServiceEntityIs(serviceEntity, Sort.by(Sort.Direction.ASC, "price"));
+        return tickets.stream().map(ticketMapper::toResponse).toList();
+    }
+
 }

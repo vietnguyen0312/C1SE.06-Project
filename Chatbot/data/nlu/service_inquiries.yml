@@ -42,6 +42,35 @@ nlu:
     - Có thông tin gì về [Dịch Vụ Mới](service_name) không?
     - Hãy mô tả [Dịch Vụ Chăm Sóc Khách Hàng](service_name) chi tiết cho tôi.
 
+- intent: ask_about_price_services
+  examples: |
+    - Giá của [Cáp treo](price_service_name) là bao nhiêu?
+    - Bạn có thể cho tôi biết giá của [Chuyến Tàu Phiêu Lưu Trong Hầm Nhỏ](price_service_name) không?
+    - [Công viên nước](price_service_name) có giá như thế nào?
+    - Chi phí cho [Cú Rơi Thế Kỉ](price_service_name) là bao nhiêu?
+    - Tôi cần biết giá của [Đền Ngũ Hành](price_service_name).
+    - Giá của [Đu quay cảm giác mạnh](price_service_name) là bao nhiêu?
+    - [Đu Quay Dây Văng](price_service_name) có giá bao nhiêu?
+    - Tôi muốn biết giá của [Hoạt động Văn hóa du lịch các dân tộc Việt Nam](price_service_name).
+    - Có thông tin gì về giá của [Khách sạn](price_service_name) không?
+    - Hãy cho tôi biết giá của [Massage và Spa](price_service_name).
+    - Giá của [Miếu Bà](price_service_name) là bao nhiêu?
+    - Bạn có thể cho tôi biết giá của [Nhà Bia Mộ](price_service_name) không?
+    - [Nhà Cổ](price_service_name) có giá như thế nào?
+    - Chi phí cho [Nhà Hàng Buffet](price_service_name) là bao nhiêu?
+    - Tôi cần biết giá của [Tắm bùn](price_service_name).
+    - Giá của [Tắm nước nóng](price_service_name) là bao nhiêu?
+    - [Tắm Trà Xanh](price_service_name) có giá bao nhiêu?
+    - Tôi muốn biết giá của [Tàu Lượn Siêu Tốc](price_service_name).
+    - Có thông tin gì về giá của [Tượng Phật](price_service_name) không?
+    - Hãy cho tôi biết giá của [Vườn hoa kiến trúc](price_service_name).
+    - Giá của [Xe điện](price_service_name) là bao nhiêu?
+    - Bạn có thể cho tôi biết giá của [Xe limousine](price_service_name) không?
+    - [Xe tuk-tuk](price_service_name) có giá như thế nào?
+    - Chi phí cho [Xem phim 4D](price_service_name) là bao nhiêu?
+    - Tôi cần biết giá của [Xích lô](price_service_name).
+    - Giá của [Xông hơi](price_service_name) là bao nhiêu?
+
 
 # - intent: ask_about_guide_services #hỏi về dịch vụ hướng dẫn viên
 #   examples: |
