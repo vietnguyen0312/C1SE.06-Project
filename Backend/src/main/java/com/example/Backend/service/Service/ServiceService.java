@@ -31,16 +31,12 @@ public class ServiceService {
 
     @PreAuthorize("hasRole('MANAGER')")
     public ServiceResponse createService(ServiceRequest request) {
-        try {
-            ServiceEntity serviceEntity = serviceMapper.toService(request);
+        ServiceEntity serviceEntity = serviceMapper.toService(request);
 
-            serviceEntity.setServiceType(serviceTypeRepository.findById(request.getServiceTypeId())
-                    .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
+        serviceEntity.setServiceType(serviceTypeRepository.findById(request.getServiceTypeId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
 
-            return serviceMapper.toResponse(serviceRepository.save(serviceEntity));
-        } catch (Exception e) {
-            throw new AppException(ErrorCode.EXISTED);
-        }
+        return serviceMapper.toResponse(serviceRepository.save(serviceEntity));
     }
 
     public PageResponse<ServiceResponse> getServices(List<String> idServiceType, int page, int size, String search) {

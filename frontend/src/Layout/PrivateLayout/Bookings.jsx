@@ -62,10 +62,9 @@ const Bookings = () => {
         <ProfileContainer>
             <DashboardContainer>
                 <div>
-                    <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Bookings</div>
                     <ButtonContainer>
                         <ButtonCPN
-                            text='Tickets'
+                            text='Vé'
                             onClick={() => {
                                 setShowTicket(true);
                                 setShowConfirmTicket(false);
@@ -78,7 +77,7 @@ const Bookings = () => {
                             }}
                         />
                         <ButtonCPN
-                            text='Rooms'
+                            text='Phòng'
                             onClick={() => {
                                 setShowBookingRoom(true);
                                 setShowTicket(false);

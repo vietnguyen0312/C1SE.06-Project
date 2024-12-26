@@ -69,9 +69,9 @@ const Sidebar = () => {
                         <KeyOutlined />
                         <div>Dịch vụ</div>
                     </Item>
-                    <Item>
+                    <Item onClick={() => navigate('/manager/blogs')}>
                         <FileDoneOutlined />
-                        <Link style={{textDecoration: "none", color: "inherit"}} to='/manager/blogs'>Blogs</Link>
+                        <div>Blogs</div>
                     </Item>
                     <Item onClick={() => navigate('/manager/bookings')}>
                         <CalendarOutlined />
