@@ -264,12 +264,12 @@ const Ticket = ({ style }) => {
         let searchByPhoneNumber = [];
 
         if (name !== '') {
-            const responseByName = await axios.get('/users', { params: { search: name.toLowerCase() } });
+            const responseByName = await axios.get('/users/booking/byName', { params: { search: name.toLowerCase() } });
             searchByName = responseByName.result.data;
         }
 
         if (phoneNumber !== '') {
-            const responseByPhoneNumber = await axios.get('/users', { params: { search: phoneNumber.toLowerCase() } });
+            const responseByPhoneNumber = await axios.get('/users/booking/byPhoneNumber', { params: { search: phoneNumber.toLowerCase() } });
             searchByPhoneNumber = responseByPhoneNumber.result.data;
         }
 
