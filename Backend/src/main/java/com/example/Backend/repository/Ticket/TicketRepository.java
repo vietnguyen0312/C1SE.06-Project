@@ -2,6 +2,7 @@ package com.example.Backend.repository.Ticket;
 
 import com.example.Backend.entity.Service.ServiceEntity;
 import com.example.Backend.entity.Ticket.Ticket;
+import com.example.Backend.entity.Ticket.TicketType;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -14,4 +15,6 @@ public interface TicketRepository extends JpaRepository<Ticket, String> {
             (String name, ServiceEntity serviceEntity1, String description, ServiceEntity serviceEntity2, Sort sort);
 
     List<Ticket> findByServiceEntityIs(ServiceEntity serviceEntity1, Sort sort);
+
+    boolean existsByServiceEntityAndTicketType(ServiceEntity serviceEntity, TicketType ticketType);
 }

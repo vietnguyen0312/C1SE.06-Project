@@ -13,6 +13,7 @@ import com.example.Backend.mapper.Service.ServiceMapper;
 import com.example.Backend.mapper.Ticket.TicketMapper;
 import com.example.Backend.repository.Service.ServiceRepository;
 import com.example.Backend.repository.Ticket.TicketRepository;
+import com.example.Backend.repository.Ticket.TicketTypeRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +30,7 @@ import java.util.*;
 @Slf4j
 public class TicketService {
     TicketRepository ticketRepository;
+    TicketTypeRepository ticketTypeRepository;
     ServiceRepository serviceRepository;
     TicketMapper ticketMapper;
     ServiceMapper serviceMapper;
@@ -36,8 +38,15 @@ public class TicketService {
     @PreAuthorize("hasRole('MANAGER')")
     public TicketResponse createTicket(TicketCreationRequest request) {
         Ticket ticket = ticketMapper.toEntity(request);
-        Ticket savedTicket = ticketRepository.save(ticket);
-        return ticketMapper.toResponse(savedTicket);
+
+        ticket.setServiceEntity(serviceRepository.findById(request.getServiceId()).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
+
+        ticket.setTicketType(ticketTypeRepository.findById(request.getTicketTypeId()).orElseThrow(()-> new AppException(ErrorCode.NOT_EXISTED)));
+
+        if (ticketRepository.existsByServiceEntityAndTicketType(ticket.getServiceEntity(), ticket.getTicketType()))
+            throw new AppException(ErrorCode.EXISTED);
+
+        return ticketMapper.toResponse(ticketRepository.save(ticket));
     }
 
     public List<MapEntryResponse<ServiceResponse,List<TicketResponse>>> getTickets(String search) {

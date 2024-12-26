@@ -101,14 +101,14 @@ const ServiceTitle = styled.h3`
 const ServiceImage = styled.img`
   width: 100%;
   max-width: 600px;
+  height: auto;
+  aspect-ratio: 16 / 9;
   margin-bottom: 20px;
-  border-radius: 10px;
+  border-radius: 5px; /* Adjusted to make it slightly more square */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease-in-out;
   cursor: pointer;
-  &:hover {
-    transform: scale(1.05);
-  }
+  object-fit: cover;
 `;
 
 const ServiceDescription = styled.p`
@@ -342,8 +342,8 @@ export class ServiceList extends Component {
                     {this.state.services.map(service => (
                         <div className="col-md-4 ftco-animate container" key={service.id}>
                             <div className="project-wrap">
-                                <a className="img" href={service.image} target="_blank" rel="noopener noreferrer">
-                                    <img src={service.image} alt={service.name} style={{ width: '100%', height: 'auto' }} />
+                                <a className="img" target="_blank" rel="noopener noreferrer">
+                                    <img src={service.image} alt={service.name} style={{ width: '100%', height: '350px', objectFit: 'cover' }} />
                                 </a>
                                 <div className="text p-4">
                                     <h3>

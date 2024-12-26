@@ -254,6 +254,9 @@ public class AuthenticationService {
     }
 
     private String generateToken(User user, long duration) {
+        if (!user.getStatus().equals("Đang hoạt động"))
+            throw new AppException(ErrorCode.LOCKED);
+
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()

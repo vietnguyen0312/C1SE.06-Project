@@ -1,10 +1,11 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import publicRoutes from './PublicRouters';
-import managerRoutes from './ManagerRouter';
 import customerRoutes from './CustomerRouter';
+import staffRoutes from './StaffRouter';
+
 const router = createBrowserRouter([
     ...publicRoutes,
-    ...managerRoutes,
+    ...staffRoutes,
     ...customerRoutes,
 ]);
 

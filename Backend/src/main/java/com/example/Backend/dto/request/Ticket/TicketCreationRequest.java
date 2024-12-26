@@ -26,5 +26,5 @@ public class TicketCreationRequest {
     int quantity;
 
     @NotNull(message = "NOT_NULL")
-    Set<String> ticketTypeId;
+    String ticketTypeId;
 }

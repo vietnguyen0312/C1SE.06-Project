@@ -11,6 +11,7 @@ const ConfirmTicket = ({ search }) => {
     
     useEffect(() => {
         fetchBillTicket(1,6,search);
+        setShowDetail(false);
     }, [search]);
 
     const ServiceDetailColumns = [
