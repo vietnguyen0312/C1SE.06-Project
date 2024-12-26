@@ -69,7 +69,7 @@ function Header() {
             <HeaderTopLeft>
               <HeaderTopLeftUL>
                 <HeaderTopLi><HeaderTopLeftLink href="/about">Về chúng tôi</HeaderTopLeftLink></HeaderTopLi>
-                <HeaderTopLi><HeaderTopLeftLink href="/ticket">Đặt vé</HeaderTopLeftLink></HeaderTopLi>
+                <HeaderTopLi><HeaderTopLeftLink href="/customer/ticket">Đặt vé</HeaderTopLeftLink></HeaderTopLi>
               </HeaderTopLeftUL>
             </HeaderTopLeft>
           </WrapperAIC>
@@ -99,7 +99,7 @@ function Header() {
                     <BlogTypeList/>
                   </ul>
                 </NavMenuItem>
-                <NavMenuItem><NavMenuLink href="/ticket">Đặt vé</NavMenuLink></NavMenuItem>
+                <NavMenuItem><NavMenuLink href="/customer/ticket">Đặt vé</NavMenuLink></NavMenuItem>
                 <IsLogin />
               </NavMenu>
             </nav>

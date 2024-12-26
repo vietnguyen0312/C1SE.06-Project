@@ -10,8 +10,6 @@ import BlogHome from '../Layout/PublicLayout/BlogHome/BlogHome';
 import BlogDetail from '../Service/BlogForDetail';
 import ServiceLayout from '../Layout/PublicLayout/ServiceLayout/ServiceLayout';
 import Hotel from '../components/Hotels';
-import Booking from '../components/Booking';
-import TicketLayout from '../Layout/PublicLayout/Ticket/TicketLayout';
 import Checkout from '../components/Checkout';
 import EmailInput from '../components/ForgotPassword/emailInput';
 import Notify from '../components/ForgotPassword/notify';
@@ -57,14 +55,6 @@ const PublicRouters = [
             {
                 path: "blogHome",
                 element: <BlogHome />
-            },
-            {
-                path: "booking",
-                element: <Booking />
-            },
-            {
-                path: "ticket",
-                element: <TicketLayout />
             },
         ],
     },

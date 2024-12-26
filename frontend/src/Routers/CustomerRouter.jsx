@@ -3,6 +3,8 @@ import ProtectedRoute from "./ProtectedRouter";
 import UserProfileLayout from "../Layout/PublicLayout/UserProfile/UserProfileLayout";
 import HistoryTicketBill from '../Layout/PublicLayout/HistoryBill/HistoryTicketBill';
 import HistoryBookingRoom from '../Layout/PublicLayout/HistoryBill/HistoryBookingRoom';
+import Booking from '../components/Booking';
+import TicketLayout from '../Layout/PublicLayout/Ticket/TicketLayout';
 
 const CustomerRouter = [
     {
@@ -23,6 +25,14 @@ const CustomerRouter = [
                     {
                         path: "historyBookingRoom",
                         element: <HistoryBookingRoom />
+                    },
+                    {
+                        path: "booking",
+                        element: <Booking />
+                    },
+                    {
+                        path: "ticket",
+                        element: <TicketLayout />
                     },
                 ],
             }

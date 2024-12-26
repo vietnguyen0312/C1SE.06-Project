@@ -65,7 +65,7 @@ public class BookingRoomDetailsService {
                         .toBookingRoomDetailsResponse(bookingRoomDetailsRepository.save(bookingRoomDetails));
         }
 
-        @PostAuthorize("#isCustomer or hasRole('MANAGER')")
+        @PostAuthorize("#isCustomer or hasRole('EMPLOYEE')")
         public PageResponse<BookingRoomDetailsResponse> getAllBookingRoomDetails(Boolean isCustomer, int page, int size) {
                 Sort sort = Sort.by(Sort.Direction.DESC, "id").ascending();
                 Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -89,14 +89,14 @@ public class BookingRoomDetailsService {
                         .data(pageData.stream().map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse).toList())
                         .build();
         }
-        @PostAuthorize("returnObject.bookingRoom.user.email == authentication.name or hasRole('MANAGER')")
+        @PostAuthorize("returnObject.bookingRoom.user.email == authentication.name or hasRole('EMPLOYEE')")
         public BookingRoomDetailsResponse getBookingRoomDetailsById(String id) {
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
                 return bookingRoomDetailsMapper.toBookingRoomDetailsResponse(bookingRoomDetails);
         }
 
-        @PreAuthorize("hasRole('MANAGER')")
+        @PreAuthorize("hasRole('EMPLOYEE')")
         public void deleteBookingRoomDetails(String id) {
                 if (!bookingRoomDetailsRepository.existsById(id)) {
                         throw new AppException(ErrorCode.NOT_EXISTED);
@@ -104,7 +104,7 @@ public class BookingRoomDetailsService {
                 bookingRoomDetailsRepository.deleteById(id);
         }
 
-        @PreAuthorize("hasRole('MANAGER')")
+        @PreAuthorize("hasRole('EMPLOYEE')")
         public List<BookingRoomDetailsResponse> getBookingRoomDetailsByBookingRoom1(String bookingRoomId) {
                 BookingRoom bookingRoom = bookingRoomRepository.findById(bookingRoomId)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));
@@ -112,7 +112,7 @@ public class BookingRoomDetailsService {
                         .map(bookingRoomDetailsMapper::toBookingRoomDetailsResponse)
                         .toList();
         }
-        @PreAuthorize("hasRole('MANAGER')")
+        @PreAuthorize("hasRole('EMPLOYEE')")
         public BookingRoomDetailsResponse updateBookingRoomDetails(String id, BookingRoomDeTailsUpdateRequest request) {
 
                 BookingRoomDetails bookingRoomDetails = bookingRoomDetailsRepository.findById(id)
@@ -162,8 +162,8 @@ public class BookingRoomDetailsService {
 
 
 
-        public List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse, List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>>
-        getBookingRoomDetailsByUserID() {
+        public List<MapEntryResponse<Instant, List<MapEntryResponse<BookingRoomResponse,
+                List<MapEntryResponse<RoomTypeResponse, List<BookingRoomDetailsResponse>>>>>>> getBookingRoomDetailsByUserID() {
 
                 var context = SecurityContextHolder.getContext();
                 String email = context.getAuthentication().getName();
@@ -323,27 +323,24 @@ public class BookingRoomDetailsService {
                         .build();
         }
 
-
-
-
-        @PreAuthorize("hasRole('MANAGER')")
+        @PreAuthorize("hasRole('EMPLOYEE')")
         public List<BookingRoomDetails> getActiveBookingRoomDetails() {
                 return bookingRoomDetailsRepository.findActiveBookingRoomDetails();
         }
 
-        @PreAuthorize("hasRole('MANAGER')")
+        @PreAuthorize("hasRole('EMPLOYEE')")
         public List<BookingRoomDetails> getBookingRoomDetailsByRoomId(String roomId) {
                 // Sắp xếp theo checkInDate của BookingRoom
                 Sort sort = Sort.by(Sort.Order.asc("bookingRoom.checkInDate"));
                 return bookingRoomDetailsRepository.findByRoom_Id(roomId, sort);
         }
 
-        @PreAuthorize("hasRole('MANAGER')")
+        @PreAuthorize("hasRole('EMPLOYEE')")
         public List<BookingRoomDetails> getBookingRoomDetailsByBookingRoomStaff(String bookingRoomId) {
                 return bookingRoomDetailsRepository.findByBookingRoom_id(bookingRoomId);
         }
 
-        @PreAuthorize("hasRole('MANAGER')")
+        @PreAuthorize("hasRole('EMPLOYEE')")
         public List<BookingRoomDetails> getBookingRoomDetailsByBookingRoomStaff1(String phoneNumber) {
                 return bookingRoomDetailsRepository.findActiveBookingRoomDetailsByPhoneNumber(phoneNumber);
         }

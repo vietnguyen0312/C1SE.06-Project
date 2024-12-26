@@ -110,9 +110,6 @@ public class UserController {
                 .build();
     }
 
-
-
-
     @GetMapping("/booking/byPhone")
     public ApiResponse<PageResponse<UserResponse>> searchUsers(
             @RequestParam(value = "search", required = false, defaultValue = "") String search,

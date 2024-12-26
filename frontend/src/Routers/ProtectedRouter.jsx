@@ -9,7 +9,7 @@ const ProtectedRoute = ({ role }) => {
         let roles = decodedJwtData.scope.split(' ');
         return roles.includes(role) ? <Outlet /> : <Navigate to="/403" />;
     }
-    return <Navigate to="/" />;
+    return <Navigate to="/authentication" />;
 }
 
 export default ProtectedRoute;

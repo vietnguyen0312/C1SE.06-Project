@@ -384,6 +384,16 @@ const HistoryBookingRoom = () => {
         }
     };
 
+    const handlePayment = async (bookingRoom) => {
+        const paymentUrl = await axios.get('/payment/vn-pay', {
+            params: {
+                amount: bookingRoom.total,
+                orderInfo: "r" + bookingRoom.id
+            }
+        });
+        window.location.href = paymentUrl.result;
+    }
+
     const handleOpenModal = (bookingRoomDetail) => {
         const existingRateRoom = RateRoom.find(item => item.bookingRoomDetails.id === bookingRoomDetail.id);
 
@@ -620,6 +630,10 @@ const HistoryBookingRoom = () => {
                 </Container>
             </BannerSectionTicket>
 
+            {ListBookingRoom.length === 0 && <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh" }}>
+                <h1>Không có hoá đơn nào</h1>
+            </div>}
+
             <InfiniteScroll
                 dataLength={ListBookingRoom.length}
                 next={fetchData}
@@ -680,7 +694,7 @@ const HistoryBookingRoom = () => {
                                                     <th className='center'>Ghi chú</th>
                                                     <th className='center'>Thành tiền</th>
                                                     <th className='center'>
-                                                        {subItem.key.status === "đã thanh toán" ? "Đánh giá" : "tạm tạm"}
+                                                        {subItem.key.status === "đã thanh toán" ? "Đánh giá" : ""}
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -742,11 +756,28 @@ const HistoryBookingRoom = () => {
                                                                                 if (RateRoom.find(item => item.bookingRoomDetails.id === bookingRoomDetail.id)) {
                                                                                     return renderRateServiceButton(bookingRoomDetail, '#009452', 'đã đánh giá', handleOpenModal);
                                                                                 }
-                                                                                return renderRateServiceButton(bookingRoomDetail, '#ffff2c', 'Đánh giá', handleOpenModal);
+                                                                                return renderRateServiceButton(bookingRoomDetail, '#ffcc00', 'Đánh giá', handleOpenModal);
                                                                             } else if (trangThai === "đã quá hạn") {
                                                                                 return renderRateServiceButton(bookingRoomDetail, '#FF00FF', 'Gia hạn', handleOpenModalUpdate);
                                                                             } else if (trangThai === "chưa thanh toán") {
-                                                                                return renderRateServiceButton(bookingRoomDetail, '#5d9fc5', 'thanh toán', handleOpenModal);
+                                                                                return (
+                                                                                    <>
+                                                                                        <RateService>
+                                                                                            <ButtonCPN
+                                                                                                text="Thanh toán"
+                                                                                                onClick={() => handlePayment(item.value[0].key)}
+                                                                                                style={{
+                                                                                                    width: '125px',
+                                                                                                    height: '30px',
+                                                                                                    fontSize: '13px',
+                                                                                                    display: 'flex',
+                                                                                                    alignItems: 'center',
+                                                                                                    justifyContent: 'center',
+                                                                                                }}
+                                                                                            />
+                                                                                        </RateService>
+                                                                                    </>
+                                                                                )
                                                                             } else if (trangThai === "chờ khách check in") {
                                                                                 return renderRateServiceButton(bookingRoomDetail, '#FF0000', 'hủy phòng', handleCancelBookingRoom);
                                                                             } else {
@@ -821,7 +852,7 @@ const HistoryBookingRoom = () => {
                                                                 </TotalText>
                                                             </div>
                                                             {status === "chưa thanh toán" && (
-                                                                <ButtonCPN text="Đặt phòng" onClick={() => handleOpenModal(item)} />
+                                                                <ButtonCPN text="Thanh toán" onClick={() => handlePayment(item.value[0].key)} />
                                                             )}
                                                         </div>
                                                     </Price>

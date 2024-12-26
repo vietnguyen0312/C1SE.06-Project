@@ -53,7 +53,7 @@ public class BookingRoomService {
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.save(bookingRoom));
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public BookingRoomResponse createBookingRoomByStaff(BookingRoomCreationByStaffRequest request) {
 
         BookingRoomCreationRequest creationRequest = BookingRoomCreationRequest.builder()
@@ -83,7 +83,7 @@ public class BookingRoomService {
     }
 
 
-    @PostAuthorize("#isCustomer or hasRole('MANAGER')")
+    @PostAuthorize("#isCustomer or hasRole('EMPLOYEE')")
     public PageResponse<BookingRoomResponse> getBookingRooms(Boolean isCustomer, int page, int size) {
         Sort sort = Sort.by(Sort.Direction.DESC, "checkInDate");
         Pageable pageable = PageRequest.of(page - 1, size, sort);
@@ -108,7 +108,7 @@ public class BookingRoomService {
                 .build();
     }
 
-    @PostAuthorize("returnObject.user.email == authentication.name or hasRole('MANAGER')")
+    @PostAuthorize("returnObject.user.email == authentication.name or hasRole('EMPLOYEE')")
     public BookingRoomResponse getBookingRoomById(String id) {
         return bookingRoomMapper.toBookingRoomResponse(bookingRoomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
@@ -132,12 +132,12 @@ public class BookingRoomService {
     }
 
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public void deleteBookingRoom(String id) {
         bookingRoomRepository.deleteById(id);
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('EMPLOYEE')")
     public List<BookingRoomResponse> getBookingRoomsByUser(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED));

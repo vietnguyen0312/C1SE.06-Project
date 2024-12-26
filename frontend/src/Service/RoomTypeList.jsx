@@ -319,7 +319,6 @@ class RoomTypeList extends Component {
       page: {},
       totalElements: {},
       hasMore: {},
-      user: [],
       selectedBookingRoomDetails: [],
       showModal: false,
       hoverRating: 0,
@@ -367,15 +366,9 @@ class RoomTypeList extends Component {
     }
   };
 
-  getInfor = async () => {
-    const response = await axios.get('/users/myInfo');
-    this.setState({ user: response.result });
-  }
-
   componentDidMount() {
     AOS.init({ duration: 2000 });
     this.fetchRooms();
-    this.getInfor();
   }
 
   fetchRooms = async () => {
@@ -608,7 +601,7 @@ class RoomTypeList extends Component {
                     <RoomInfo>
                       <RoomName>{room.name}</RoomName>
                       <RoomPrice>{room.price.toLocaleString('vi-VN')} VNĐ / DAY</RoomPrice>
-                      <LinkR to={`/booking?roomTypeId=${room.id}`} onClick={() => this.handleModalOpen(room)}>Đặt Phòng</LinkR>
+                      <LinkR to={`/customer/booking?roomTypeId=${room.id}`} onClick={() => this.handleModalOpen(room)}>Đặt Phòng</LinkR>
                       <LinkR to="#" onClick={() => this.handleModalOpen(room)}>Xem Chi Tiết</LinkR>
                     </RoomInfo>
                   </RoomCard>
@@ -645,7 +638,7 @@ class RoomTypeList extends Component {
                 <ModalPrice>Giá: {selectedRoom.price.toLocaleString('vi-VN')} VNĐ</ModalPrice>
                 <p>Mô Tả: {selectedRoom.detail}</p>
                 <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px', paddingBottom: '20px', borderBottom: '1px solid #f8b600' }}>
-                  <LinkR to={`/booking?roomTypeId=${selectedRoom.id}`}> <ButtonCpn text="Đặt Phòng" /> </LinkR>
+                  <LinkR to={`/customer/booking?roomTypeId=${selectedRoom.id}`}> <ButtonCpn text="Đặt Phòng" /> </LinkR>
                 </div>
                 <div>
                   <RatingContainer>
@@ -720,12 +713,6 @@ class RoomTypeList extends Component {
                               </RatingItem>
                               <Bottom>
                                 <div>{this.formatDate(rating.dateUpdate)}</div>
-                                {this.state.user.id === rating.user.id && (
-                                  <>
-                                    <div onClick={() => this.handleOpenModal(rating)}>Sửa</div>
-                                    <div onClick={() => this.handleDeleteRating(rating)}>Xóa</div>
-                                  </>
-                                )}
                               </Bottom>
                             </div>
                           ))

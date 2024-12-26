@@ -351,7 +351,7 @@ const Fixed = () => {
     <>
       <Container data-aos="fade-right">
         <Ticket>
-          <a href='/ticket'>
+          <a href='/customer/ticket'>
             <img src={('/img/ticket/Ticket.png')} alt='ticket' />
           </a>
         </Ticket>

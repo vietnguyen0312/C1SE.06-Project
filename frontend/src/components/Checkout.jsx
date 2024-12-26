@@ -3,6 +3,8 @@ import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from '../Configuration/AxiosConfig';
 import ButtonCPN from './Button/Button';
+import { useNavigate } from 'react-router-dom';
+import { getRoles, getRedirectPath } from '../Service/Login';
 
 const Container = styled.div`
     width: 70%;
@@ -60,6 +62,7 @@ const Status = styled.span`
 
 const Checkout = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const params = new URLSearchParams(location.search);
     const orderInfo = params.get('vnp_OrderInfo');
     const vnp_ResponseCode = params.get('vnp_ResponseCode');
@@ -106,6 +109,10 @@ const Checkout = () => {
                         billDetails: detailsRes.result
                     });
                 }
+            }
+
+            if (vnp_ResponseCode !== '00') {
+                navigate(getRedirectPath(getRoles(localStorage.getItem('token'))))
             }
 
             if (category === 'v') {

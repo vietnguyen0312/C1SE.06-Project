@@ -197,7 +197,7 @@ const ManageBlog = () => {
             color: "inherit",
             marginRight: "20px",
           }}
-          to="/manager/createBlog"
+          to="/staff/createBlog"
         >
           <ButtonCPN
             style={{
@@ -250,7 +250,7 @@ const ManageBlog = () => {
         {blogImages.map((blog, index) => (
           <BlogCard key={`${blog.id}-${index}`}>
             <Link
-              to={`/manager/editBlog/${blog.id}`}
+              to={`/staff/editBlog/${blog.id}`}
               style={{
                 display: "flex",
                 flex: 1,
@@ -268,7 +268,7 @@ const ManageBlog = () => {
               </div>
             </Link>
             <Link
-              to={`/manager/editBlog/${blog.id}`}
+              to={`/staff/editBlog/${blog.id}`}
               style={{ textDecoration: "none" }}
             >
               <ButtonCPN

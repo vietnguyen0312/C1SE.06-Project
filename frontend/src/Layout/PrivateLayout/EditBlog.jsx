@@ -3,6 +3,7 @@ import QuillEditor from "../../components/QuillEditor";
 import "react-quill/dist/quill.snow.css";
 import styled from "styled-components";
 import LoadingIcons from "react-loading-icons";
+import { Modal, Spin } from 'antd';
 import ConfirmModal from '../../components/ConfirmModal';
 import axios from "../../Configuration/AxiosConfig";
 import { useNavigate, useParams } from "react-router-dom";
@@ -116,6 +117,7 @@ const EditBlog = () => {
 
   const handleConfirm = async () => {
     try {
+      setLoading(true);
       const response = await axios.put(`/blogs/${id}`, tempBlogData);
 
       const cloudinary = await axios.get(`/blogImage/findImagesByBlog/${id}`);
@@ -133,6 +135,7 @@ const EditBlog = () => {
       }
       toast.success("Cập nhật thành công!");
       setIsModalOpen(false);
+      setLoading(false);
       navigate(-1);
     } catch (error) {
       toast.error("Có lỗi xảy ra khi cập nhật!");
@@ -247,166 +250,167 @@ const EditBlog = () => {
     navigate(-1);
   };
 
-  if (loading) {
-    return <LoadingIcons.SpinningCircles />;
-  }
-
   return (
-    <BlogEditorContainer>
-      <EditorWrapper>
-        <h3 style={{ marginBottom: "20px", textAlign: "center" }}>
-          Chỉnh sửa Tin tức
-        </h3>
+    <>
+      <Modal visible={loading} footer={null} closable={false}>
+          <Spin tip="Đang cập nhật..." />
+      </Modal>
+      <BlogEditorContainer>
+        <EditorWrapper>
+          <h3 style={{ marginBottom: "20px", textAlign: "center" }}>
+            Chỉnh sửa Tin tức
+          </h3>
 
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <select
-          value={selectedId} 
-          onChange={(e) => {
-            const selectedType = blogTypes.find(
-              (type) => type.id === e.target.value
-            );
-            setSelectedId(selectedType.id);
-            setBlogType({id : selectedType.id , name : selectedType.name});
-          }}
-          style={{
-            width: "100%",
-            marginBottom: "20px",
-            padding: "10px",
-            fontSize: "16px",
-            border: "1px solid #e5e5e5",
-            borderRadius: "4px",
-          }}
-        >
-          {blogTypes.map((type) => (
-            <option key={type.id} value={type.id}>
-              {type.name}
-            </option>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
+          <select
+            value={selectedId} 
+            onChange={(e) => {
+              const selectedType = blogTypes.find(
+                (type) => type.id === e.target.value
+              );
+              setSelectedId(selectedType.id);
+              setBlogType({id : selectedType.id , name : selectedType.name});
+            }}
+            style={{
+              width: "100%",
+              marginBottom: "20px",
+              padding: "10px",
+              fontSize: "16px",
+              border: "1px solid #e5e5e5",
+              borderRadius: "4px",
+            }}
+          >
+            {blogTypes.map((type) => (
+              <option key={type.id} value={type.id}>
+                {type.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            placeholder="Nhập tiêu đề..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={{
+              width: "100%",
+              marginBottom: "20px",
+              padding: "10px",
+              fontSize: "16px",
+              border: "1px solid #e5e5e5",
+              borderRadius: "4px",
+            }}
+          />
+          <textarea
+            type="text"
+            placeholder="Nhập nội dung mở đầu..."
+            value={contentOpen}
+            onChange={(e) => setContentOpen(e.target.value)}
+            style={{
+              width: "100%",
+              marginBottom: "20px",
+              padding: "10px",
+              fontSize: "16px",
+              border: "1px solid #e5e5e5",
+              borderRadius: "4px",
+              minHeight: "100px",
+              resize: "vertical",
+            }}
+            wrap="soft"
+          />
+          {bodySections.map((section, index) => (
+            <div key={index} style={{ marginBottom: "20px" }}>
+              {section.type === "image" ? (
+                <StyledContainer>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => handleImageChange(index, event)}
+                    style={{ marginBottom: "10px" }}
+                  />
+                  {section.file ? (
+                    <StyledImage
+                      src={URL.createObjectURL(section.file)}
+                      alt={`image-${index}`}
+                      style={{ width: "100%", margin: "1rem 0" }}
+                    />
+                  ) : (
+                    <StyledImage
+                      src={section.imgUrl}
+                      alt={`image-${index}`}
+                      style={{ width: "100%", margin: "1rem 0" }}
+                    />
+                  )}
+                  <p>Hình ảnh: {section.name}</p>
+                  <TrashButton onClick={() => handleRemoveBodySection(index)} />
+                </StyledContainer>
+              ) : (
+                <div>
+                  <QuillEditor
+                    value={section}
+                    onChange={(value) => handleBodyChange(index, value)}
+                    placeholder="Nhập nội dung blog của bạn..."
+                  />
+                  <TrashButton onClick={() => handleRemoveBodySection(index)} />
+                </div>
+              )}
+            </div>
           ))}
-        </select>
-        <input
-          type="text"
-          placeholder="Nhập tiêu đề..."
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          style={{
-            width: "100%",
-            marginBottom: "20px",
-            padding: "10px",
-            fontSize: "16px",
-            border: "1px solid #e5e5e5",
-            borderRadius: "4px",
-          }}
-        />
-        <textarea
-          type="text"
-          placeholder="Nhập nội dung mở đầu..."
-          value={contentOpen}
-          onChange={(e) => setContentOpen(e.target.value)}
-          style={{
-            width: "100%",
-            marginBottom: "20px",
-            padding: "10px",
-            fontSize: "16px",
-            border: "1px solid #e5e5e5",
-            borderRadius: "4px",
-            minHeight: "100px",
-            resize: "vertical",
-          }}
-          wrap="soft"
-        />
-        {bodySections.map((section, index) => (
-          <div key={index} style={{ marginBottom: "20px" }}>
-            {section.type === "image" ? (
-              <StyledContainer>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(event) => handleImageChange(index, event)}
-                  style={{ marginBottom: "10px" }}
+        </EditorWrapper>
+        <PreviewWrapper>
+          <h3
+            style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center" }}
+          >
+            {title}
+          </h3>
+          <p>{contentOpen}</p>
+          {bodySections.map((section, index) => (
+            <div key={index}>
+              {typeof section === "string" ? (
+                <div dangerouslySetInnerHTML={{ __html: section }} />
+              ) : section.file ? (
+                <StyledImage
+                  src={URL.createObjectURL(section.file)}
+                  alt="Preview"
                 />
-                {section.file ? (
-                  <StyledImage
-                    src={URL.createObjectURL(section.file)}
-                    alt={`image-${index}`}
-                    style={{ width: "100%", margin: "1rem 0" }}
-                  />
-                ) : (
-                  <StyledImage
-                    src={section.imgUrl}
-                    alt={`image-${index}`}
-                    style={{ width: "100%", margin: "1rem 0" }}
-                  />
-                )}
-                <p>Hình ảnh: {section.name}</p>
-                <TrashButton onClick={() => handleRemoveBodySection(index)} />
-              </StyledContainer>
-            ) : (
-              <div>
-                <QuillEditor
-                  value={section}
-                  onChange={(value) => handleBodyChange(index, value)}
-                  placeholder="Nhập nội dung blog của bạn..."
+              ) : (
+                <StyledImage
+                  src={section.imgUrl}
+                  alt={`image-${index}`}
+                  style={{ width: "100%", margin: "1rem 0" }}
                 />
-                <TrashButton onClick={() => handleRemoveBodySection(index)} />
-              </div>
-            )}
-          </div>
-        ))}
-      </EditorWrapper>
-      <PreviewWrapper>
-        <h3
-          style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center" }}
-        >
-          {title}
-        </h3>
-        <p>{contentOpen}</p>
-        {bodySections.map((section, index) => (
-          <div key={index}>
-            {typeof section === "string" ? (
-              <div dangerouslySetInnerHTML={{ __html: section }} />
-            ) : section.file ? (
-              <StyledImage
-                src={URL.createObjectURL(section.file)}
-                alt="Preview"
-              />
-            ) : (
-              <StyledImage
-                src={section.imgUrl}
-                alt={`image-${index}`}
-                style={{ width: "100%", margin: "1rem 0" }}
-              />
-            )}
-          </div>
-        ))}
-      </PreviewWrapper>
-      <FixedButtonContainer>
-        <ButtonStyled
-          style={{ width: "300%", fontSize: "14px" }}
-          onClick={handleAddTextSection}
-          text="Thêm văn bản"
+              )}
+            </div>
+          ))}
+        </PreviewWrapper>
+        <FixedButtonContainer>
+          <ButtonStyled
+            style={{ width: "300%", fontSize: "14px" }}
+            onClick={handleAddTextSection}
+            text="Thêm văn bản"
+          />
+          <ButtonStyled
+            style={{ width: "300%", fontSize: "14px" }}
+            onClick={handleAddImageSection}
+            text="Thêm hình ảnh"
+          />
+          <ButtonStyled
+            style={{ width: "200%", fontSize: "14px" }}
+            onClick={handleUpdateBlog}
+            text="Cập nhật"
+          />
+          <ButtonStyled text="Quay lại" onClick={handleBack} />
+        </FixedButtonContainer>
+        <ConfirmModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={handleConfirm}
+          title="Xác nhận cập nhật"
+          message="Bạn có chắc chắn muốn cập nhật bài viết này?"
+          confirmText="Cập nhật"
+          cancelText="Hủy"
         />
-        <ButtonStyled
-          style={{ width: "300%", fontSize: "14px" }}
-          onClick={handleAddImageSection}
-          text="Thêm hình ảnh"
-        />
-        <ButtonStyled
-          style={{ width: "200%", fontSize: "14px" }}
-          onClick={handleUpdateBlog}
-          text="Cập nhật"
-        />
-        <ButtonStyled text="Quay lại" onClick={handleBack} />
-      </FixedButtonContainer>
-      <ConfirmModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleConfirm}
-        title="Xác nhận cập nhật"
-        message="Bạn có chắc chắn muốn cập nhật bài viết này?"
-        confirmText="Cập nhật"
-        cancelText="Hủy"
-      />
-    </BlogEditorContainer>
+      </BlogEditorContainer>
+    </>
   );
 };
 

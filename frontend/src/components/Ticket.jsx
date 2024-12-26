@@ -269,7 +269,7 @@ const Ticket = ({ style }) => {
         }
 
         if (phoneNumber !== '') {
-            const responseByPhoneNumber = await axios.get('/users/booking/byPhoneNumber', { params: { search: phoneNumber.toLowerCase() } });
+            const responseByPhoneNumber = await axios.get('/users/booking/byPhone', { params: { search: phoneNumber.toLowerCase() } });
             searchByPhoneNumber = responseByPhoneNumber.result.data;
         }
 

@@ -99,7 +99,7 @@ public class BillTicketService {
                 .build();
     }
 
-    @PostAuthorize("returnObject.user.email == authentication.name or hasRole('MANAGER')")
+    @PostAuthorize("returnObject.user.email == authentication.name or hasRole('EMPLOYEE')")
     public BillTicketResponse getBill(String id) {
         return billTicketMapper.toBillTicketResponse(billTicketRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED)));
     }
