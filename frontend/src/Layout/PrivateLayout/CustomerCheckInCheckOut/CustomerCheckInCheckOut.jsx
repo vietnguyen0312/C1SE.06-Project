@@ -122,7 +122,7 @@ const CustomerCheckInCheckOut = () => {
         if (phoneNumber !== '') {
             const responseByPhoneNumber = await axios.get('/users/booking/byPhone', { params: { search: phoneNumber.toLowerCase() } });
             searchByPhoneNumber = responseByPhoneNumber.result.data;
-            console.log(searchByPhoneNumber);
+
             setFilteredCustomer(searchByPhoneNumber);
         }
 

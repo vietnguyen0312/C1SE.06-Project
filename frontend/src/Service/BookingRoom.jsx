@@ -1084,41 +1084,31 @@ class BookingRoom extends Component {
     }
 
     handleSearch = debounce(async (searchValue) => {
-        console.log(searchValue);
 
         if (searchValue === '') {
             this.setState({ filteredBookingRoomByPhone: [] }); // Reset lại filteredTickets nếu searchValue trống
         } else {
-            try {
-                const response = await axios.get('/users/booking/byPhone', { params: { search: searchValue.toLowerCase() } });
-                this.setState({ filteredBookingRoomByPhone: response.result.data }); // Giả sử response.data.result chứa kết quả
-                console.log(response.result.data);
-            } catch (error) {
-                console.error('Error fetching tickets:', error);
-            }
+
+            const response = await axios.get('/users/booking/byPhone', { params: { search: searchValue.toLowerCase() } });
+            this.setState({ filteredBookingRoomByPhone: response.result.data }); // Giả sử response.data.result chứa kết quả
+
         }
         this.setState({ isDropdownVisiblePhone: searchValue !== '' });
     }, 700);
 
     handleSearchEmail = debounce(async (searchValue) => {
-        console.log(searchValue);
         this.setState({ searchEmail: searchValue });
         if (searchValue === '') {
             this.setState({ filteredBookingRoomByEmail: [] }); // Reset lại filteredTickets nếu searchValue trống
         } else {
-            try {
-                const response = await axios.get('/users/booking/byEmail', { params: { search: searchValue.toLowerCase() } });
-                this.setState({ filteredBookingRoomByEmail: response.result.data }); // Giả sử response.data.result chứa kết quả
-                console.log(response.result.data);
-            } catch (error) {
-                console.error('Error fetching tickets:', error);
-            }
+            const response = await axios.get('/users/booking/byEmail', { params: { search: searchValue.toLowerCase() } });
+            this.setState({ filteredBookingRoomByEmail: response.result.data }); // Giả sử response.data.result chứa kết quả
+
         }
         this.setState({ isDropdownVisibleEmail: searchValue !== '' }); // Show dropdown if searchValue is not empty
     }, 700);
 
     setSelectedService = (item) => {
-        console.log(item);
         this.setState({
             nameCustomer: item?.username,
             phoneCustomer: item?.phoneNumber,
@@ -1128,7 +1118,6 @@ class BookingRoom extends Component {
     }
 
     setSelectedService1 = (item) => {
-        console.log(item);
         this.setState({
             nameCustomer: item?.username,
             phoneCustomer: item?.phoneNumber,
@@ -1142,7 +1131,6 @@ class BookingRoom extends Component {
         const normalizedName = name ? name.toLowerCase() : '';
         const normalizedPhone = phoneNumber ? phoneNumber.toLowerCase() : '';
         const normalizedEmail = email ? email.toLowerCase() : '';
-        console.log(normalizedName, normalizedPhone, normalizedEmail);
         let searchByName = [];
         let searchByPhoneNumber = [];
         let searchByEmail = [];
@@ -1160,8 +1148,6 @@ class BookingRoom extends Component {
             const responseByEmail = await axios.get('/users/booking/byEmail', { params: { search: normalizedEmail } });
             searchByEmail = responseByEmail.result.data;
         }
-
-        console.log(searchByName, "adsad", searchByPhoneNumber, "adsad", searchByEmail);
 
         if (normalizedName === '' && normalizedPhone === '' && normalizedEmail === '') {
             // Trường hợp cả 3 đều rỗng
@@ -1202,7 +1188,7 @@ class BookingRoom extends Component {
             this.setState({ filteredCustomer: combinedResults });
         }
 
-        console.log(this.state.filteredCustomer);
+
     };
 
     componentWillUnmount() {

@@ -45,8 +45,12 @@ nlu:
     - hãy cho tôi biết về phòng [đôi](room_describe) có những gì
     - hãy cho tôi biết về phòng [suite](room_describe) có những gì
     - hãy cho tôi biết về phòng [VIP](room_describe) có những gì
+    - khu du lịch có những loại phòng nào
+    - Mô tả các loại phòng
+    - khách sạn có những loại phòng nào
 
 
+ 
 - intent: ask_number_of_rooms
   examples: |
     - Khách sạn có bao nhiêu phòng?
@@ -230,6 +234,10 @@ nlu:
     - Các phương thức thanh toán mà khách sạn chấp nhận là gì?
     - Thanh toán qua ứng dụng có được không?
     - Tôi muốn biết về các phương thức thanh toán của khách sạn.
+    - Các hình thức thanh toán
+    - Thanh toán bằng thẻ tín dụng có được không?
+    - Thanh toán bằng tiền mặt có được không?
+    - Thanh toán bằng thẻ quốc tế có được không?
 
 - intent: ask_late_check_in
   examples: |

@@ -26,7 +26,7 @@
 #     - Tôi có nên thuê trang thiết bị ở đây không?
 #     - Có thể tìm thấy trang thiết bị leo núi ở đâu gần đây?
 #     - Những món đồ nào giúp bảo đảm an toàn khi leo núi?
-
+ 
 # - intent: ask_about_special_events #Hỏi về các sự kiện đặc biệt.
 #   examples: |
 #     - Có sự kiện đặc biệt nào sắp diễn ra không?
