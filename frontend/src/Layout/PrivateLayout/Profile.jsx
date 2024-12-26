@@ -82,17 +82,7 @@ class Profile extends Component {
             <ProfileContainer>
                 <DashboardContainer>
                     <div>
-                        <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Profile</div>
-                        <Header>
-                            <HeaderItem>Home</HeaderItem>
-                            <p>→</p>
-                            <HeaderItem>Profile</HeaderItem>
-                        </Header>
-
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <RetweetOutlined />
-                        <DateStyle>Nov 9, 2024 - Nov 15, 2024</DateStyle>
+                        <div style={{ fontSize: '20px', fontWeight: '600', marginBottom: '10px' }}>Thông tin cá nhân</div>
                     </div>
                 </DashboardContainer>
                 <ProfileBody>

@@ -10,6 +10,8 @@ import {
     FileDoneOutlined 
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { getRoles } from '../../Service/Login';
+
 const SidebarContainer = styled.div`
     width: 250px;
     height: 100vh;
@@ -49,49 +51,70 @@ const Content = styled.div`
 `;
 
 const Sidebar = () => {
+    const roles = getRoles(localStorage.getItem('token'));
+    const isManager = roles.includes('MANAGER');
+    const isEmployee = roles.includes('EMPLOYEE');
+    const isEmployer = roles.includes('EMPLOYER');
+    
     const navigate = useNavigate(); 
     return (
         <SidebarContainer>
             <SidebarContent>
-                <div style={{ padding: '15px 0', borderBottom: '1px solid #e5e5e5' }} onClick={() => navigate('/manager')}>
-                    <Item>
-                        <DashboardOutlined />
-                        <div>Doanh thu</div>
-                    </Item>
-                </div>
+                {isManager && (
+                    <div style={{ padding: '15px 0', borderBottom: '1px solid #e5e5e5' }} onClick={() => navigate('/staff')}>
+                        <Item>
+                            <DashboardOutlined />
+                            <div>Doanh thu</div>
+                        </Item>
+                    </div>
+                )}
                 <Hotel>
                     <Content>KHÁCH SẠN | DỊCH VỤ</Content>
-                    <Item onClick={() => navigate('/manager/rooms')}>
-                        <HomeOutlined />
-                        <div>Phòng</div>
-                    </Item>
-                    <Item onClick={() => navigate('/manager/service')}>
-                        <KeyOutlined />
-                        <div>Dịch vụ</div>
-                    </Item>
-                    <Item onClick={() => navigate('/manager/blogs')}>
-                        <FileDoneOutlined />
-                        <div>Blogs</div>
-                    </Item>
-                    <Item onClick={() => navigate('/manager/bookings')}>
-                        <CalendarOutlined />
-                        <div>Đặt phòng / vé</div>
-                    </Item>
+                    {isManager && (
+                        <>
+                            <Item onClick={() => navigate('/staff/rooms')}>
+                                <HomeOutlined />
+                                <div>Phòng</div>
+                            </Item>
+                            <Item onClick={() => navigate('/staff/service')}>
+                                <KeyOutlined />
+                                <div>Dịch vụ</div>
+                            </Item>
+                        </>
+                    )}
+                    {isEmployee && (
+                        <>
+                            <Item onClick={() => navigate('/staff/blogs')}>
+                                <FileDoneOutlined />
+                                <div>Blogs</div>
+                            </Item>
+                            <Item onClick={() => navigate('/staff/bookings')}>
+                                <CalendarOutlined />
+                                <div>Đặt phòng / vé</div>
+                            </Item>
+                        </>
+                    )}
                 </Hotel>
                 <Hotel>
                     <Content>KHÁCH HÀNG | NHÂN SỰ</Content>
-                    <Item onClick={() => navigate('/manager/listManager')}>
-                        <TeamOutlined />
-                        <div>Quản lý</div>
-                    </Item>
-                    <Item onClick={() => navigate('/manager/employee')}>
-                        <TeamOutlined />
-                        <div>Nhân viên</div>
-                    </Item>
-                    <Item onClick={() => navigate('/manager/customer')}>
-                        <TeamOutlined />
-                        <div>Khách hàng</div>
-                    </Item>
+                    {isManager && (
+                        <Item onClick={() => navigate('/staff/employee')}>
+                            <TeamOutlined />
+                            <div>Nhân viên</div>
+                        </Item>
+                    )}
+                    {isEmployee && (
+                        <Item onClick={() => navigate('/staff/customer')}>
+                            <TeamOutlined />
+                            <div>Khách hàng</div>
+                        </Item>
+                    )}
+                    {isEmployer && (
+                        <Item onClick={() => navigate('/staff/listManager')}>
+                            <TeamOutlined />
+                            <div>Quản lý</div>
+                        </Item>
+                    )}
                 </Hotel>
             </SidebarContent>
         </SidebarContainer>

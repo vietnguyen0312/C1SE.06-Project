@@ -11,18 +11,15 @@ import Employee from "../Layout/PrivateLayout/Employee";
 import Customer from "../Layout/PrivateLayout/Customer";
 import Service from "../Layout/PrivateLayout/Service";
 import Manager from "../Layout/PrivateLayout/Manager";
-const ManagerRouter = [
+
+const StaffRouter = [
     {
-        element: <ProtectedRoute role='MANAGER' />,
+        element: <ProtectedRoute role='EMPLOYEE' />,
         children: [
             {
-                path: "/manager",
+                path: "/staff",
                 element: <MainLayout />,
                 children: [
-                    {
-                        index: true,
-                        element: <Dashboard />,
-                    },
                     {
                         path: "createBlog",
                         element: <CreateBlog />,
@@ -44,20 +41,50 @@ const ManagerRouter = [
                         element: <Bookings />,
                     },
                     {
-                        path: "rooms",
-                        element: <Rooms />,
+                        path: "customer",
+                        element: <Customer />,
+                    },
+                ],
+            }
+        ]
+    },
+    {
+        element: <ProtectedRoute role='MANAGER' />,
+        children: [
+            {
+                path: "/staff",
+                element: <MainLayout />,
+                children: [
+                    {
+                        index: true,
+                        element: <Dashboard />,
                     },
                     {
                         path: "employee",
                         element: <Employee />,
                     },
                     {
-                        path: "customer",
-                        element: <Customer />,
+                        path: "rooms",
+                        element: <Rooms />,
                     },
                     {
                         path: "service",
                         element: <Service />,
+                    },
+                ],
+            }
+        ]
+    },
+    {
+        element: <ProtectedRoute role='EMPLOYER' />,
+        children: [
+            {
+                path: "/staff",
+                element: <MainLayout />,
+                children: [
+                    {
+                        path: "profile",
+                        element: <Profile />,
                     },
                     {
                         path: "listManager",
@@ -69,4 +96,4 @@ const ManagerRouter = [
     }
 ];
 
-export default ManagerRouter;
+export default StaffRouter;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Input, Menu, Dropdown } from "antd";
 import {
@@ -7,7 +7,9 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import axios from '../../Configuration/AxiosConfig';
 const { Search } = Input;
+import { getRoles, getRedirectPath } from '../../Service/Login';
 
 const SidebarHeader = styled.div`
   font-size: 60px;
@@ -103,25 +105,39 @@ const StyledLogoutOutlined = styled(LogoutOutlined)`
 
 const Header = () => {
   const navigate = useNavigate();
+  const [myInfo, setMyInfo] = useState(null);
+
+  useEffect(() => {
+    const fetchMyInfo = async () => {
+      const response = await axios.get('/users/myInfo');
+      setMyInfo(response.result);
+    };
+    fetchMyInfo();
+  }, []);
+
+  const handleLogout = async () => {
+    const token = localStorage.getItem('token');
+    localStorage.removeItem('token');
+    await axios.post('/auth/logout', { token });
+    navigate('/');
+  };
+
   const UserMenu = (
     <StyledMenu>
       <Menu.Item key="0" style={{ fontSize: "15px", fontWeight: "bold" }}>
-        Name
+        {myInfo?.username}
       </Menu.Item>
       <Menu.Item key="1" style={{ fontSize: "14px", color: "#c0bfbf" }}>
-        email@gmail.com
+        {myInfo?.email}
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="2" onClick={() => navigate("/manager/profile")}>
-        Profile
+      <Menu.Item key="2" onClick={() => navigate("/staff/profile")}>
+        Thông tin cá nhân
       </Menu.Item>
-      <Menu.Item key="3">Help</Menu.Item>
-      <Menu.Item key="4">Message</Menu.Item>
-      <Menu.Item key="5">Setting</Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="6">
+      <Menu.Item key="6" onClick={handleLogout}>
         <StyledLogoutOutlined />
-        Logout
+        Đăng xuất
       </Menu.Item>
     </StyledMenu>
   );
@@ -132,7 +148,7 @@ const Header = () => {
           <HeaderLeftContent>
             <SidebarHeader
               className="Allison"
-              onClick={() => navigate("/manager")}
+              onClick={() => navigate(getRedirectPath(getRoles(localStorage.getItem('token'))))}
             >
               Healings
             </SidebarHeader>

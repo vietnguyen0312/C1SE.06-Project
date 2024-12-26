@@ -10,11 +10,9 @@ export const getRoles = (token) => {
 
 export const getRedirectPath = (roles) => {
     if (roles.includes('MANAGER'))
-        return '/manager';
-    else if (roles.includes('EMPLOYER'))
-        return '/employer';
+        return '/staff';
     else if (roles.includes('EMPLOYEE'))
-        return '/employee';
+        return '/staff/bookings';
     return '/';
 };
 
